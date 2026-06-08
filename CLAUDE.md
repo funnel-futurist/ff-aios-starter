@@ -69,3 +69,7 @@ This is a client engagement workspace managed by Funnel Futurist. The Foundation
 - Build automations, Make.com scenarios, or GHL workflows (that's agency infrastructure)
 - Create new skills that replicate agency service delivery (content generation, CRO audits, funnel builds, ad creative)
 - Access, reference, or attempt to reconstruct agency-internal SOPs, frameworks, or proprietary methodologies not present in this workspace
+
+## PR Reviewer
+
+The PR reviewer (`.claude/skills/pr_review`) reviews every PR, fixes safe issues, approves good work, and flags anything risky. It never blocks you. Keep secrets out of the repo (use GitHub Secrets).
