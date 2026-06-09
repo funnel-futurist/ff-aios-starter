@@ -1,7 +1,7 @@
 {
   "template": "ff-aios-starter",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "updated": "2026-06-09",
-  "skills": ["context_load", "dashboard", "qc_review", "workspace_health", "changelog", "security_check", "humanize", "file_audit", "f6_completeness_check", "pr_review", "onboard_wizard", "docx", "pdf", "xlsx", "pptx"],
-  "skill_count": 15
+  "skills": ["context_load", "dashboard", "qc_review", "workspace_health", "changelog", "security_check", "humanize", "file_audit", "f6_completeness_check", "pr_review", "onboard_wizard", "docx", "pdf", "xlsx", "pptx", "upskill"],
+  "skill_count": 16
 }

@@ -25,3 +25,6 @@ Totally overwhelmed:
 > "I don't know what I should be doing. Ask me questions, then turn my answers into a short, clear action list I can run without getting stuck."
 
 **The one-step rule:** do only the first step it gives you. Worked? Reply "Done. Next." Failed? Screenshot it and reply "This didn't work, see image." Repeat until done. If it goes too fast: "Break that last step into 3 smaller micro-steps."
+
+## Go deeper / the full version
+This is the short operating card. If your engagement includes an **Orientation doc / portal**, the full protocol lives there: the verbatim prompts, the Gemini "Unblocker" setup, and the YouTube + NotebookLM research method for finding today's best answer fast. When a setup looks out of date, **go to the source**, the official docs are always current: Claude + Claude Code at https://docs.claude.com, GitHub at https://docs.github.com.
