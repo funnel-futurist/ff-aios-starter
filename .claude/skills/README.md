@@ -10,6 +10,7 @@ Skills are pre-built moves your AIOS can run by name. Type `/` in Claude Code to
 | **context_load** | Reads your whole workspace and gives you a session brief (what's here, what's active). | `/context_load` |
 | **dashboard** | Quick status: open tasks, what's in the review queue, what's coming up. | `/dashboard` |
 | **grill_me** | Pressure-tests your thinking before you act. DECIDE mode runs the Define-Before-You-Build gate so you never build the wrong thing; CAPTURE mode interviews you and writes a process/offer/decision into a clean doc so nothing tacit gets lost. Sparring partner, not answer machine. | `/grill_me` |
+| **project_management** | Break-glass clarity when your plate is overwhelming. Dump everything on it; it triages the whole plate on a value x energy 2x2, tags each by acquisition/fulfillment/operations, flags what you're avoiding, names the one lever, and hands back own/delegate/automate/eliminate + a single "do this next." Pairs with grill_me (grill_me = one decision; this = the whole plate). | `/project_management` |
 | **upskill** | Researches what Claude Code + the ecosystem now offer for YOUR workflows, grills you on skill-bloat (you can have 500 skills and use 10), and proposes what to add, update, or retire. Stay current and lean. | `/upskill` |
 | **pr_review** | Your guardian. Reviews every pull request, auto-fixes safe issues, flags real risk, approves good work. Never blocks you. | runs on PRs |
 | **qc_review** | Reviews a deliverable against your brand voice and quality standards. | `/qc_review` |
