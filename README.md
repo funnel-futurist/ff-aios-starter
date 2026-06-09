@@ -1,101 +1,42 @@
-# Welcome to Your Funnel Futurist Client Hub
+# Your AIOS: an AI operating system for your business
 
-This repo is your centralized workspace for everything related to your engagement with Funnel Futurist. It's where strategy lives, deliverables land, and decisions get tracked.
+This template gives you a working **AI operating system**: one repo that becomes your business's second brain, run by Claude Code. Click **"Use this template,"** and in a few minutes you (and your team) are operating with AI: an always-on PR reviewer watching your back, a guided setup wizard, and a safety net for when you get stuck.
 
----
-
-## How This Works
-
-**We build. You review. We iterate. Everything stays here.**
-
-1. **01_Foundations/** — Your Foundational 6. We build this during onboarding. You maintain it as your business evolves. This is the source of truth for all strategy and creative work.
-
-2. **02_Deliverables/** — Finished work lands here, organized by type. Copy, funnels, ads, emails, webinars, reports. Review here, feedback goes in 03.
-
-3. **03_Quality_Control/** — Your brand preferences, approval standards, and revision history. Update `qc_preferences.md` anytime your taste evolves. We use it to calibrate everything we produce.
-
-4. **04_Customer_Journey/** — Where you are, what's next, what we're measuring. Your engagement timeline and success metrics live here.
-
-5. **05_Assets/** — Your existing brand assets. Logo, colors, fonts, voice guide, and any content you had before working with us.
-
-6. **06_Communication/** — Async paper trail. Decisions, feedback, daily handoff, unstuck protocol. Nothing gets lost in Slack.
-
-7. **07_Setup/** — Interactive setup walkthroughs for VAs and founders. Living docs that evolve with your workspace.
+**AIOS is the *mechanism*, not the tool.** The agent (Claude Code today) is interchangeable; the system (your brain, your folders, your skills) is what compounds.
 
 ---
 
-## Connected Platforms
+## Start in 3 steps
 
-| Platform | What It Does | Your Access |
-|---|---|---|
-| **This Repo (GitHub)** | Strategy, deliverables, decisions | Full read/write |
-| **Google Drive** | Shared folder for large files, docs, collaboration | Your folder only |
-| **GoHighLevel** | CRM, pipeline, automations, booking | Sub-account (yours) |
+1. **Use this template** → click the green **"Use this template"** button → you get your own private repo. That repo *is* your AIOS.
+2. **Open it in Claude Code** and run **`/onboard_wizard`**: it walks you through the whole setup (pick your tool, clone the repo, add your keys, invite your team) and captures your vision / mission / values.
+3. **Go.** Open a PR and the reviewer has your back; get stuck and the unstuck protocol gets you moving.
 
-Your Google Drive folder link and GHL sub-account details will be provided during onboarding.
+Full written walkthrough (caveman mode, no skipped steps): **[GETTING_STARTED.md](GETTING_STARTED.md)**.
 
 ---
 
-## Using Claude Code
+## What's inside
 
-This repo is pre-configured for Claude Code with security settings and starter skills. See **[GETTING_STARTED.md](GETTING_STARTED.md)** for full setup instructions based on your tech comfort level.
-
-**Quick version:**
-- **Non-technical?** Download the **Claude Desktop** app, open the Code tab, point it at this folder. Done.
-- **Technical?** Clone the repo, open in **VS Code** with the Claude Code extension, run `/init`.
-
-Claude can help you:
-- Draft content briefs based on your F6
-- Review deliverables against your QC preferences (`/qc_review`)
-- Get a quick status brief (`/dashboard`)
-- Track what's been decided and what's pending
-- Navigate your engagement timeline
-
-**You don't need Claude Code to work with us.** It's a power tool for clients who want to move faster on their side.
-
----
-
-## How We Work Together (Async)
-
-Your VA and our team deliver work through this repo. Here's the daily rhythm:
-
-1. **VA works** → pushes updates to GitHub
-2. **Finished work** lands in `02_Deliverables/_review_queue/`
-3. **Daily handoff** posted in `06_Communication/daily_handoff.md`
-4. **You review** next morning — approve, give feedback, or ask questions
-5. **Task board** in `04_Customer_Journey/task_tracker.md` tracks everything
-
-No meetings required for day-to-day work. The repo is the collaboration layer.
-
----
-
-## Receiving Updates
-
-We periodically improve this template — new skills, better security defaults, updated documentation. Updates arrive as a **pull request** on your repo. You (or your VA) review and merge. Nothing changes without your approval.
-
-This is a maintenance perk of working with Funnel Futurist — your workspace stays current as our tools evolve.
-
----
-
-## File Naming Rules
-
-All files in this repo follow a simple naming convention. See `taxonomy_rules.md` for details.
-
-**Quick version:** lowercase, underscores, no spaces. Prefixes tell you what the file is:
-- `ref_` = reference document (read, don't edit)
-- `sop_` = standard operating procedure
-- `qc_` = quality control document
-- Files you edit have no prefix — just descriptive names.
-
----
-
-## Getting Help
-
-| Need | Where |
+| Piece | What it is |
 |---|---|
-| Quick question | Your Slack channel (#[your-name]-funnel-futurists) |
-| Scheduled technical call | Book a Technical Support Call |
-| Emergency / stuck | Book an AIOS Hot Seat |
-| Self-serve | Ask Claude in this workspace |
+| **Your workspace** (`01_Foundations/` → `09_Archive/`) | Where your strategy, deliverables, brain, and history live. `01_Foundations/` holds your Foundational 6 (market, avatar, offer, economics, pitch, profile). |
+| **Skills** (type `/`) | Pre-built workflows: `onboard_wizard`, `context_load`, `dashboard`, `qc_review`, `workspace_health`, `pr_review` (your guardian), and more. Add your own. |
+| **The PR reviewer** ([docs/PR_REVIEWER_SETUP.md](docs/PR_REVIEWER_SETUP.md)) | Reviews every PR, auto-fixes safe issues, approves good work, flags real risk. **Never blocks you.** ~2-min setup. |
+| **The unstuck protocol** ([docs/UNSTUCK_PROTOCOL.md](docs/UNSTUCK_PROTOCOL.md)) | Your safety net: caveman mode → screenshot + AI → YouTube (last 1–2 months) → NotebookLM → escalate. You'll solve ~99% yourself. |
+| **CLAUDE.md** | Your constitution; loads into every message. It's yours to shape (just follow the best practices in it). |
 
-Full setup guide: **[GETTING_STARTED.md](GETTING_STARTED.md)**
+---
+
+## The best practices (your guardrails)
+
+- **Secrets stay out of the repo.** Keys live in `.env` (gitignored); set a spend limit on each; turn on 2FA. (Airlocks: scope access, contain the blast radius.)
+- **Reversible by default.** Commit early and often; don't force-push or delete important work.
+- **Lean beats bloated.** Add the high-impact core; look the specifics up as you go.
+- **Never run skills from sources you don't trust.**
+
+---
+
+## It's yours
+
+This is *your* AIOS: own it, shape it, grow it. We give you a clean, secure, best-practice starting point; what you build on top is up to you. As the tooling evolves, improvements arrive as **pull requests** you review and merge, so nothing changes without your approval.
