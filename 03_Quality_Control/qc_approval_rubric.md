@@ -47,6 +47,6 @@ We'll flag it explicitly: "Your preference is X, but our data suggests Y perform
 ## Escalation
 
 If we disagree on quality or direction:
-1. Reference the F6 — does it support your position or ours?
+1. Reference the F6, does it support your position or ours?
 2. If F6 is ambiguous, we discuss and update the F6
 3. Client has final say on taste. Agency has final say on strategy.

@@ -1,6 +1,6 @@
 # Offer Optimization
 
-> Your offer stack — what you sell, how it's positioned, and why it's the obvious choice.
+> Your offer stack, what you sell, how it's positioned, and why it's the obvious choice.
 
 ---
 

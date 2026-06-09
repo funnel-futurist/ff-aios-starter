@@ -30,5 +30,5 @@
 
 - **VA:** Update task status at end of day before writing the daily handoff.
 - **Founder:** Review when you open the repo. Move approved items to Completed.
-- **Both:** Add new tasks as they come up. Keep descriptions short — one line per task.
-- **Rule:** If a task is blocked for more than 24 hours, it goes in the daily handoff as "Blocked — needs your input."
+- **Both:** Add new tasks as they come up. Keep descriptions short, one line per task.
+- **Rule:** If a task is blocked for more than 24 hours, it goes in the daily handoff as "Blocked, needs your input."

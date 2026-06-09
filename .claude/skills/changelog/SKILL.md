@@ -20,16 +20,16 @@ Run `git log --oneline -20` (or since the last changelog entry date if one exist
 
 ### Step 2: Group by Category
 Organize commits into:
-- **Strategy Docs** — F6 updates, new docs in 01_Foundations/
-- **Deliverables** — New work in 02_Deliverables/
-- **Workspace Updates** — Template changes, new skills, config updates
-- **Communication** — Meeting notes, decisions, feedback logged
-- **Other** — Anything that doesn't fit above
+- **Strategy Docs**, F6 updates, new docs in 01_Foundations/
+- **Deliverables**, New work in 02_Deliverables/
+- **Workspace Updates**, Template changes, new skills, config updates
+- **Communication**, Meeting notes, decisions, feedback logged
+- **Other**, Anything that doesn't fit above
 
 ### Step 3: Write in Plain English
 For each item:
 - BAD: "feat: add doc_2_avatar_analysis.md to 01_Foundations/avatar_analysis/"
-- GOOD: "Your Avatar Analysis document was added — Claude now knows your ideal client profile"
+- GOOD: "Your Avatar Analysis document was added, Claude now knows your ideal client profile"
 
 ### Step 4: Append to Changelog
 Add the entry to `06_Communication/changelog.md` (create the file if it doesn't exist).
@@ -56,4 +56,4 @@ Append to the TOP of the changelog (newest first).
 ## FORBIDDEN
 - No git jargon (commits, hashes, branches, merges)
 - No file paths unless the reader needs to find the file
-- No technical descriptions — write for a founder who doesn't code
+- No technical descriptions, write for a founder who doesn't code

@@ -2,6 +2,8 @@
 
 > One-page executive summary of where the business is right now. Updated at the start of each engagement phase.
 
+> Works two ways: **standalone** (you own and run your AIOS yourself) or **agency-managed** (an agency like Funnel Futurist set it up with you). Where this says "your agency," that means them, or you if you're solo.
+
 ---
 
 ## Business Overview
@@ -58,10 +60,10 @@
 
 ## Engagement Scope
 
-**What Funnel Futurist is handling:**
+**What your agency is handling** (or what you're owning yourself if you're solo):
 -
 
-**What the client owns:**
+**What the founder/business owns:**
 -
 
 ---

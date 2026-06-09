@@ -15,15 +15,15 @@ Specify one of:
 
 ## Steps
 
-1. Read `03_Quality_Control/qc_preferences.md` — client's brand voice, visual preferences, and taste standards.
-2. Read `03_Quality_Control/qc_approval_rubric.md` — the shared approval criteria.
-3. Read the relevant F6 docs from `01_Foundations/` — especially avatar analysis (voice/language) and pitch & messaging (positioning).
+1. Read `03_Quality_Control/qc_preferences.md`, client's brand voice, visual preferences, and taste standards.
+2. Read `03_Quality_Control/qc_approval_rubric.md`, the shared approval criteria.
+3. Read the relevant F6 docs from `01_Foundations/`, especially avatar analysis (voice/language) and pitch & messaging (positioning).
 4. Review the target deliverable against all three layers: agency standards, client preferences, and F6 alignment.
 
 ## Output
 
 ```
-QC REVIEW — [filename or description]
+QC REVIEW, [filename or description]
 
 VERDICT: PASS / FLAG / REVISE
 
@@ -34,7 +34,7 @@ VERDICT: PASS / FLAG / REVISE
 STRENGTHS:
 - [what's working well]
 
-SUMMARY: [1-2 sentences — overall quality and whether it's ready for client review]
+SUMMARY: [1-2 sentences, overall quality and whether it's ready for client review]
 ```
 
 ## Rules
@@ -43,5 +43,5 @@ SUMMARY: [1-2 sentences — overall quality and whether it's ready for client re
 - **Major** = significantly weakens the piece. Should fix.
 - **Minor** = polish issue. Fix if time permits.
 - PASS = 0 critical, 0 major issues. FLAG = 0 critical, 1+ major. REVISE = 1+ critical.
-- If QC preferences are empty, flag it: "QC preferences not yet configured — reviewing against agency standards only."
-- Be specific. "Tone is off" is not a fix. "Paragraph 3 uses passive voice — rewrite as direct address" is.
+- If QC preferences are empty, flag it: "QC preferences not yet configured, reviewing against agency standards only."
+- Be specific. "Tone is off" is not a fix. "Paragraph 3 uses passive voice, rewrite as direct address" is.

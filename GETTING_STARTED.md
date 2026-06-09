@@ -1,145 +1,56 @@
-# Getting Started
+# Getting Started: from nothing to operating (caveman mode, no skipped steps)
 
-> Your first 10 minutes with this workspace.
+> Fastest path once you're in: open this repo in Claude Code and run **`/onboard_wizard`**, it walks you through the rest interactively. This page is the full written reference. If any step is fuzzy, use the unstuck protocol ([docs/UNSTUCK_PROTOCOL.md](docs/UNSTUCK_PROTOCOL.md)) or search YouTube for the exact step (a video from the **last 1-2 months**, the tools change fast).
 
----
+## Two things to know before you click anything
+1. **A GitHub account is the real first step.** You cannot click "Use this template" without one. So you make that account first, before anything else.
+2. **Your Claude *subscription* and your *API key* are two different things.** The subscription (at claude.ai) is what lets you chat with Claude. The API key (at console.anthropic.com, same login) is what lets Claude Code act on its own (run skills, edit and commit files). You'll set up both. Most people get confused here, so just know: two dashboards, one Anthropic login.
 
-## Step 0: How Technical Are You?
-
-Rate yourself 1-10: *"How comfortable are you opening Terminal on your computer, typing a command, and pressing Enter?"*
-
-| Your Score | Your Path | Your VA's Job |
-|---|---|---|
-| **1-3** ("What's Terminal?") | Use **Claude Desktop** app only. Your VA handles everything else. | Full setup: GitHub, folder structure, security config, all integrations |
-| **4-6** ("I've used it but I'm not confident") | Use **Claude Desktop** + **GitHub Desktop** (visual Git). VA handles security and advanced setup. | Security config, integrations, server setup if needed |
-| **7-10** ("I live in the terminal") | Use **VS Code + Claude Extension** or terminal. Self-serve most setup. | Collaboration partner, not setup lead |
+**Heads up (things that quietly block people):** you'll need a payment method for the Claude subscription; admin rights on your computer if you go the install route; a Google account for the Drive step; and each teammate needs their *own* GitHub account before you can add them. Use a real business email you'll keep.
 
 ---
 
-## For Everyone: What You Need
+## The critical path (do these in order)
 
-1. **A Claude subscription** — **Team plan** ($25/user/mo) recommended. Sign up at [claude.ai](https://claude.ai). Gives admin controls and you can add your VA later under one bill.
-   - If you don't have a company email (G Suite), start with **Pro** ($20/mo) and upgrade to Team when ready.
-2. **A GitHub account** — Free. Sign up at [github.com](https://github.com). Your VA needs one too.
+1. **Create your GitHub account, then turn on 2FA.** Go to github.com, sign up (free is fine), verify your email, pick a professional username (it shows in your repo URL). Then immediately: Settings → Password and authentication → enable Two-factor authentication with an authenticator app (not SMS), and save your recovery codes. A compromised GitHub account means someone else owns your brain. Lock it now.
 
----
+2. **Create your Anthropic account and subscribe.** Go to claude.ai, sign up, then subscribe (Pro is $20/mo; Max is $100/mo, pick Max if you'll use it heavily or run a team). This gives you the Claude interface.
 
-## Path A: Non-Technical Founder (Score 1-5)
+3. **Use this template to make your own repo.** On the template's GitHub page, click the green **"Use this template"** → Create a new repository. Set it to **Private** (this is your business brain, not public). Name it something like `my-aios`. Click Create. That repo *is* your AIOS.
 
-### Your Setup (5 minutes)
+4. **Pick how you'll run Claude Code.** Three options: **Web** (claude.ai in the browser, easiest, no install), **Desktop** (the Claude app), or **VS Code** (recommended, you see all your files next to the chat and have full control). Choose before the next step, because the next steps differ by path.
 
-1. **Download Claude Desktop** from [claude.ai/download](https://claude.ai/download) (Mac or Windows)
-2. **Sign in** with your Claude subscription
-3. **Open the Code tab** in Claude Desktop
-4. **Point it at this folder** (your VA will have cloned it to your computer during setup)
-5. **Type:** `/context_load` — Claude reads your workspace and gives you a briefing
+5. **(Desktop / VS Code only) Install git.** Git keeps your repo synced between GitHub and your computer. Mac: open Terminal, type `git --version`, accept the install prompt if it appears. Windows: download from git-scm.com/download/win and run it with all defaults. Then `git --version` should print a number. (Web path: skip 5-7.)
 
-That's it. You're running.
+6. **(Desktop / VS Code only) Clone your repo onto your computer.** On your repo, click the green **Code** button, copy the HTTPS URL. Open Terminal (Mac) or Command Prompt / PowerShell (Windows), type `git clone <paste-the-url>` and press Enter. The folder it creates *is* your AIOS on your machine.
 
-### Your Daily Workflow
+7. **Open Claude Code in your AIOS folder.** VS Code: File → Open Folder → pick the cloned folder. You should see `CLAUDE.md`, `GETTING_STARTED.md`, and the `01`-`09` folders in the sidebar.
 
-**Morning:**
-- Open Claude Desktop → Code tab → this folder
-- Ask: *"What's my status? What needs my attention?"*
-- Check `02_Deliverables/_review_queue/` if Claude says there's something to review
-- Approve or give feedback
+8. **Get your Anthropic API key (this is the separate one).** Go to console.anthropic.com (same login), API Keys → Create key. Name it specifically, like `my-aios-claude-code`, so you can revoke just that one later. **Copy it now, you can't see it again.** Then set a spend limit on the key (start at $20-$50/mo) so a runaway script can't surprise you.
 
-**Anytime:**
-- Ask Claude anything about your business — it knows your F6, your timeline, your preferences
-- Draft content briefs, review copy, check metrics — just describe what you need
-- Your VA handles all the technical building
+9. **Create your `.env` file and paste the key in.** In your AIOS folder, make a file named exactly `.env`. The repo is already set to never upload this file to GitHub. Add one line: `ANTHROPIC_API_KEY=your-key-here`. Save. This is the only place your key lives. Never put it in any other file or a chat message. Every future key (Google, etc.) goes here too.
 
-### Your VA Did This For You
+10. **Run `/onboard_wizard`.** In Claude Code, type `/onboard_wizard` and press Enter. It asks who you are (founder / operator / VA), captures your vision, mission, and values, confirms your folder structure, and personalizes your AIOS to your real business. Answer each question; wait for it to say done.
 
-Your Technical VA already:
-- Cloned this repo to your computer
-- Configured security settings (Claude can't read your API keys)
-- Set up GitHub so you and your VA stay in sync
-- Created your billing account (Team plan)
-- Loaded your Foundational 6 docs into `01_Foundations/`
+11. **Invite your team on GitHub.** Your repo → Settings → Collaborators → Add people → type each teammate's GitHub username (they each need their own account first; send them step 1). Give operators/VAs **Write**, view-only people **Read**. Now everyone shares the same brain.
+
+12. **Learn the sync loop: commit, push, pull.** Commit = save a labeled snapshot locally. Push = upload your commits to GitHub so the team sees them. Pull = download what teammates pushed. Claude does these for you when you ask, but the habit is simple: pull at the start of a session, commit + push at the end. That keeps everyone in sync.
+
+13. **Turn on the PR reviewer (2 minutes).** Open [docs/PR_REVIEWER_SETUP.md](docs/PR_REVIEWER_SETUP.md) and follow it. A PR (pull request) is a proposed change before it's merged. The reviewer reads every PR, flags real risks, auto-fixes safe things, and approves good work. It never blocks you. It's your safety net.
+
+14. **Bookmark the unstuck protocol.** Open [docs/UNSTUCK_PROTOCOL.md](docs/UNSTUCK_PROTOCOL.md) and pin it. The order: caveman-mode Claude → screenshot + AI → YouTube (last 1-2 months) → NotebookLM → escalate to a human. Between Claude Code and this, you'll solve ~99% yourself.
+
+15. **Connect Google Drive (so your brain stays current).** This lets your AIOS read and write your real documents. In console.cloud.google.com: New Project → name it → APIs and Services → Enable APIs, and turn on **only** the document suite you'll use: **Drive**, **Docs**, **Sheets**, **Slides**. Don't enable everything (least privilege; add Gmail/Calendar later only when you have a reason). Create credentials, put the key in `.env`, then point your `01_Foundations/` docs at your real Drive files so they stay on the latest version. Stuck? Unstuck protocol → search "Google Drive API key Cloud Console."
 
 ---
 
-## Path B: Technical Founder (Score 6-10)
+## You're set up when all of these are true
+Subscription active · your private repo created · Claude Code running (web or local) · API key in `.env` · `/onboard_wizard` run · team invited to the repo · secure (2FA on, named keys with spend limits) · unstuck protocol bookmarked.
 
-### Your Setup (10 minutes)
+**Prove it's actually working:** run `/context_load`, then `/f6_completeness_check`, then ask *"what do you understand about my business?"* If Claude answers with specifics from your own docs, your brain is wired right. A generic answer means Drive, your `01_Foundations/`, or your key isn't connected yet, fix that before you rely on it.
 
-1. **Clone this repo:**
-   ```bash
-   git clone https://github.com/[your-org]/[your-repo].git
-   cd [your-repo]
-   ```
-
-2. **Open in VS Code** (with Claude Code extension installed) or **Claude Desktop** (Code tab)
-
-3. **Run `/init`** — Claude reads the workspace and generates a summary
-
-4. **Run `/context_load`** — get your session brief
-
-5. **If you need API integrations:**
-   ```bash
-   cp .env.example .env
-   # Fill in your keys from 1Password → save → close
-   # Claude Code CANNOT read this file — that's the security feature
-   ```
-
-### Collaborating With Your VA
-
-- Your VA works on a **branch**, you review and approve merges to **main**
-- Daily handoff: `06_Communication/daily_handoff.md` — your VA posts end-of-day updates here
-- Task board: `04_Customer_Journey/task_tracker.md` — single source of truth for all work
-- Review queue: `02_Deliverables/_review_queue/` — finished work lands here for your approval
-- Decisions: `06_Communication/decisions_log.md` — every strategic call gets logged here
+Caveman version: **account + subscription + repo + running + key secured + team on it + safety net + proof it works.**
 
 ---
 
-## What Claude Can Do In This Workspace
-
-| Ask Claude... | It Will... |
-|---|---|
-| "What's my status?" | Read your task tracker, handoff, and review queue |
-| "Draft a content brief for [topic]" | Use your F6 to write a brief in your brand voice |
-| "Review this copy" | Check it against your QC preferences and F6 positioning |
-| "What decisions have we made?" | Pull from the decisions log |
-| "Summarize my last call" | Process notes from `06_Communication/meeting_notes/` |
-| "What's blocked?" | Check the task tracker for stuck items |
-
-### Skills (Pre-Built Workflows)
-
-| Command | What It Does |
-|---|---|
-| `/context_load` | Reads your entire workspace and gives a session brief |
-| `/dashboard` | Quick status — tasks, review queue, upcoming deadlines |
-| `/qc_review` | Reviews a deliverable against your brand preferences |
-
----
-
-## Keeping This Workspace Updated
-
-Your Funnel Futurist team may push updates to this template over time — new skills, improved documentation, security patches. These updates arrive as a **pull request** on your repo. You review and merge them. Nothing changes without your approval.
-
-This is a maintenance perk of working with Funnel Futurist — your workspace stays current as our tools evolve.
-
----
-
-## Need Help?
-
-| Need | Where |
-|---|---|
-| Quick question | Your Slack channel (#[your-name]-funnel-futurists) |
-| Scheduled technical call | Book a Technical Support Call |
-| Emergency / stuck | Book an AIOS Hot Seat |
-| Self-serve | Ask Claude in this workspace — it knows your F6 and engagement context |
-
----
-
-## Security: How We Protect Your Keys
-
-- **Claude Code cannot read your `.env` file.** The `.claude/settings.json` in this repo blocks it.
-- **Your `.env` file is never committed to GitHub.** The `.gitignore` blocks it.
-- **API keys are never sent over Slack, email, or text.** They go through your password manager (1Password recommended) only.
-- **If a key is ever accidentally shared in a message**, tell your Funnel Futurist team immediately. We revoke and regenerate within the hour.
-
----
-
-*Last updated: 2026-03-20*
+*This is your AIOS. `CLAUDE.md` is yours to shape as you grow. Just keep the guardrails (secrets out of the repo, reversible by default, lean over bloated, never run skills you don't trust).*
