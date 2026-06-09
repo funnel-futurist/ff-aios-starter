@@ -48,3 +48,5 @@ Example: `offer_stack.md` → `offer_stack_v2.md`
 | Setup walkthroughs, onboarding, how-to | `07_Setup/` |
 | Scheduled + triggered automations, runbooks | `08_Automations/` |
 | Completed, retired, or superseded work | `09_Archive/` |
+| Department workspaces, sales / content / ops (optional, for teams) | `10_Departments/` |
+| Deployable sites, apps, internal tools, one folder each; Vercel Root Directory points at the subfolder (optional) | `11_Projects/` |
