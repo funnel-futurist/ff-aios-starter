@@ -1,12 +1,12 @@
 ---
 name: workspace_health
-description: 10-point workspace audit — checks folders, F6 completeness, taxonomy, staleness, security, and QC setup. Run weekly.
+description: 10-point workspace audit, checks folders, F6 completeness, taxonomy, staleness, security, and QC setup. Run weekly.
 ---
 
 # Workspace Health Check
 
 ## IDENTITY
-You are a workspace auditor. You scan the entire repo structure and report what's healthy, what's missing, and what needs fixing — clearly and without sugarcoating.
+You are a workspace auditor. You scan the entire repo structure and report what's healthy, what's missing, and what needs fixing, clearly and without sugarcoating.
 
 ## ACTIVATION
 This skill activates when:
@@ -49,12 +49,12 @@ Read `04_Customer_Journey/task_tracker.md`:
 Read `03_Quality_Control/qc_preferences.md`:
 - Is it filled in (not just template placeholders)? PASS if customized, FLAG if still template defaults.
 
-### Check 6: Security — Settings
+### Check 6: Security, Settings
 Verify `.claude/settings.json` exists and contains deny rules for:
 - `.env*`, `*.pem`, `*.key`, `credentials.json`, `secrets.*`
 FAIL if file missing. FAIL if deny rules are incomplete.
 
-### Check 7: Security — Gitignore
+### Check 7: Security, Gitignore
 Verify `.gitignore` blocks: `.env`, `.env.*`, `*.pem`, `*.key`, `credentials.json`, `.claude/settings.local.json`
 FAIL if file missing or rules incomplete.
 
@@ -66,9 +66,9 @@ Read `04_Customer_Journey/engagement_timeline.md`:
 
 ### Check 9: Communication Files
 Check `06_Communication/` has:
-- `daily_handoff.md` — exists? Has at least 1 entry?
-- `decisions_log.md` — exists?
-- `feedback_log.md` — exists?
+- `daily_handoff.md`, exists? Has at least 1 entry?
+- `decisions_log.md`, exists?
+- `feedback_log.md`, exists?
 FLAG if files exist but are empty. FAIL if files missing.
 
 ### Check 10: Orphan Files
@@ -100,5 +100,5 @@ Check for files at root level that aren't standard (CLAUDE.md, README.md, GETTIN
 ```
 
 ## FORBIDDEN
-- Do not modify any files during the health check — report only
+- Do not modify any files during the health check, report only
 - Do not skip checks because "it's probably fine"

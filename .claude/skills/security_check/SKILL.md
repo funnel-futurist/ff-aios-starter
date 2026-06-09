@@ -1,6 +1,6 @@
 ---
 name: security_check
-description: Verify workspace security — deny rules, gitignore, no leaked credentials. Run after setup and periodically.
+description: Verify workspace security, deny rules, gitignore, no leaked credentials. Run after setup and periodically.
 ---
 
 # Security Check
@@ -36,7 +36,7 @@ Read `.gitignore`. Verify it blocks:
 
 ### Check 3: No .env Files Committed
 Run: `git ls-files | grep -E '\.env$|\.env\.'` (excluding .env.example)
-Should return empty. If any .env file is tracked by git, **FAIL** — it contains credentials.
+Should return empty. If any .env file is tracked by git, **FAIL**, it contains credentials.
 
 ### Check 4: No Secrets in Files
 Scan all tracked files for patterns:
@@ -47,7 +47,7 @@ Scan all tracked files for patterns:
 - `postgresql://` or `mongodb+srv://` (connection strings)
 - `-----BEGIN PRIVATE KEY` or `-----BEGIN RSA PRIVATE KEY`
 
-**FAIL** if any match found — credential is exposed. **PASS** if clean.
+**FAIL** if any match found, credential is exposed. **PASS** if clean.
 
 ### Check 5: No Secrets in Commit Messages
 Run: `git log --oneline -20 --format="%s"` and scan messages for the same patterns as Check 4.
@@ -69,11 +69,11 @@ Run: `git log --oneline -20 --format="%s"` and scan messages for the same patter
 | 5 | No Secrets in History | PASS/FAIL | [patterns found or "clean"] |
 
 **Action Required:**
-[If any FAIL — exact steps to fix, in order of urgency]
+[If any FAIL, exact steps to fix, in order of urgency]
 [If a credential was found: "REVOKE THIS KEY IMMEDIATELY at [platform]. Then regenerate and update your .env file."]
 ```
 
 ## FORBIDDEN
-- Never display the actual secret/key value in the report — just note that one was found and where
-- Never modify files during the security check — report only
-- If a real credential is found, the FIRST instruction is always "revoke immediately" — not "remove from file"
+- Never display the actual secret/key value in the report, just note that one was found and where
+- Never modify files during the security check, report only
+- If a real credential is found, the FIRST instruction is always "revoke immediately", not "remove from file"

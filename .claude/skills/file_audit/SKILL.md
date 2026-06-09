@@ -1,6 +1,6 @@
 ---
 name: file_audit
-description: Workspace drift detection — compares current structure against canonical template, flags missing docs, orphaned files, naming violations, and structural drift.
+description: Workspace drift detection, compares current structure against canonical template, flags missing docs, orphaned files, naming violations, and structural drift.
 ---
 
 # File Audit
@@ -86,7 +86,7 @@ For each of the 6 `01_Foundations/` subfolders:
 ```
 
 ## RULES
-- Do not modify any files during the audit — report only
+- Do not modify any files during the audit, report only
 - Do not skip checks or assume "probably fine"
-- Flag everything, even minor issues — the client decides what to fix
+- Flag everything, even minor issues, the client decides what to fix
 - If taxonomy_rules.md is missing, FAIL the entire audit and report that first

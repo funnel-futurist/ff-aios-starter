@@ -48,9 +48,9 @@ Check the text for these common tells:
 
 - Replace AI vocabulary with plain words ("additionally" → "also", "utilize" → "use")
 - Use "is" and "has" instead of "serves as" and "boasts"
-- Vary sentence length — short punchy, then longer flowing
-- Add specificity — dates, numbers, names instead of vague claims
-- Let personality in — opinions, conviction, real feelings
+- Vary sentence length, short punchy, then longer flowing
+- Add specificity, dates, numbers, names instead of vague claims
+- Let personality in, opinions, conviction, real feelings
 - Cut every word that doesn't earn its place
 
 ### Step 4: Final Check
@@ -73,8 +73,8 @@ Read the rewrite one more time and ask: "Would a stranger suspect AI wrote this?
 
 ## FORBIDDEN
 
-- Don't strip personality along with AI artifacts — MORE voice, not less
+- Don't strip personality along with AI artifacts, MORE voice, not less
 - Don't use any of the AI vocabulary words in YOUR rewrite
 - Don't make everything sound the same flat tone
-- Don't remove technical accuracy — facts stay, slop goes
+- Don't remove technical accuracy, facts stay, slop goes
 - If a sentence is already human, leave it alone
