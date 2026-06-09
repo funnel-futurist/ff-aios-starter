@@ -47,7 +47,9 @@
 ## You're set up when all of these are true
 Subscription active · your private repo created · Claude Code running (web or local) · API key in `.env` · `/onboard_wizard` run · team invited to the repo · secure (2FA on, named keys with spend limits) · unstuck protocol bookmarked.
 
-Caveman version: **account + subscription + repo + running + key secured + team on it + safety net.**
+**Prove it's actually working:** run `/context_load`, then `/f6_completeness_check`, then ask *"what do you understand about my business?"* If Claude answers with specifics from your own docs, your brain is wired right. A generic answer means Drive, your `01_Foundations/`, or your key isn't connected yet, fix that before you rely on it.
+
+Caveman version: **account + subscription + repo + running + key secured + team on it + safety net + proof it works.**
 
 ---
 

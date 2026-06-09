@@ -18,8 +18,8 @@ Your AIOS holds the keys to your business. Treat it that way. This is the short 
 ## If a key leaks (act in this order)
 1. **Revoke it immediately** in the platform that issued it (Anthropic Console, Google Cloud, etc.).
 2. **Generate a replacement**, put it in `.env`, and confirm `.env` is still gitignored (`git status` should not list it).
-3. If the key was ever committed, the value is in git history even after you delete the file. Rotate it; consider the old value burned.
-4. Tell anyone who shares the repo so they pull the change and don't reuse the dead key.
+3. **Tell your team in the open** (don't hide it). Anyone sharing the repo needs to stop using the dead key.
+4. **Scrub the history if it was committed.** If the key ever landed in a tracked file and got pushed, the value lives in git history forever (even after you delete the file), and bots scrape repos within minutes. Rotation in step 1 is what actually protects you, so treat the old value as burned. To also clean history: ask Claude Code to scrub it (`git filter-repo` or BFG), or for a brand-new repo just delete it and re-create from the template.
 
 ## Reporting a problem in the template itself
 Found a flaw in this template (a weak default, a missing guardrail)? Tell whoever gave you the template, or open a private issue on the upstream repo. Don't post secrets or live keys in an issue.
