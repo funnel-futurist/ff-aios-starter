@@ -25,6 +25,7 @@ When you catch yourself explaining the same task twice, make it a skill: a folde
 
 ## This brain evolves (staying current + updated)
 - **We'll add skills over time, but only what's actually useful to you.** If a skill isn't solving something specific in your business, it doesn't go in. We won't overwhelm you with capability you don't need.
+- **Install packs:** periodically we ship curated bundles of new, tested skills you can opt into, so you stay current without chasing every update yourself. You + your operator doing light research consistently = you stay ahead of the curve.
 - **Stay current yourself:** run `/upskill` now and then. The tools change monthly, this keeps you on today's best setup without bloat.
 - **Pull template updates:** you can re-pull improvements from the template brain on demand, or set up a **routine** (`/schedule`) to check for updates automatically. No database, no server, just a scheduled check you own.
 - **The template brain (copy it / share it):** github.com/funnel-futurist/ff-aios-starter → green **"Use this template."**
