@@ -40,8 +40,11 @@ Example: `offer_stack.md` → `offer_stack_v2.md`
 | Content Type | Folder |
 |---|---|
 | Strategy, research, positioning | `01_Foundations/` |
-| Finished work from the agency | `02_Deliverables/` |
+| Finished deliverables (copy, ads, emails, funnels, reports) | `02_Deliverables/` |
 | Your brand preferences, revision notes | `03_Quality_Control/` |
 | Timeline, milestones, KPIs | `04_Customer_Journey/` |
 | Logos, fonts, colors, existing content | `05_Assets/` |
 | Decisions, feedback, meeting notes | `06_Communication/` |
+| Setup walkthroughs, onboarding, how-to | `07_Setup/` |
+| Scheduled + triggered automations, runbooks | `08_Automations/` |
+| Completed, retired, or superseded work | `09_Archive/` |
