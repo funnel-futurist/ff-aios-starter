@@ -25,9 +25,9 @@
 
 ## Copy Preferences
 
-**Headlines — prefer:** <!-- Direct? Curiosity? Question? Story? -->
-**Body copy — prefer:** <!-- Short and punchy? Long-form and detailed? -->
-**CTA style — prefer:** <!-- Urgent? Soft? Conversational? -->
+**Headlines, prefer:** <!-- Direct? Curiosity? Question? Story? -->
+**Body copy, prefer:** <!-- Short and punchy? Long-form and detailed? -->
+**CTA style, prefer:** <!-- Urgent? Soft? Conversational? -->
 
 ---
 

@@ -1,6 +1,6 @@
 # 09_Archive
 
-Where finished, retired, or superseded work goes to rest — without cluttering your active workspace.
+Where finished, retired, or superseded work goes to rest, without cluttering your active workspace.
 
 ## Why this exists
 Your AIOS is a garden: water it and it grows, but weeds grow too. Archiving is how you **trim without throwing away.** Move things here when they're done or replaced; your active folders stay lean (so Claude reads the *current* truth, not old noise), and nothing is lost.
@@ -12,7 +12,7 @@ Your AIOS is a garden: water it and it grows, but weeds grow too. Archiving is h
 
 ## How
 - Keep the original filename; optionally prefix with the date archived.
-- Don't delete — archive. Git already keeps history; this keeps it *findable*.
+- Don't delete, archive. Git already keeps history; this keeps it *findable*.
 - When in doubt between deleting and archiving, archive.
 
 Lean active workspace + a safe place for the past = a brain that stays sharp as it grows.

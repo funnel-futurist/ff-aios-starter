@@ -14,10 +14,10 @@ Simple naming conventions so everything stays organized as the workspace grows.
 
 | Prefix | Meaning | Example |
 |---|---|---|
-| `ref_` | Reference document — read, don't edit | `ref_buyer_awareness_journey.md` |
+| `ref_` | Reference document, read, don't edit | `ref_buyer_awareness_journey.md` |
 | `sop_` | Standard operating procedure | `sop_content_review_process.md` |
 | `qc_` | Quality control document | `qc_preferences.md` |
-| (none) | Working document — edit freely | `market_analysis.md` |
+| (none) | Working document, edit freely | `market_analysis.md` |
 
 ### Versioning
 
@@ -31,7 +31,7 @@ Example: `offer_stack.md` → `offer_stack_v2.md`
 
 - Folder names are **lowercase with underscores**: `brand_guide/` not `Brand Guide/`
 - Each numbered folder has a specific purpose (see README.md)
-- Don't create new top-level folders — if something doesn't fit, put it in the closest match and flag it
+- Don't create new top-level folders, if something doesn't fit, put it in the closest match and flag it
 
 ---
 
