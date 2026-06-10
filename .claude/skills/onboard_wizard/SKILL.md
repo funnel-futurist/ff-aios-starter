@@ -38,7 +38,16 @@ Quick check: can they explain the folder layout, where global vs client material
 
 **Then prove the brain is actually wired** (don't skip, this is how they know it worked): run `/context_load`, then `/f6_completeness_check`, then ask *"what do you understand about my business?"* If Claude answers with specifics from their own foundational docs, it's working. A generic answer means something isn't connected yet (Google Drive, an empty `01_Foundations/`, or the key), fix that before moving on.
 
-## Step 6: Save, commit, and what's next
+## Step 6: Your toolkit (the moves you can run)
+Now show them what's on hand, so they finish onboarding knowing their capabilities, not just their setup. Tell them: **type `/` in Claude Code to see every skill live**, and the full list (what each does + how to trigger it) lives in `.claude/skills/README.md`. Name the daily drivers so they are not overwhelmed:
+- **/context_load**, run it to start a session, Claude reads your whole brain.
+- **/dashboard**, where things stand right now.
+- **/grill_me**, before you build, pressure-test the decision so you do not build the wrong thing.
+- **/project_management**, when your plate is overwhelming, dump it here and it triages the whole thing.
+- And the quiet guardians that run on their own: **pr_review** (watches every change) and **security_check** (catches leaked keys).
+The point is not to memorize all of them. These are curated should-do moves, not bloat, so you reach for the same handful daily and the rest are there when you need them. Type `/` anytime.
+
+## Step 7: Save, commit, and what's next
 - Save everything; **commit** (your safety net, `git` keeps history so nothing is ever truly lost).
 - Point them to: the **unstuck protocol** (their safety net the whole way), the **PR reviewer** (now watching every change, it fixes safe stuff and never blocks you), and, if they're a **cyborg VA, the certification** (that's the next step; it proves they can run this safely).
 
