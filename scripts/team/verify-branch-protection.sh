@@ -39,8 +39,7 @@ pr = d.get('required_pull_request_reviews')
 print('  '+('✓' if pr else '✗ FAIL')+' PR required before merge'); f+= 0 if pr else 1
 print('  '+('✓' if (pr or {}).get('require_code_owner_reviews') else '✗ FAIL')+' code-owner review required'); f+= 0 if (pr or {}).get('require_code_owner_reviews') else 1
 ctx=[c for c in (d.get('required_status_checks') or {}).get('contexts',[])]
-need=[x for x in ('static_checks','pr-gate') if x not in ctx]
-print('  '+('✓' if not need else '✗ FAIL')+f' required checks present (have: {ctx or \"none\"})'); f+= 0 if not need else 1
+print('  '+('✓' if ctx else 'ℹ')+f' required status checks: {ctx or \"none (optional — only if you add CI/an AI reviewer)\"}')  # informational, not a fail
 fp = not (d.get('allow_force_pushes') or {}).get('enabled', True)
 print('  '+('✓' if fp else '✗ FAIL')+' force-pushes to main blocked'); f+= 0 if fp else 1
 de = not (d.get('allow_deletions') or {}).get('enabled', True)
