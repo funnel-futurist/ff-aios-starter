@@ -26,6 +26,7 @@ That's it. Open the repo in Claude Code → type **`/start-my-day`** when you be
 
 ## If you get stuck or confused
 - Tell Claude: *"treat me like a caveman, explain like I'm 5, give me every click."*
+- **Saw scary `<<<<<<<` symbols after syncing?** That's a merge conflict — normal, nothing's lost. Run **`/resolve-conflict`**.
 - Read **[CONTRIBUTING.md](CONTRIBUTING.md)** for the "what do I do when…" answers.
 - New here? Run **`/onboard_wizard`** for the full guided first-time setup.
 - When in doubt, run `/wrap-up` and ask. Nothing on your own branch can hurt the official version.

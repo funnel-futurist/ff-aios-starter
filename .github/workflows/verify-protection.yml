@@ -1,0 +1,22 @@
+# Drift detector: weekly (and on-demand) check that main's branch protection + CODEOWNERS are still
+# in place — so the workflow's "you can't break main" promise can't silently become false.
+# NOTE: reading branch protection needs ADMIN. The default GITHUB_TOKEN can't, so this uses an
+# optional repo secret ADMIN_TOKEN (a fine-grained PAT with admin:read) when present; without it
+# the script reports INCONCLUSIVE and the job stays green (it never false-alarms).
+name: Verify branch protection
+
+on:
+  schedule:
+    - cron: '0 13 * * 1'   # Mondays 13:00 UTC
+  workflow_dispatch: {}
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Assert protection + CODEOWNERS
+        env:
+          GH_TOKEN: ${{ secrets.ADMIN_TOKEN || github.token }}
+        run: bash scripts/team/verify-branch-protection.sh "${{ github.repository }}"
