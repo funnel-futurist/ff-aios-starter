@@ -9,6 +9,16 @@ Plain-English operating rhythm for you and anyone you add (operators / VAs). Nev
 4. Open the folder in **Claude Code** (VS Code extension or desktop app).
 5. Run **`/start-my-day`**. The first time it asks your name + GitHub username and saves a small local file (`.aios/local-operator.json`) so it can greet you. That file stays on your machine.
 
+## Already set up but maybe behind? Sync up so you're not missing skills
+*(For people who set this up a while ago — first-timers get everything on clone.)* New skills and fixes land on `main` over time, and you won't have them locally until you sync. **Tell:** if you type `/` and don't see `/start-my-day` and `/wrap-up`, you're behind. To catch up:
+- **Easiest:** open the repo in Claude Code and say *"sync me to the latest main."* Claude does it safely.
+- **Or do it yourself:**
+  1. If you have unsaved work, run `/wrap-up` first (or `git stash`) so nothing is lost.
+  2. `git checkout main && git pull origin main`
+  3. On a long-running branch? Pull main's updates into it: `git merge origin/main`
+
+Now the latest skills are available — use `/start-my-day` and `/wrap-up` as normal. Re-running this anytime you feel out of date is safe.
+
 ## The daily rhythm
 1. Open the repo in Claude Code → you'll see a status nudge.
 2. **`/start-my-day`** → sync, get on a branch, decide what "done" looks like, load your brain.
