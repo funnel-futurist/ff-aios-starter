@@ -40,15 +40,28 @@ Quick check: can they explain the folder layout, where global vs client material
 
 ## Step 6: Your toolkit (the moves you can run)
 Now show them what's on hand, so they finish onboarding knowing their capabilities, not just their setup. Tell them: **type `/` in Claude Code to see every skill live**, and the full list (what each does + how to trigger it) lives in `.claude/skills/README.md`. Name the daily drivers so they are not overwhelmed:
-- **/context_load**, run it to start a session, Claude reads your whole brain.
+- **/start-my-day**, run it to BEGIN a session — syncs you to the latest, puts you on a safe branch, loads your brain.
+- **/wrap-up**, run it to END a session — self-reviews + cleans your work, saves it, pushes it, opens your review request, writes a plain-English team update.
+- **/context_load**, reads your whole brain (\`/start-my-day\` runs this for you).
 - **/dashboard**, where things stand right now.
 - **/grill_me**, before you build, pressure-test the decision so you do not build the wrong thing.
 - **/project_management**, when your plate is overwhelming, dump it here and it triages the whole thing.
-- And the quiet guardians that run on their own: **pr_review** (watches every change) and **security_check** (catches leaked keys).
+- And the quiet guardians that run on their own: **pr_review** (watches every change), **security_check** (catches leaked keys), and a **staleness nudge** (tells you if you're behind, see Step 7).
 The point is not to memorize all of them. These are curated should-do moves, not bloat, so you reach for the same handful daily and the rest are there when you need them. Type `/` anytime.
 
-## Step 7: Save, commit, and what's next
-- Save everything; **commit** (your safety net, `git` keeps history so nothing is ever truly lost).
+## Step 7: Your daily rhythm (the two commands you'll use forever)
+This is how you actually work day to day, so nobody ever works from an old copy or loses work on their laptop. Teach the **separate-timelines** picture in one breath: *`main` is the one official version; your branch is your private side-timeline so you can't break it; "pull before you work, push when you're done" is the whole game.* Then the rhythm:
+- **Start every session with `/start-my-day`** — it greets you, syncs you to the latest official version, puts you on a clean branch, and asks what "done" looks like.
+- **End every session with `/wrap-up`** — it reviews your work like a senior engineer, cleans it up, saves + pushes it, opens your review request, and writes the team a plain-English update.
+- Have them **run `/start-my-day` right now** as practice, then point them to `START_HERE.md` + `CONTRIBUTING.md`.
+
+**What runs automatically (so they're not scared of it):** two tiny safety nets they never configure —
+1. a **staleness nudge** when they open the repo (tells them if they're on `main` or behind — it only *reads*, never changes their files), and
+2. **denied dangerous commands** — the repo refuses the few commands that could wipe out unsaved work (`rm -rf`, `git push --force`, `git reset --hard`, …).
+Tell them plainly: *"these exist to protect you, you can't turn them off by accident, and you can't break the official version — that's what branches and review are for."* (Hooks + this whole rhythm are covered deeper in the certification.)
+
+## Step 8: Save, commit, and what's next
+- Save everything; the simplest way is to just run **`/wrap-up`** — it commits, pushes, and opens your review request in one go (`git` keeps history, so nothing is ever truly lost).
 - Point them to: the **unstuck protocol** (their safety net the whole way), the **PR reviewer** (now watching every change, it fixes safe stuff and never blocks you), and, if they're a **cyborg VA, the certification** (that's the next step; it proves they can run this safely).
 
 ## Always-on reminders

@@ -1,0 +1,43 @@
+# CONTRIBUTING — how you work in your AIOS
+
+Plain-English operating rhythm for you and anyone you add (operators / VAs). Never used git? Fine — the two skills do the work. Start with **[START_HERE.md](START_HERE.md)**, then use this for the details. For the full first-time walkthrough, run **`/onboard_wizard`**.
+
+## First-time setup (once per computer)
+1. Install **git** (search "install git for [your OS]" if needed).
+2. Clone your repo: `git clone <your-repo-url>`
+3. Sign in to GitHub from the command line with **your own** account: `gh auth login`
+4. Open the folder in **Claude Code** (VS Code extension or desktop app).
+5. Run **`/start-my-day`**. The first time it asks your name + GitHub username and saves a small local file (`.aios/local-operator.json`) so it can greet you. That file stays on your machine.
+
+## The daily rhythm
+1. Open the repo in Claude Code → you'll see a status nudge.
+2. **`/start-my-day`** → sync, get on a branch, decide what "done" looks like, load your brain.
+3. Do your work. Commit small, reviewable chunks (or let `/wrap-up` handle it).
+4. **`/wrap-up`** → self-review, commit, push, open/update your PR, post the team update.
+
+## Branch names
+`yourname/short-topic-YYYY-MM-DD` — e.g. `alex/welcome-emails-2026-06-18`. `/start-my-day` makes these for you.
+
+## What waits for a human
+Set a `CODEOWNERS` file so the catastrophic / irreversible paths (e.g. `.github/`, your `CLAUDE.md`, the skills/hooks engine, any database migrations) require a **code-owner ([PRIMARY_REVIEWER])** to approve before merge. Everything else can move freely. (See `.github/CODEOWNERS` — fill in the placeholders for your repo.)
+
+## What to do when…
+- **"I'm behind / stale"** → run `/start-my-day`; it syncs you safely.
+- **"I'm confused / scared I'll break something"** → you won't. Nothing on your branch touches the official version until it's reviewed. Ask Claude to explain like you're new.
+- **"I want to start completely fresh"** → run `/start-my-day`; if you have unsaved work it parks it safely first (never deletes it).
+- **"I have work I forgot to push"** → run `/wrap-up`; it finds uncommitted/unpushed work and gets it safe.
+- **"I'm blocked for more than ~30 minutes"** → stop, `/wrap-up` what you have, and put the blocker in your team update.
+
+## The hard rules
+- Never work on `main`. (The nudge + `/start-my-day` keep you off it.)
+- Never force-push or hard-reset. (Blocked by your repo's safety settings.)
+- Never commit secrets/keys. (`/wrap-up`'s review flags them; `.env` is git-ignored.)
+- Send changes to `main` through a reviewed PR (turn on branch protection — see below).
+
+## Want to understand the automatic stuff (hooks)?
+A tiny program runs automatically when you open the repo: a **staleness nudge** that tells you if you're on `main` or behind the latest. It only *reads* — it never changes your files. Your `.claude/settings.json` also **denies** the most dangerous commands outright (`rm -rf`, `git push --force`, `git reset --hard`, …). You never configure these; they exist to protect you. (Covered in the AIOS training + certification.)
+
+## Recommended GitHub settings (one-time, by the repo owner)
+- Protect `main`: require a PR before merge, block force-pushes and deletions.
+- Require **code-owner review** so the `CODEOWNERS` paths can't merge without a human.
+- (Optional) add the AI PR reviewer for automatic first-pass review.

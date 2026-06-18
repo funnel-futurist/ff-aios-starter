@@ -1,0 +1,7 @@
+{
+  "operator": "yourname",
+  "display_name": "Your Name",
+  "github": "your-github-username",
+  "role": "operator",
+  "_note": "Copy this file to .aios/local-operator.json and fill in your details. The real file is git-ignored. It is a LOCAL LABEL so the routine can greet you and sanity-check identity — it is NOT a login or a security boundary. Real identity comes from your `git config` + `gh auth`."
+}
