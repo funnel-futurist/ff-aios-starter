@@ -15,5 +15,17 @@
       "Bash(git clean -f:*)",
       "Bash(sudo:*)"
     ]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/git-staleness-check.js\""
+          }
+        ]
+      }
+    ]
   }
 }

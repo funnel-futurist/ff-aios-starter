@@ -1,0 +1,26 @@
+# CODEOWNERS — only CATASTROPHIC / IRREVERSIBLE paths need an owner.
+# Everything else moves freely (no bottleneck). A mistake on the paths below can't be cleanly undone,
+# so they require a code-owner's review before merging into main (turn on "Require review from
+# Code Owners" in branch protection to enforce this).
+#
+# Replace the placeholders with real GitHub usernames, e.g. @your-github-username.
+#   [REPO_OWNER]        = the founder / repo owner
+#   [PRIMARY_REVIEWER]  = whoever approves governance changes (often the same person)
+#   [TECHNICAL_REVIEWER]= optional second owner for code/migrations
+
+# Irreversible — a mistake here can't be cleanly undone
+**/migrations/**            [REPO_OWNER] [TECHNICAL_REVIEWER]
+**/*.sql                    [REPO_OWNER] [TECHNICAL_REVIEWER]
+.env*                       [REPO_OWNER]
+.gitignore                  [REPO_OWNER]
+
+# The review/merge gate itself — weakening this dilutes every other guarantee
+/.github/                   [REPO_OWNER] [PRIMARY_REVIEWER]
+
+# The brain's constitution + the skill/hook engine (governs every session + agent)
+/CLAUDE.md                  [REPO_OWNER] [PRIMARY_REVIEWER]
+/.claude/skills/            [REPO_OWNER] [PRIMARY_REVIEWER]
+/.claude/settings.json      [REPO_OWNER] [PRIMARY_REVIEWER]
+/.claude/hooks/             [REPO_OWNER] [PRIMARY_REVIEWER]
+
+# Deliberately NOT owner-gated: your normal docs, deliverables, and day-to-day work move freely.

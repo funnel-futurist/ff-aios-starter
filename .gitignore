@@ -19,3 +19,6 @@ credentials.json
 node_modules/
 *.log
 .vercel/
+
+# Personal operator label — local only (the .example.json IS committed)
+.aios/local-operator.json
