@@ -21,6 +21,9 @@ Plain-English operating rhythm for you and anyone you add (operators / VAs). Nev
 ## What waits for a human
 Set a `CODEOWNERS` file so the catastrophic / irreversible paths (e.g. `.github/`, your `CLAUDE.md`, the skills/hooks engine, any database migrations) require a **code-owner ([PRIMARY_REVIEWER])** to approve before merge. Everything else can move freely. (See `.github/CODEOWNERS` — fill in the placeholders for your repo.)
 
+## If you're the one who reviews / merges (the repo owner)
+Run **`/review-queue`** anytime to see what needs you right now — what's **ready to merge**, what's **waiting on your review**, what's **blocked**, and what's **going stale**. It reads live from GitHub (never a stale list) and lets you merge with one confirmation. This is your "what's on my plate" view so nothing sits unseen.
+
 ## What to do when…
 - **"I'm behind / stale"** → run `/start-my-day`; it syncs you safely.
 - **"I'm confused / scared I'll break something"** → you won't. Nothing on your branch touches the official version until it's reviewed. Ask Claude to explain like you're new.

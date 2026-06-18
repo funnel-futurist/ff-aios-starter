@@ -28,6 +28,7 @@ Flag and remove (quick confirm) anything that shouldn't be committed: logs, `__p
 - **Auto-fix ONLY the safe set** (apply directly): formatting, lint, obvious typos, removing generated junk, small consistency fixes.
 - **NEVER auto-change the judgment set — surface it for the operator's approval instead:** strategy/docs content, offer logic, client-facing claims, large deletions, and anything governance — `.github/`, `CODEOWNERS`, `.claude/hooks`, `.claude/settings.json`, workflows, migrations, `.env`/secrets. *(If a human owns it in `CODEOWNERS`, you do not silently change it.)*
 - Sanity-check against your repo's standards: `CLAUDE.md` and any naming / voice / framework guides it points to.
+- **Documentation check:** if this change adds or edits a skill, hook, or process step, confirm it's documented where people will actually find it — the skill's own description, `README`/`CONTRIBUTING`, and (if it changes how the team works) the onboarding wizard. If it isn't, add it before opening the PR. *A new step nobody knows about doesn't exist.*
 Tell the operator what you fixed and what needs their call. **Goal: the PR is already best-practice before it ever goes to review.**
 
 ## Step 4 — One clean commit
