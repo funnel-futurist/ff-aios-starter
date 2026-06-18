@@ -29,8 +29,9 @@ REVIEW QUEUE — {N} open PRs
 ⛔ Blocked ({n})
   #{num} {title} — {why} (owner: {who})
 🕰️ Stale ({n})
-  #{num} {title} — {days}d, no movement
+  #{num} {title} — {days}d idle  → who acts next: {author/reviewer}
 ```
+**Every line names who acts next** — for Blocked/Stale say whose move it is (the author fixes / the reviewer reviews), so nothing sits in limbo because each side thinks it's the other's turn.
 
 ## Step 4 — Offer action (with explicit confirmation)
 - **Ready to merge** → offer to merge. Only on an explicit "yes":
@@ -38,6 +39,7 @@ REVIEW QUEUE — {N} open PRs
   gh pr merge {num} --squash --delete-branch
   ```
 - **Needs you** → offer to open the PR, show the diff, or surface any reviewer verdict so you can decide, then approve.
+- **Stale** → offer to post a gentle nudge to the owner (a one-line comment naming what it needs), or to close it if it's dead. Don't let it keep rotting silently.
 - **Never** merge without an explicit confirmation. **Never** merge a Blocked or Needs-you PR on someone's behalf.
 
 ## Always
