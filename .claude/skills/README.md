@@ -20,6 +20,7 @@ Skills are pre-built moves your AIOS can run by name. Type `/` in Claude Code to
 | **file_audit** | Audits filenames + structure against your naming rules. | `/file_audit` |
 | **changelog** | Generates a clean changelog entry from your recent changes. | `/changelog` |
 | **humanize** | Strips AI-tells from copy (em-dashes, filler, robotic phrasing) so it reads like you. | `/humanize` |
+| **financial_teardown** | Runs a full subscription/software teardown: AI reads your bank statements to inventory every recurring charge, sorts each tool by "would anything break?", cancels dead weight, claws back refunds with proven templates, and sets up prevention (dedicated card + limits). Cuts monthly burn, recovers cash, frees bandwidth. | `/financial_teardown` |
 | **docx** · **pdf** · **xlsx** · **pptx** | Your document factory: create and edit Word docs, PDFs, Excel sheets, and PowerPoint decks. Claude reaches for these automatically when you ask for a document. | automatic |
 
 ## How to add your own
