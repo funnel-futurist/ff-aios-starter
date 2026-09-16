@@ -86,6 +86,7 @@ def verify_push(remote, lines):
     for commit in sorted(commits):
         changed = git("diff-tree", "--root", "--no-commit-id", "-r", "-m", "--name-only", "-z", commit).decode().split("\0")
         names = {path.split("/")[2] for path in changed if path.startswith(".claude/skills/") and len(path.split("/")) >= 3 and path.split("/")[2] != "README.md"}
+        direct_names = set(names)
         with tempfile.TemporaryDirectory(prefix="skill-push-") as tmp:
             tree = pathlib.Path(tmp)
             snapshot(commit, tree)
@@ -109,6 +110,29 @@ def verify_push(remote, lines):
                     failures.append((commit, name, ["missing SKILL.md"]))
                     continue
                 errors = public_check(folder)
+                if name not in direct_names:
+                    # Existing structural debt is reported, not newly imposed by
+                    # unrelated documentation changes. Reject new reference damage.
+                    fields = ("refs_dead", "refs_unanchored", "resources_dead", "resources_unanchored", "checklist_pointers_dead")
+                    report = validator.check(folder)
+                    now = {key + ":" + str(value) for key in fields for value in report[key]}
+                    parents = git("rev-list", "--parents", "-n", "1", commit).decode().split()[1:]
+                    prior = set()
+                    if parents:
+                        with tempfile.TemporaryDirectory(prefix="skill-parent-") as oldtmp:
+                            oldtree = pathlib.Path(oldtmp)
+                            snapshot(parents[0], oldtree)
+                            validator.REPO = oldtree
+                            validator.SKILLS = oldtree / ".claude/skills"
+                            validator._BASENAME_INDEX = None
+                            oldfolder = validator.SKILLS / name
+                            if (oldfolder / "SKILL.md").is_file():
+                                oldreport = validator.check(oldfolder)
+                                prior = {key + ":" + str(value) for key in fields for value in oldreport[key]}
+                        validator.REPO = tree
+                        validator.SKILLS = tree / ".claude/skills"
+                        validator._BASENAME_INDEX = None
+                    errors = sorted(now - prior)
                 if errors:
                     failures.append((commit, name, errors))
     for commit, name, errors in failures:

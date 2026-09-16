@@ -369,6 +369,40 @@ class TestOutgoingSnapshots(TestPrePushHook):
         self.assertNotEqual(result.returncode, 0)
         self.assertEqual(hook.read_text(), "#!/bin/sh\nexit 42\n")
 
+    def test_legacy_debt_allows_reference_update_but_not_new_damage(self):
+        # Seed remote history from before this gate existed. This deliberately
+        # invalid legacy fixture is not a new contribution under the gate.
+        root = pathlib.Path(self.clone)
+        (root / "docs").mkdir()
+        (root / "docs/guide.md").write_text("# Existing guide\n")
+        self._commit_skill("legacy", "---\nname: legacy\ndescription: Old skill\n---\n"
+                           "Read `docs/guide.md` and `docs/already-missing.md`.\n")
+        hook = root / ".git/hooks/pre-push"
+        saved = hook.with_name("pre-push.fixture-backup")
+        hook.rename(saved)
+        try:
+            seeded = self.push("main")
+            self.assertEqual(seeded.returncode, 0, seeded.stderr)
+        finally:
+            saved.rename(hook)
+        # The unchanged skill still has structural and reference debt. Merely
+        # updating an existing referenced document must not impose new debt.
+        (root / "docs/guide.md").write_text("# Updated guide\n")
+        subprocess.run(["git", "-C", self.clone, "add", "-A"], check=True, capture_output=True)
+        subprocess.run(["git", "-C", self.clone, "commit", "-m", "update referenced guide"],
+                       check=True, capture_output=True)
+        result = self.push("main")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        # New damage must still be rejected even in an already-invalid skill.
+        (root / "docs/guide.md").unlink()
+        subprocess.run(["git", "-C", self.clone, "add", "-A"], check=True, capture_output=True)
+        subprocess.run(["git", "-C", self.clone, "commit", "-m", "delete referenced guide"],
+                       check=True, capture_output=True)
+        result = self.push("main")
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("docs/guide.md", result.stderr)
+        self.assertNotIn("docs/already-missing.md", result.stderr)
+
     def test_deleted_cross_skill_reference_blocks_push(self):
         body = (REPO / "tests/fixtures/skill_good/SKILL.md").read_text()
         self._commit_skill("shared", body.replace("name: skill_good", "name: shared"),
@@ -397,7 +431,7 @@ class TestOutgoingSnapshots(TestPrePushHook):
                        check=True, capture_output=True)
         result = self.push("main")
         self.assertNotEqual(result.returncode, 0)
-        self.assertIn("no_dead_refs", result.stderr)
+        self.assertIn("refs_dead", result.stderr)
 
     def test_malformed_skill_root_file_blocks_push(self):
         (pathlib.Path(self.clone) / ".claude/skills/not-a-directory").write_text("invalid")
