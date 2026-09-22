@@ -18,7 +18,7 @@
   },
   "created_from": {
     "branch": "exec/p22-install-20260922",
-    "git_rev": "1a4cd1657b720968dddea4c691a87d164b885a39"
+    "git_rev": "fe8e6afa006fac2795552ebcec7a7cdc3ceaaca4"
   },
   "credentials": [
     {
@@ -1355,7 +1355,7 @@
       "class": "seed",
       "mode": "100644",
       "path": ".gitignore",
-      "sha256": "02f008e76f31e8a63a6dc3c5416ef4360ae42ca78d0a6c247de5c2cf0b9f7034"
+      "sha256": "c4d81682464c4ee7746dc36275252122cd8abab79f51bde342dce3fefa4c1f26"
     },
     {
       "class": "managed",

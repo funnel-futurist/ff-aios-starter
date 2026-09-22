@@ -48,6 +48,16 @@ the internal client roster and pass `--denylist`.
 | 8 | propagation sweep (32 repos) | DONE |
 | 9 | receipt + LANE_RECEIPT | DONE |
 
+## Verified state at release (CI, Ubuntu runner, not a laptop)
+
+- `Install contract / tests`: **PASS** - 85 unit tests + 47 end-to-end assertions
+- `Install contract / governance`: **FAIL, by design** - the placeholder CODEOWNERS
+- `PR Review`: **PASS** - floor clean, `ai_review` reports "not configured", `pr-gate` says
+  "AI review not configured - manual merge only"
+- release `starter-2.6.0` pins `fe8e6afa006fac2795552ebcec7a7cdc3ceaaca4`, status **draft**
+- sanitization: 1 finding, the real one (HUMAN_ACTION 4)
+- PR: #12
+
 ## Open gates (nothing here blocks the next instance from working)
 
 1. **Release approval** - Phoenix. `releases/starter-2.6.0.json` is `draft`. Internal validation
