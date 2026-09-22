@@ -11,14 +11,14 @@
     "aios_release": null
   },
   "counts": {
-    "files": 281,
-    "managed": 245,
+    "files": 282,
+    "managed": 246,
     "seed": 36,
     "skills": 24
   },
   "created_from": {
     "branch": "exec/p22-install-20260922",
-    "git_rev": "3de8c6d2cce0c12bf7599d099a83ab2c3a78c8a8"
+    "git_rev": "6fbae45b52a46b7aff635b9d3d77d29d6251cd8c"
   },
   "credentials": [
     {
@@ -83,7 +83,7 @@
       "class": "managed",
       "mode": "100644",
       "path": ".claude/skills/README.md",
-      "sha256": "c25b3e52f6cc2425a1654543d0176189ea42bf42cd6a2cfba79bbc0d667c81f5"
+      "sha256": "4d08a70f96d65ab9669d80b4484293e89644e961a0a7762d46e478772f8710b4"
     },
     {
       "class": "managed",
@@ -1337,7 +1337,7 @@
       "class": "managed",
       "mode": "100644",
       "path": ".github/workflows/install-contract.yml",
-      "sha256": "bbf5c4da4d00792311bef13da6cc3377144270c9554d3341a7fbfa719536ac04"
+      "sha256": "484621a3f1729852c4149b5e8d92cdafe01931725ff96f6a87fd1fc4084f4c43"
     },
     {
       "class": "managed",
@@ -1583,7 +1583,7 @@
       "class": "managed",
       "mode": "100644",
       "path": "CONTRIBUTING.md",
-      "sha256": "bd5a2921f8c5c20ef1a40143f193a135bcfe790fcdc572a523cd58d5ae04aae6"
+      "sha256": "d7ae69dbb509d8f83e9be3b8c9c282a2331bc9565ace5e763254726b477ed5ed"
     },
     {
       "class": "managed",
@@ -1613,7 +1613,13 @@
       "class": "managed",
       "mode": "100644",
       "path": "START_HERE.md",
-      "sha256": "93c9a6e131a3ef34aa103f2d210cfbf3476158c020f322d36d4a72d0b6b3feaf"
+      "sha256": "6652e1bb9e9e55bf4d5bb62daa96da3b52a26c0a5e1743eda44cd10809b20985"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": "docs/INSTALL_AND_UPGRADE.md",
+      "sha256": "3e7c8111e2d81a4066bed645af9ac8ffb164db3658f1f2e9538b8f331d1a9366"
     },
     {
       "class": "managed",
@@ -1631,7 +1637,7 @@
       "class": "managed",
       "mode": "100755",
       "path": "scripts/aios/aios.py",
-      "sha256": "ba06a09a81faffb813c539c950d3b84cec103ebc9fac7e91a53677e56de5b983"
+      "sha256": "7ad07b0fc455ca72bc38ff10d4962013230fef5df62a494e5f5b8426a259fa95"
     },
     {
       "class": "managed",
@@ -1673,7 +1679,7 @@
       "class": "managed",
       "mode": "100644",
       "path": "scripts/aios/aioslib/sanitize.py",
-      "sha256": "25931f510bc09ff334f58e306db23efe86a4e1cea634eef5c52547e3830cbf46"
+      "sha256": "40c4bdde85f23d54d683783684adf8b5fd0863e67d51461dbaee4b5a030842d2"
     },
     {
       "class": "managed",
