@@ -51,6 +51,59 @@ def journal_path(target):
     return os.path.join(target, JOURNAL_PATH)
 
 
+LOCK_PATH = os.path.join(AIOS_DIR, "lock")
+
+
+class _Lock(object):
+    """An exclusive lock for the duration of a mutation.
+
+    The journal already makes a half-finished upgrade recoverable, but it is written *after*
+    the workspace has been verified clean. Two upgrades started in the same second would both
+    pass verification and then interleave their writes. `O_CREAT | O_EXCL` is atomic on every
+    filesystem worth supporting, so the second one refuses instead of racing.
+
+    A stale lock (the holder was killed) is recoverable: the message says how, and `rollback`
+    clears it, because a lock that can wedge a workspace forever is its own outage.
+    """
+
+    def __init__(self, target, op):
+        self.path = os.path.join(target, LOCK_PATH)
+        self.op = op
+        self.fd = None
+
+    def __enter__(self):
+        util.ensure_parent(self.path)
+        try:
+            self.fd = os.open(self.path, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o644)
+        except OSError:
+            holder = ""
+            try:
+                with open(self.path) as fh:
+                    holder = fh.read().strip()
+            except OSError:
+                pass
+            raise Refusal(
+                EXIT_STATE,
+                "another %s is already running in this workspace" % self.op,
+                [("lock held by: %s" % holder) if holder else "lock file: %s" % self.path,
+                 "if nothing is running, the previous attempt was killed: run `aios rollback`, "
+                 "or delete %s once you are sure" % LOCK_PATH],
+            )
+        os.write(self.fd, ("%s pid=%d at %s\n"
+                           % (self.op, os.getpid(), util.now_iso())).encode("utf-8"))
+        return self
+
+    def __exit__(self, exc_type, exc, tb):
+        try:
+            if self.fd is not None:
+                os.close(self.fd)
+            if os.path.exists(self.path):
+                os.remove(self.path)
+        except OSError:
+            pass
+        return False
+
+
 def load_journal(target):
     path = journal_path(target)
     if os.path.isfile(path):
@@ -116,7 +169,7 @@ def state_fingerprint(target):
         for name in files:
             rel = os.path.normpath(os.path.join(rel_root, name)) if rel_root else name
             rel = rel.replace(os.sep, "/")
-            if rel in managed or rel in (INSTALL_PATH, JOURNAL_PATH):
+            if rel in managed or rel in (INSTALL_PATH, JOURNAL_PATH, LOCK_PATH):
                 continue
             if rel.startswith(BACKUP_DIR.replace(os.sep, "/")):
                 continue
@@ -259,6 +312,11 @@ def install(target, manifest, source_repo, config, aios_lookup=None, render_gove
 
 def upgrade(target, manifest, source_repo, aios_lookup=None):
     """Replace managed files with a newer approved release. State is never touched."""
+    with _Lock(target, "upgrade"):
+        return _upgrade_locked(target, manifest, source_repo, aios_lookup)
+
+
+def _upgrade_locked(target, manifest, source_repo, aios_lookup=None):
     record = load_record(target)
     if load_journal(target):
         raise Refusal(EXIT_STATE, "a previous operation did not finish; run rollback first",
@@ -421,6 +479,16 @@ def upgrade(target, manifest, source_repo, aios_lookup=None):
 
 def rollback(target):
     """Restore the previous release. Works after a clean upgrade or a hard kill."""
+    # A killed holder leaves its lock behind. Recovery is exactly when you need to get in, so
+    # rollback clears it rather than telling the operator their workspace is wedged.
+    stale = os.path.join(target, LOCK_PATH)
+    if os.path.exists(stale):
+        os.remove(stale)
+    with _Lock(target, "rollback"):
+        return _rollback_locked(target)
+
+
+def _rollback_locked(target):
     journal = load_journal(target)
     record_path = install_record_path(target)
     current = util.read_json(record_path) if os.path.isfile(record_path) else None

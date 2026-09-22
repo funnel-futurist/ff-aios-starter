@@ -432,3 +432,43 @@ if __name__ == "__main__":
     import unittest
 
     unittest.main()
+
+
+class Concurrency(Sandbox):
+    """Two mutations at once. The journal makes a crash recoverable; the lock stops a race."""
+
+    def setUp(self):
+        Sandbox.setUp(self)
+        self.v1 = harness.approve(harness.build_manifest(self.source, self.rev, "1.0.0"))
+        install_mod.install(self.target, self.v1, self.source, harness.config())
+        rev2 = harness.bump_source(self.source, {"START_HERE.md": "# v2\n"})
+        self.v2 = harness.approve(harness.build_manifest(self.source, rev2, "1.1.0"))
+
+    def test_a_second_upgrade_is_refused_while_one_holds_the_lock(self):
+        lock = install_mod._Lock(self.target, "upgrade")
+        lock.__enter__()
+        try:
+            with self.assertRaises(Refusal) as ctx:
+                install_mod.upgrade(self.target, self.v2, self.source)
+            self.assertEqual(ctx.exception.code, util.EXIT_STATE)
+            self.assertIn("already running", ctx.exception.message)
+        finally:
+            lock.__exit__(None, None, None)
+        # released: the upgrade now succeeds
+        record = install_mod.upgrade(self.target, self.v2, self.source)
+        self.assertEqual(record["release"]["version"], "1.1.0")
+
+    def test_rollback_clears_a_lock_left_by_a_killed_holder(self):
+        install_mod.upgrade(self.target, self.v2, self.source)
+        harness.write(self.target, install_mod.LOCK_PATH, "upgrade pid=99999 (killed)\n")
+        record, summary, _how = install_mod.rollback(self.target)
+        self.assertEqual(summary["version"], "1.0.0")
+        self.assertFalse(os.path.exists(os.path.join(self.target, install_mod.LOCK_PATH)))
+
+    def test_the_lock_is_released_on_success_and_on_refusal(self):
+        install_mod.upgrade(self.target, self.v2, self.source)
+        self.assertFalse(os.path.exists(os.path.join(self.target, install_mod.LOCK_PATH)))
+        with self.assertRaises(Refusal):
+            install_mod.upgrade(self.target, self.v1, self.source)  # downgrade, refused
+        self.assertFalse(os.path.exists(os.path.join(self.target, install_mod.LOCK_PATH)),
+                         "a refusal must not leave the workspace locked")
