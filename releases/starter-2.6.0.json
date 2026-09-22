@@ -18,7 +18,7 @@
   },
   "created_from": {
     "branch": "exec/p22-install-20260922",
-    "git_rev": "6ce226f69c1e3e0b122201de7c09440f72191d9d"
+    "git_rev": "dc9699c7f85c770eb5b57715d8bd82346a14f2eb"
   },
   "credentials": [
     {
@@ -1721,7 +1721,7 @@
       "class": "managed",
       "mode": "100755",
       "path": "scripts/team/verify-branch-protection.sh",
-      "sha256": "cd8634a517606ab6603212335327f21f5092a34ddf1be44321a311507c470644"
+      "sha256": "56fdf45f1fe99fbff6bd1d83d45e3f68064fe1e726be92c8fd9c1b60d2e20771"
     },
     {
       "class": "managed",
