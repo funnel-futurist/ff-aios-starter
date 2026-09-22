@@ -119,6 +119,16 @@ git -C "$SRC" show "$REV:START_HERE.md" > "$TARGET/START_HERE.md"
 aios verify --target "$TARGET" >/dev/null 2>&1
 expect_code 0 $? "restored, clean again"
 
+step "the installed workspace runs its OWN copy of the tool (self-contained)"
+# Everything above drives the SOURCE checkout's CLI. A client runs the copy that landed in
+# their workspace, so prove that one works, from inside the workspace, with nothing else on
+# PATH. If the package did not ship its own tooling, this is where it shows.
+( cd "$TARGET" && env -i PATH="$BIN:/usr/bin:/bin" HOME="$HOMEDIR" \
+    python3 scripts/aios/aios.py verify --target . ) > "$WORK/selfcheck.txt" 2>&1
+expect_code 0 $? "the workspace verifies itself with its own installed CLI"
+grep -q "matches the installed release" "$WORK/selfcheck.txt" \
+  && ok "self-verification readback agrees" || bad "self-verification disagreed"
+
 step "A2/N3: role scoping, proven with the REDUCED role"
 mk_gh acme-va
 aios start --target "$TARGET" > "$WORK/start_operator.txt" 2>&1
