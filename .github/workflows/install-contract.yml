@@ -22,6 +22,8 @@ jobs:
         run: python3 --version
       - name: Install contract tests
         run: python3 -m unittest discover -s tests/aios -t tests/aios -v
+      - name: End-to-end on the real content, in a scrubbed environment
+        run: bash tests/aios/integration_real_content.sh
       - name: PR floor tests (unchanged, run here too so one command covers the repo)
         run: |
           node --test scripts/pr_review/static_checks.test.mjs
