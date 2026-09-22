@@ -17,7 +17,7 @@ from harness import Sandbox
 
 sys.path.insert(0, harness.AIOS_DIR)
 
-from aioslib import governance, sanitize, util  # noqa: E402
+from aioslib import governance, release as release_mod, sanitize, util  # noqa: E402
 from aioslib.util import Refusal  # noqa: E402
 
 REAL_ROOT = harness.REPO_ROOT
@@ -325,3 +325,38 @@ class AdversarialRegressions(Sandbox):
         self.assertEqual(self.scan("c.py", 'K = "AKIA"\n    "QRSTUVWX12345678"\n'), [])
         doc = sanitize.__doc__ or ""
         self.assertIn("assembled across lines", doc)
+
+
+class BytecodeNeverShips(Sandbox):
+    """Running the installer generates .pyc files. They must never enter a package.
+
+    Missed locally because macOS's system Python redirects bytecode to a central
+    `pycache_prefix`; a Linux CI runner writes it next to the source, `git add -A` swept it
+    into the release, and the shipped bytecode then collided with the bytecode the client's
+    own workspace generates - blocking every upgrade.
+    """
+
+    def test_package_spec_excludes_bytecode(self):
+        spec = util.read_json(os.path.join(REAL_ROOT, "release", "package_spec.json"))
+        for path in ("scripts/aios/aioslib/__pycache__/util.cpython-312.pyc",
+                     "scripts/aios/x.pyc"):
+            self.assertIsNone(release_mod.classify(spec, path),
+                              "%s would ship" % path)
+
+    def test_the_repo_refuses_to_track_bytecode(self):
+        import subprocess
+        out = subprocess.run(["git", "-C", REAL_ROOT, "check-ignore",
+                              "scripts/aios/aioslib/__pycache__/util.cpython-312.pyc"],
+                             stdout=subprocess.PIPE)
+        self.assertEqual(out.returncode, 0, "python bytecode is not gitignored")
+
+    def test_a_release_built_from_a_tree_with_bytecode_excludes_it(self):
+        harness.write(self.source, "scripts/aios/aioslib/__pycache__/util.cpython-312.pyc",
+                      b"\x00fake bytecode")
+        harness.run_git(self.source, "add", "-Af")
+        harness.run_git(self.source, "commit", "-qm", "bytecode sneaks in")
+        rev = util.git(self.source, ["rev-parse", "HEAD"])
+        spec = dict(harness.PACKAGE_SPEC)
+        spec["exclude"] = list(spec["exclude"]) + ["**/__pycache__/**", "*.pyc"]
+        man = release_mod.build(self.source, rev, "1.0.0", spec=spec)
+        self.assertFalse([f for f in man["files"] if "__pycache__" in f["path"]])

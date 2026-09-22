@@ -15,6 +15,13 @@ Thumbs.db
 *.key
 credentials.json
 
+# Python bytecode. The install tool is Python, so running it generates these next to the
+# source on most platforms - macOS's system Python hides it with a central pycache_prefix,
+# which is exactly why this was missed locally and caught on a Linux CI runner.
+__pycache__/
+*.pyc
+*.pyo
+
 # Dependencies / build / logs
 node_modules/
 *.log
