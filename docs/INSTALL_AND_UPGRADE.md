@@ -24,6 +24,7 @@ one whose files no longer hash to what the manifest recorded.
 ```bash
 python3 scripts/aios/aios.py start                 # who you are, what you may do, what is installed
 python3 scripts/aios/aios.py verify --target .     # does this workspace still match its release?
+python3 scripts/aios/aios.py verify --target . --repo ../ff-aios-starter   # ...and does the record still match the pin?
 python3 scripts/aios/aios.py upgrade --release releases/starter-X.Y.Z.json --target .
 python3 scripts/aios/aios.py rollback --target .   # back to the previous release
 ```
@@ -123,6 +124,16 @@ bash scripts/team/verify-branch-protection.sh
 
 A `CODEOWNERS` file full of `[REPO_OWNER]` placeholders enforces **nothing** - GitHub matches
 no one - and neither does a perfectly filled one if branch protection is off.
+
+## Two questions `verify` can answer
+
+Without `--repo` it asks *"does this workspace still match what was installed?"*, using the record
+in `.aios/install.json`. That record lives in your own repo, so a determined local editor could
+change a managed file **and** its recorded hash, and the check would agree with itself.
+
+With `--repo` it also re-derives every hash from the pinned commit in the source repository, which
+catches exactly that. The output always says which of the two it ran. Use `--repo` when the answer
+matters to somebody other than you.
 
 ## Exit codes
 

@@ -121,8 +121,7 @@ python3 - "$TARGET" <<'PYEOF'
 import json, sys, hashlib, os
 t = sys.argv[1]
 f = os.path.join(t, "START_HERE.md")
-open(f, "w").write("tampered
-")
+open(f, "w").write("tampered by hand")
 rp = os.path.join(t, ".aios", "install.json")
 rec = json.load(open(rp))
 for e in rec["managed"]:
