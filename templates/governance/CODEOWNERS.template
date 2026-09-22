@@ -1,0 +1,45 @@
+# CODEOWNERS - only CATASTROPHIC / IRREVERSIBLE paths need an owner.
+# Everything else moves freely (no bottleneck). A mistake on the paths below can't be cleanly undone,
+# so they require a code-owner's review before merging into main.
+#
+# THIS FILE IS A TEMPLATE. It is rendered per workspace, never copied, because a code owner must be
+# somebody with write access to YOUR repository. Render it with:
+#
+#   python3 scripts/aios/aios.py governance render --repo-slug <owner>/<repo> \
+#     --owner "REPO_OWNER=@your-handle" --owner "PRIMARY_REVIEWER=@their-handle" \
+#     --out .github/CODEOWNERS
+#
+# The rendered file carries an `# aios-codeowners-for:` line naming the repository it belongs to,
+# so a workspace generated from a template cannot silently inherit somebody else's owners.
+#
+#   [REPO_OWNER]        = the founder / repo owner
+#   [PRIMARY_REVIEWER]  = whoever approves governance changes (often the same person)
+#   [TECHNICAL_REVIEWER]= optional second owner for code/migrations
+#
+# Naming an owner is necessary but NOT sufficient: GitHub only enforces it when branch protection
+# on main has "Require review from Code Owners" turned on. Check both with:
+#   python3 scripts/aios/aios.py governance check
+#   bash scripts/team/verify-branch-protection.sh
+
+# Irreversible - a mistake here can't be cleanly undone
+**/migrations/**            [REPO_OWNER] [TECHNICAL_REVIEWER]
+**/*.sql                    [REPO_OWNER] [TECHNICAL_REVIEWER]
+.env*                       [REPO_OWNER]
+.gitignore                  [REPO_OWNER]
+
+# The review/merge gate itself - weakening this dilutes every other guarantee
+/.github/                   [REPO_OWNER] [PRIMARY_REVIEWER]
+
+# The brain's constitution + the skill/hook engine (governs every session + agent)
+/CLAUDE.md                  [REPO_OWNER] [PRIMARY_REVIEWER]
+/.claude/skills/            [REPO_OWNER] [PRIMARY_REVIEWER]
+/.claude/settings.json      [REPO_OWNER] [PRIMARY_REVIEWER]
+/.claude/hooks/             [REPO_OWNER] [PRIMARY_REVIEWER]
+
+# Who may operate this workspace, and which release it runs - the install contract's own gate
+/.aios/config.json          [REPO_OWNER] [PRIMARY_REVIEWER]
+/.aios/roles.json           [REPO_OWNER] [PRIMARY_REVIEWER]
+/releases/                  [REPO_OWNER] [PRIMARY_REVIEWER]
+/release/                   [REPO_OWNER] [PRIMARY_REVIEWER]
+
+# Deliberately NOT owner-gated: your normal docs, deliverables, and day-to-day work move freely.
