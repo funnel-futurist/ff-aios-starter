@@ -18,7 +18,7 @@
   },
   "created_from": {
     "branch": "exec/p22-install-20260922",
-    "git_rev": "6fbae45b52a46b7aff635b9d3d77d29d6251cd8c"
+    "git_rev": "1a4cd1657b720968dddea4c691a87d164b885a39"
   },
   "credentials": [
     {
@@ -1619,7 +1619,7 @@
       "class": "managed",
       "mode": "100644",
       "path": "docs/INSTALL_AND_UPGRADE.md",
-      "sha256": "3e7c8111e2d81a4066bed645af9ac8ffb164db3658f1f2e9538b8f331d1a9366"
+      "sha256": "b8809be9e0afe1b2cdc574e684a6c66b5938153861a6720a9ac2723a2915d79b"
     },
     {
       "class": "managed",
@@ -1637,7 +1637,7 @@
       "class": "managed",
       "mode": "100755",
       "path": "scripts/aios/aios.py",
-      "sha256": "7ad07b0fc455ca72bc38ff10d4962013230fef5df62a494e5f5b8426a259fa95"
+      "sha256": "a5563f54e18354964e307198de637694250424937aedabd2b120556e73290e0a"
     },
     {
       "class": "managed",
@@ -1655,7 +1655,7 @@
       "class": "managed",
       "mode": "100644",
       "path": "scripts/aios/aioslib/install.py",
-      "sha256": "68957541798f6dfd11764a602b33c8cdccb198c42c8502ae9323ef321c20314c"
+      "sha256": "0e2383692e5deac44f03ad74038e87afa7e28f98361c7b794e13cc7d0615f076"
     },
     {
       "class": "managed",
@@ -1685,7 +1685,7 @@
       "class": "managed",
       "mode": "100644",
       "path": "scripts/aios/aioslib/util.py",
-      "sha256": "18ebb33a566ad33b459266350772e3d5c9ddb219394a1fb7e989223490e4d18a"
+      "sha256": "e6424b41bff8b0eda26cb5a3818652054f6c04e443b406fe6551425cdc70bade"
     },
     {
       "class": "managed",
