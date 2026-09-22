@@ -43,7 +43,7 @@ the internal client roster and pass `--denylist`.
 | 3 | credential references + sanitization | DONE - hardened against an adversarial review |
 | 4 | governance: CODEOWNERS check + render + template split | DONE - check fails on the real file, by design |
 | 5 | CI wiring + pr-review.yml portability fixes | DONE |
-| 6 | internal validation on real content, clean env | DONE - 38/38 |
+| 6 | internal validation on real content, clean env | DONE - 47/47, also green in CI |
 | 7 | Gemini #11 synthesis; DeepSeek sanitization attack; two-family review | DONE |
 | 8 | propagation sweep (32 repos) | DONE |
 | 9 | receipt + LANE_RECEIPT | DONE |
