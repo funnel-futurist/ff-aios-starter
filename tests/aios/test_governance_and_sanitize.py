@@ -37,10 +37,18 @@ class CodeownersCheck(Sandbox):
         self.assertTrue(any("placeholder" in p for p in problems), problems)
         self.assertTrue(any("enforces nothing" in p for p in problems), problems)
 
-    def test_n7b_the_real_repository_file_is_the_case_that_fails(self):
-        """The actual file on this branch, checked as-is. It must fail until a human fills it."""
+    def test_n7b_the_real_repository_file_now_passes_and_must_keep_passing(self):
+        """The actual file on this branch.
+
+        This assertion used to be the inverse: it required the real file to FAIL, because it
+        was full of [REPO_OWNER] placeholders and the point was to prove the check saw them.
+        Phoenix named the owners (founder corrections, 2026-09-22) and GitHub confirmed which
+        of them actually hold write access, so the file is now real. The durable invariant is
+        the other way round - if placeholders ever come back, or an owner is named who is not
+        bound to this repository, this fails.
+        """
         problems = governance.check(REAL_ROOT, expected_slug="funnel-futurist/ff-aios-starter")
-        self.assertTrue(problems, "if this ever passes with placeholders, the check is broken")
+        self.assertEqual(problems, [], "the repository's own CODEOWNERS stopped enforcing")
 
     def test_a5_a_filled_file_passes(self):
         root = self._write("# aios-codeowners-for: acme/acme-aios\n"

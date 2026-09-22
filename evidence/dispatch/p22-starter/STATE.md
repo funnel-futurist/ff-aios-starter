@@ -60,19 +60,21 @@ the internal client roster and pass `--denylist`.
 
 ## Open gates (nothing here blocks the next instance from working)
 
-1. **Release approval** - Phoenix. `releases/starter-2.6.0.json` is `draft`. Internal validation
-   used a sandbox-only fixture approval; nothing in this repo claims a human approved anything.
-2. **Code owners** - Phoenix names them; an admin turns on branch protection. `main` currently has
-   NO protection, so the CI `governance` job is red on purpose.
+1. **Release approval** - Phoenix. `releases/starter-2.6.0.json` is `draft`. HUMAN_DECISION, not
+   blocked: internal validation used a sandbox-only fixture approval and nothing here claims a
+   human approved anything.
+2. **Code owners - DONE.** Phoenix named Phoenix/John/Justine; GitHub was asked who actually has
+   access. `.github/CODEOWNERS` now names @phoenix-ship-it (write) and @Joburn-ai (admin), the
+   check passes, and the CI `governance` job is GREEN. Remaining: `justine-del` has org-level
+   read only and is not a collaborator, returned as an exact access mismatch; and branch
+   protection still needs the admin account, without which the file enforces nothing.
 3. **AI reviewer credential** - admin. Zero Actions secrets is why `ai_review` has failed since
    2026-06-09. Recommendation recorded: accept manual review here.
-4. **One sanitization finding** - Phoenix. A publicly-readable Google Doc in a client-facing
-   skill, IDENTIFIED per founder correction 97f2671: fully public (HTTP 200, all 45,328 bytes to
-   an anonymous request). No credentials, no client names, no internal hosts - but it IS a
-   worked case study of FF's own subscription spend and support correspondence, which an earlier
-   version of this file wrongly called a blank template. His own rule ("if it contains
-   Funnel Futurist internal-only material, restrict access") points to restrict; he may still
-   judge his own numbers publishable. Does not hold the release.
+4. **The Google Doc - CLOSED by founder decision.** Classified LEGACY_SOURCE /
+   SUPERSEDED_BY_OPERATORS_RESET. The material lives in Operator's Reset SOP 2 of 5 (verified in
+   ai-os). The skill no longer presents the doc as current authority. Residual, not ours:
+   `funnelfuturist.com/operators-reset` returns 404, so there is no live link to point clients
+   at yet - the skill names the source instead of shipping a broken URL.
 5. **Reader access** - Phoenix. This repo is public and a template; evidence here is published.
 
 Full runbooks for all five are in the receipt, section 11.
