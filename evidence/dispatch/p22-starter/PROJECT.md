@@ -48,3 +48,13 @@ account provisioning. Secrets anywhere. Merging PR #11 to get around the broken 
 ## Acceptance criteria (from the prompt, section 12) and negative tests (section 13)
 
 Tracked with status in `STATE.md`.
+
+## Receipt rules learned here
+
+- **Every sha in a receipt is the full 40 characters.** P22-001's envelope used a short
+  `receipt_url` sha and the Integrator's completeness check rejected it: a link that can move
+  is not evidence. The committed receipt was clean; the envelope was not. Both must be.
+- **Counts name the command that produced them**, and a count that changes late gets corrected
+  everywhere, including the units table.
+- **A deliberate FAIL is stated as one**, with its reason, rather than omitted to keep a report
+  looking green. The `governance` CI job is red on purpose and says so in the receipt.
