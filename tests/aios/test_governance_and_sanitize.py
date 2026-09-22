@@ -126,6 +126,16 @@ class Sanitization(Sandbox):
                               denylist_terms=["porter", "pounds"])
         self.assertEqual(findings, [])
 
+    def test_enumerable_findings_carry_no_hash_to_confirm_a_guess_against(self):
+        """A hash of a client name is not safe to publish; a hash of a real key is."""
+        name_hit = self._scan([("notes.md", "call with Acme Fixture")],
+                              denylist_terms=["acme_fixture"])[0]
+        self.assertEqual(name_hit["fingerprint"], "-")
+        url_hit = self._scan([("d.md", "https://x-prod-1.up.railway.app")])[0]
+        self.assertEqual(url_hit["fingerprint"], "-")
+        secret_hit = self._scan([("c.py", 'K="%s"' % ("sk-ant-" + "api03-" + "A" * 40))])[0]
+        self.assertNotEqual(secret_hit["fingerprint"], "-")
+
     def test_n6d_internal_hosts_fail(self):
         findings = self._scan([("doc.md", "see https://odysseus-production-1234.up.railway.app")])
         self.assertTrue(findings)
@@ -215,3 +225,103 @@ if __name__ == "__main__":
     import unittest
 
     unittest.main()
+
+
+class AdversarialRegressions(Sandbox):
+    """Every gap an adversarial review (DeepSeek V4 Pro, 2026-09-22) found and I reproduced.
+
+    Each one was MISSED by the scanner before the fix, reproduced deterministically, then
+    closed. They are pinned here so they cannot come back quietly.
+
+    The sample key deliberately avoids the string `EXAMPLE`: AWS's documentation key
+    `AKIAIOSFODNN7EXAMPLE` is correctly suppressed as a placeholder, which briefly made the
+    fixes look like they had not worked.
+    """
+
+    KEY = "AKIA" + "QRSTUVWX12345678"
+
+    def scan(self, path, data, deny=None):
+        deny_re = None
+        if deny:
+            deny_re, _ = sanitize._denylist_re(deny)
+        return sanitize.scan_bytes(path, data if isinstance(data, bytes) else data.encode(),
+                                   deny_re)
+
+    def test_a_real_key_beside_an_env_read_is_not_suppressed(self):
+        """The line-wide allowlist hid a hard-coded fallback key. Fallbacks live exactly there."""
+        line = 'const k = process.env.STRIPE_KEY || "sk_live_%s"' % ("0" * 22)
+        self.assertTrue(self.scan("config.js", line))
+
+    def test_a_placeholder_is_still_suppressed(self):
+        self.assertEqual(self.scan(".env.example", "ANTHROPIC_API_KEY=your-key-here"), [])
+        self.assertEqual(self.scan("doc.md", "keys look like sk-ant- (prefix)"), [])
+
+    def test_a_secret_beyond_the_old_line_and_size_caps_is_found(self):
+        self.assertTrue(self.scan("long.txt", b"A" * 9000 + self.KEY.encode()))
+        self.assertTrue(self.scan("big.txt", b"A" * (1024 * 1024) + b"\n" + self.KEY.encode()))
+
+    def test_an_oversize_file_is_reported_unscanned_not_silently_skipped(self):
+        findings = sanitize.scan_bytes("huge.bin", b"A" * (sanitize.MAX_SCAN_BYTES + 1))
+        self.assertEqual(findings[0]["kind"], "unscanned")
+
+    def test_utf16_is_decoded(self):
+        self.assertTrue(self.scan("u.txt", (self.KEY + "\n").encode("utf-16")))
+
+    def test_zip_and_office_members_are_opened(self):
+        import io
+        import zipfile
+        buf = io.BytesIO()
+        with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as z:
+            z.writestr("word/document.xml", self.KEY)
+        findings = self.scan("report.docx", buf.getvalue())
+        self.assertTrue(findings)
+        self.assertIn("!word/document.xml", findings[0]["path"])
+
+    def test_base64_encoded_secrets_are_decoded(self):
+        import base64
+        blob = base64.b64encode(self.KEY.encode()).decode()
+        self.assertTrue(self.scan("c.json", '{"k": "%s"}' % blob))
+
+    def test_shapes_that_were_missing_entirely(self):
+        for line in ['K="sk-proj-%s"' % ("a" * 32),
+                     'K="sk_test_%s"' % ("5" * 24),
+                     'U="mongodb://admin:pw@host:27017"',
+                     'U="mysql://root:pw@db:3306/app"']:
+            self.assertTrue(self.scan("c", line), line)
+
+    def test_a_client_name_in_the_path_is_found(self):
+        findings = self.scan("02_Deliverables/Acme Fixture/readme.md", b"nothing here\n",
+                             deny=["Acme Fixture"])
+        self.assertTrue(findings)
+        self.assertEqual(findings[0]["line"], 0)
+
+    def test_private_and_internal_hosts_are_found(self):
+        self.assertTrue(self.scan("e.py", 'U="http://10.0.0.5/admin"'))
+        self.assertTrue(self.scan("e.py", 'U="https://api.corp.internal/v1"'))
+
+    def test_a_long_line_does_not_hang_the_scanner(self):
+        """Unbounded quantifiers before a literal backtracked O(n^2) and hung on 4MB."""
+        import time
+        start = time.time()
+        sanitize.scan_bytes("x.txt", b"A" * (512 * 1024))
+        self.assertLess(time.time() - start, 10.0)
+
+    def test_release_mode_fails_closed_on_unchecked_generic_terms(self):
+        path = os.path.join(self.tmp, "deny3.txt")
+        with open(path, "w") as fh:
+            fh.write("template\nacme_fixture\n")
+        with self.assertRaises(Refusal) as ctx:
+            sanitize.scan_release(self.source, self.rev, ["README.md"], path, "release")
+        self.assertEqual(ctx.exception.code, util.EXIT_SANITIZE)
+        # ...and says so rather than quietly narrowing the claim
+        self.assertTrue(any("not checked" in d or "ordinary English" in d
+                            for d in [ctx.exception.message] + list(ctx.exception.details)))
+        findings, _n, ignored = sanitize.scan_release(
+            self.source, self.rev, ["README.md"], path, "release", acknowledge_generic=True)
+        self.assertEqual(ignored, ["template"])
+
+    def test_the_documented_limitation_is_real_and_stays_documented(self):
+        """A secret assembled across lines is NOT detected. Written down, not pretended away."""
+        self.assertEqual(self.scan("c.py", 'K = "AKIA"\n    "QRSTUVWX12345678"\n'), [])
+        doc = sanitize.__doc__ or ""
+        self.assertIn("assembled across lines", doc)

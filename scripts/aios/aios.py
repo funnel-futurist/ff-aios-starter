@@ -274,7 +274,8 @@ def cmd_sanitize(args):
         spec = release_mod.load_spec(repo, rev)
         paths = [p for p, _c, _m, _s in release_mod.select_files(repo, rev, spec)]
     findings, scanned, ignored = sanitize.scan_release(
-        repo, rev, paths, args.denylist, args.mode, args.allow_generic, args.allowlist)
+        repo, rev, paths, args.denylist, args.mode, args.allow_generic, args.allowlist,
+        args.acknowledge_generic)
     _say("scanned %d file(s) at %s" % (scanned, rev[:12]))
     _say("denylist: %s" % (args.denylist or "(none - mode %s)" % args.mode))
     if ignored:
@@ -406,6 +407,8 @@ def build_parser():
     sa.add_argument("--allow", dest="allowlist",
                     default=os.path.join(_repo_root(), "release", "sanitize_allow.txt"),
                     help="terms that are intentional in this package (publisher branding)")
+    sa.add_argument("--acknowledge-generic", dest="acknowledge_generic", action="store_true",
+                    help="record that the skipped generic terms were reviewed and accepted")
     sa.add_argument("--allow-generic", dest="allow_generic", action="store_true",
                     help="also match denylist terms that are ordinary English words")
     sa.set_defaults(func=cmd_sanitize)
