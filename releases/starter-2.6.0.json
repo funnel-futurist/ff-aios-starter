@@ -18,7 +18,7 @@
   },
   "created_from": {
     "branch": "exec/p22-install-20260922",
-    "git_rev": "fe8e6afa006fac2795552ebcec7a7cdc3ceaaca4"
+    "git_rev": "6ce226f69c1e3e0b122201de7c09440f72191d9d"
   },
   "credentials": [
     {
@@ -485,7 +485,7 @@
       "class": "managed",
       "mode": "100644",
       "path": ".claude/skills/financial_teardown/SKILL.md",
-      "sha256": "1cd627fade74ef5b9557dad305b7c736546ad80cbb8f0c86727f5b92c2ce4a81"
+      "sha256": "737a859e1ccab7373f91da9b8fe5abb7844c51423daf71d2c71d0213e5d10fa6"
     },
     {
       "class": "managed",
