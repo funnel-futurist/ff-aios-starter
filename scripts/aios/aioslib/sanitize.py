@@ -20,7 +20,6 @@ flagged `Reporter` and `compounds` as client names. A check that cries wolf gets
 off, so precision is a safety property, not a nicety.
 """
 
-import os
 import re
 
 from . import util
@@ -28,11 +27,14 @@ from .util import EXIT_SANITIZE, Refusal
 
 # Assembled from fragments for the same reason static_checks.mjs does it: a scanner whose own
 # source contains a contiguous matchable literal flags itself and every PR that touches it.
+# Each pattern requires a plausible key BODY, not just a prefix. A bare `sk-ant-` in a
+# sentence is documentation - the security_check skill has to be able to name the shapes it
+# looks for without tripping the scanner that reads it.
 SECRET_FRAGMENTS = [
-    "sk-ant" + "-",
+    "sk-ant" + "-[A-Za-z0-9_-]{16,}",
     "sk-[a-zA-Z0-9]{20,}",
-    "xoxb" + "-",
-    "xoxp" + "-",
+    "xoxb" + "-[0-9A-Za-z-]{12,}",
+    "xoxp" + "-[0-9A-Za-z-]{12,}",
     "AKIA[A-Z0-9]{16}",
     "ghp_[a-zA-Z0-9]{36}",
     "github_pat" + "_[A-Za-z0-9_]{20,}",
@@ -41,7 +43,7 @@ SECRET_FRAGMENTS = [
     "pit-[0-9a-f]{8}-[0-9a-f]{4}",
     "postgresql:" + r"\/\/[^\s\"']*:[^\s\"']+@",
     "mongodb" + r"\+srv:\/\/[^\s\"']*:[^\s\"']+@",
-    "-----BEGIN (RSA |EC |OPENSSH )?PRIVATE" + "[ ]KEY",
+    "-----BEGIN (RSA |EC |OPENSSH )?PRIVATE" + "[ ]KEY-----",
     "eyJ[A-Za-z0-9_-]{10,}\\.eyJ[A-Za-z0-9_-]{10,}\\.[A-Za-z0-9_-]{10,}",
 ]
 SECRET_RE = re.compile("(" + "|".join(SECRET_FRAGMENTS) + ")", re.I)
@@ -65,6 +67,19 @@ ALLOW_LINE_RE = re.compile(
 MAX_SCAN_BYTES = 4 * 1024 * 1024
 
 
+def load_allowlist(path):
+    """Terms that are intentional in this package (the publisher's own name, for example)."""
+    if not path:
+        return None
+    terms = [t.strip() for t in open(path, "r", encoding="utf-8") if t.strip()
+             and not t.startswith("#")]
+    if not terms:
+        return None
+    return re.compile("|".join(
+        r"\b" + r"[\s_-]?".join(re.escape(w) for w in re.split(r"[\s_-]+", t)) + r"\b"
+        for t in terms), re.I)
+
+
 def load_denylist(path):
     """One term per line; `#` comments ignored. Terms are never echoed in full."""
     terms = []
@@ -76,16 +91,38 @@ def load_denylist(path):
     return terms
 
 
-def _denylist_re(terms):
-    parts = []
+# Single words that are ordinary English before they are anybody's name. A denylist built
+# mechanically from folder names picks these up, and a scan of this repo with such a list
+# returned 178 "client names", every one of them a word like `template` or `internal`.
+# A scanner that cries wolf gets switched off, so precision is a safety property.
+COMMON_WORDS = frozenset("""
+template internal external enable enabled supported support weekly daily monthly client
+clients team project projects brand content main start review reviews global local test
+tests demo example sample draft final new old core base common shared public private
+admin owner user users guide guides doc docs note notes task tasks work works asset assets
+report reports plan plans setup config data info page pages site sites app apps service
+""".split())
+
+
+def _denylist_re(terms, allow_generic=False):
+    """Returns (compiled_regex_or_None, ignored_terms).
+
+    Generic single words are NOT silently dropped: a real client can be called Enable, and a
+    silent drop is a false negative, which is worse than a false positive. They are reported
+    so the operator decides, and `allow_generic` includes them.
+    """
+    parts, ignored = [], []
     for term in terms:
-        words = [re.escape(w) for w in re.split(r"[\s_-]+", term.strip()) if w]
+        words = [w for w in re.split(r"[\s_-]+", term.strip()) if w]
         if not words:
             continue
-        parts.append(r"\b" + r"[\s_-]?".join(words) + r"\b")
+        if not allow_generic and len(words) == 1 and words[0].lower() in COMMON_WORDS:
+            ignored.append(term)
+            continue
+        parts.append(r"\b" + r"[\s_-]?".join(re.escape(w) for w in words) + r"\b")
     if not parts:
-        return None
-    return re.compile("|".join(parts), re.I)
+        return None, ignored
+    return re.compile("|".join(parts), re.I), ignored
 
 
 def fingerprint(text):
@@ -93,7 +130,7 @@ def fingerprint(text):
     return util.sha256_bytes(text.lower().encode("utf-8"))[:12]
 
 
-def scan_bytes(path, data, deny_re=None):
+def scan_bytes(path, data, deny_re=None, allow_re=None):
     """Findings for one file. A finding never carries the matched value, only a fingerprint.
 
     Binary files are scanned too, as latin-1. A secret pasted into a .docx is still a secret,
@@ -111,6 +148,7 @@ def scan_bytes(path, data, deny_re=None):
         if len(line) > 8000:
             line = line[:8000]
         allowed = ALLOW_LINE_RE.search(line)
+        allow_hit = allow_re.search(line) if allow_re is not None else None
         m = SECRET_RE.search(line)
         if m and not allowed:
             findings.append({
@@ -126,7 +164,7 @@ def scan_bytes(path, data, deny_re=None):
                 })
         if deny_re is not None:
             m3 = deny_re.search(line)
-            if m3:
+            if m3 and not (allow_hit and allow_hit.group(0).lower() == m3.group(0).lower()):
                 findings.append({
                     "path": path, "line": lineno, "kind": "client_name",
                     "detail": "denylisted name", "fingerprint": fingerprint(m3.group(0)),
@@ -134,22 +172,23 @@ def scan_bytes(path, data, deny_re=None):
     return findings
 
 
-def scan_files(files, deny_re=None):
+def scan_files(files, deny_re=None, allow_re=None):
     findings = []
     for path, data in files:
-        findings.extend(scan_bytes(path, data, deny_re))
+        findings.extend(scan_bytes(path, data, deny_re, allow_re))
     return findings
 
 
-def scan_release(repo, rev, spec_paths, denylist_path=None, mode="release"):
+def scan_release(repo, rev, spec_paths, denylist_path=None, mode="release",
+                 allow_generic=False, allowlist_path=None):
     """Scan exactly the file set a release would ship.
 
     `mode='release'` requires a denylist: a portability claim made without the list of names
     you are checking for is not a claim, it is a hope.
     """
-    deny_re = None
+    deny_re, ignored = None, []
     if denylist_path:
-        deny_re = _denylist_re(load_denylist(denylist_path))
+        deny_re, ignored = _denylist_re(load_denylist(denylist_path), allow_generic)
     elif mode == "release":
         raise Refusal(
             EXIT_SANITIZE,
@@ -163,8 +202,8 @@ def scan_release(repo, rev, spec_paths, denylist_path=None, mode="release"):
     for path, mode_str, data in util.read_tree(repo, rev):
         if path in wanted:
             files.append((path, data))
-    findings = scan_files(files, deny_re)
-    return findings, len(files)
+    findings = scan_files(files, deny_re, load_allowlist(allowlist_path))
+    return findings, len(files), ignored
 
 
 def require_clean(findings, what="package"):

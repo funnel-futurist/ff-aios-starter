@@ -1,0 +1,12 @@
+# Terms that are INTENTIONAL in this package, so the sanitizer does not report them.
+#
+# Only the publisher's own name belongs here. This is a template published by Funnel
+# Futurist: its name in the LICENSE, and the "an agency like Funnel Futurist" framing in the
+# setup docs, are deliberate branding, not a client leak. FF also appears as a client folder
+# in the internal roster, which is why a mechanically-built denylist flags it.
+#
+# A client name NEVER belongs in this file. Removing the leak is the fix; allowlisting it is
+# not.
+funnel futurist
+funnel-futurist
+ff-aios-starter

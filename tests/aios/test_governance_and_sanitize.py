@@ -102,7 +102,7 @@ class Sanitization(Sandbox):
             path = os.path.join(self.tmp, "deny.txt")
             with open(path, "w") as fh:
                 fh.write("\n".join(denylist_terms) + "\n")
-            deny_re = sanitize._denylist_re(sanitize.load_denylist(path))
+            deny_re, _ignored = sanitize._denylist_re(sanitize.load_denylist(path))
         return sanitize.scan_files([(p, c.encode() if isinstance(c, str) else c)
                                     for p, c in files], deny_re)
 
@@ -139,6 +139,20 @@ class Sanitization(Sandbox):
         blob = b"\x00\x01\x02" + ("xoxb" + "-1234567890-abcdefghijklmnop").encode() + b"\xff"
         findings = sanitize.scan_files([("asset.bin", blob)])
         self.assertTrue(findings, "a secret inside a binary is still a secret")
+
+    def test_generic_denylist_words_are_reported_not_silently_dropped(self):
+        """A silent drop is a false negative; a real client can be called Enable."""
+        path = os.path.join(self.tmp, "deny2.txt")
+        with open(path, "w") as fh:
+            fh.write("template\ninternal\nacme_fixture\n")
+        deny_re, ignored = sanitize._denylist_re(sanitize.load_denylist(path))
+        self.assertEqual(sorted(ignored), ["internal", "template"])
+        self.assertTrue(deny_re.search("Acme Fixture"))
+        self.assertIsNone(deny_re.search("this is a template"))
+        widened, ignored2 = sanitize._denylist_re(sanitize.load_denylist(path),
+                                                  allow_generic=True)
+        self.assertEqual(ignored2, [])
+        self.assertTrue(widened.search("this is a template"))
 
     def test_release_mode_refuses_to_run_without_a_denylist(self):
         """You cannot claim "no client names" without the list of names."""

@@ -273,9 +273,14 @@ def cmd_sanitize(args):
         rev = util.git(repo, ["rev-parse", args.rev])
         spec = release_mod.load_spec(repo, rev)
         paths = [p for p, _c, _m, _s in release_mod.select_files(repo, rev, spec)]
-    findings, scanned = sanitize.scan_release(repo, rev, paths, args.denylist, args.mode)
+    findings, scanned, ignored = sanitize.scan_release(
+        repo, rev, paths, args.denylist, args.mode, args.allow_generic, args.allowlist)
     _say("scanned %d file(s) at %s" % (scanned, rev[:12]))
     _say("denylist: %s" % (args.denylist or "(none - mode %s)" % args.mode))
+    if ignored:
+        _say("ignored:  %d denylist term(s) that are ordinary English words, so the scan stays "
+             "readable: %s" % (len(ignored), ", ".join(sorted(ignored)[:10])))
+        _say("          (pass --allow-generic to include them; a real client CAN be called Enable)")
     if findings:
         _say("findings: %d" % len(findings))
         for f in findings[:50]:
@@ -398,6 +403,11 @@ def build_parser():
     sa.add_argument("--release", help="scan exactly this manifest's file set")
     sa.add_argument("--denylist", help="client-name denylist, supplied at run time")
     sa.add_argument("--mode", choices=("release", "scan"), default="release")
+    sa.add_argument("--allow", dest="allowlist",
+                    default=os.path.join(_repo_root(), "release", "sanitize_allow.txt"),
+                    help="terms that are intentional in this package (publisher branding)")
+    sa.add_argument("--allow-generic", dest="allow_generic", action="store_true",
+                    help="also match denylist terms that are ordinary English words")
     sa.set_defaults(func=cmd_sanitize)
 
     go = sub.add_parser("governance", help="CODEOWNERS check / render")
