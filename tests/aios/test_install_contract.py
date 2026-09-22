@@ -208,7 +208,7 @@ class Credentials(Sandbox):
         self.assertEqual(record["credentials"][0]["resolved"], False)
 
     def test_n2c_a_literal_value_in_config_is_refused_and_never_echoed(self):
-        cfg = harness.config(credentials={"ACME_API_KEY": "sk-ant-" + "a" * 40})
+        cfg = harness.config(credentials={"ACME_API_KEY": "sk-" + "ant-" + "a" * 40})
         problems = orgconfig.validate(cfg)
         self.assertTrue(problems)
         joined = " ".join(problems)

@@ -107,7 +107,7 @@ class Sanitization(Sandbox):
                                     for p, c in files], deny_re)
 
     def test_n6_a_literal_secret_fails(self):
-        key = "sk-ant-" + "api03-" + "A" * 40
+        key = "sk-" + "ant-" + "api03-" + "A" * 40
         findings = self._scan([("config.py", 'KEY = "%s"' % key)])
         self.assertTrue(findings)
         self.assertEqual(findings[0]["kind"], "secret")
@@ -133,7 +133,7 @@ class Sanitization(Sandbox):
         self.assertEqual(name_hit["fingerprint"], "-")
         url_hit = self._scan([("d.md", "https://x-prod-1.up.railway.app")])[0]
         self.assertEqual(url_hit["fingerprint"], "-")
-        secret_hit = self._scan([("c.py", 'K="%s"' % ("sk-ant-" + "api03-" + "A" * 40))])[0]
+        secret_hit = self._scan([("c.py", 'K="%s"' % ("sk-" + "ant-" + "api03-" + "A" * 40))])[0]
         self.assertNotEqual(secret_hit["fingerprint"], "-")
 
     def test_n6d_internal_hosts_fail(self):
@@ -254,7 +254,7 @@ class AdversarialRegressions(Sandbox):
 
     def test_a_placeholder_is_still_suppressed(self):
         self.assertEqual(self.scan(".env.example", "ANTHROPIC_API_KEY=your-key-here"), [])
-        self.assertEqual(self.scan("doc.md", "keys look like sk-ant- (prefix)"), [])
+        self.assertEqual(self.scan("doc.md", "keys look like " + "sk-" + "ant- (prefix)"), [])
 
     def test_a_secret_beyond_the_old_line_and_size_caps_is_found(self):
         self.assertTrue(self.scan("long.txt", b"A" * 9000 + self.KEY.encode()))
