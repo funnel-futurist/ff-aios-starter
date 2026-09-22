@@ -66,8 +66,11 @@ the internal client roster and pass `--denylist`.
    NO protection, so the CI `governance` job is red on purpose.
 3. **AI reviewer credential** - admin. Zero Actions secrets is why `ai_review` has failed since
    2026-06-09. Recommendation recorded: accept manual review here.
-4. **One sanitization finding** - Phoenix. A publicly-readable Google Doc URL in a client-facing
-   skill. The release is blocked until it is resolved, which is correct.
+4. **One sanitization finding** - Phoenix. A publicly-readable Google Doc in a client-facing
+   skill, now IDENTIFIED and measured per founder correction 97f2671: public (HTTP 200, full
+   45,328 bytes to an anonymous request) but carrying nothing sensitive (0 findings from our own
+   scanner, including the generic-term pass). Governance, not exposure. One line from Phoenix
+   closes it, and it does not hold the release.
 5. **Reader access** - Phoenix. This repo is public and a template; evidence here is published.
 
 Full runbooks for all five are in the receipt, section 11.
