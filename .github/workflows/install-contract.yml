@@ -1,0 +1,36 @@
+# The install contract's own tests, plus the governance check that makes an unfilled
+# CODEOWNERS template loud instead of silent.
+#
+# Two separate jobs on purpose:
+#   tests      - must always be green. Deterministic, offline, stdlib only.
+#   governance - RED until a human decides who the code owners are. That is the defect
+#                reporting itself, not a broken pipeline. It does not gate the tests.
+name: Install contract
+
+on:
+  push:
+    branches-ignore: []
+  pull_request:
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Python version (the floor a client machine has to clear)
+        run: python3 --version
+      - name: Install contract tests
+        run: python3 -m unittest discover -s tests/aios -t tests/aios -v
+      - name: PR floor tests (unchanged, run here too so one command covers the repo)
+        run: |
+          node --test scripts/pr_review/static_checks.test.mjs
+          node scripts/team/guard-dangerous-git.test.js
+
+  governance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: CODEOWNERS names real owners, bound to this repository
+        run: python3 scripts/aios/aios.py governance check --repo-slug "${GITHUB_REPOSITORY}"

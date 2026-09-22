@@ -171,9 +171,15 @@ def render(template_text, repo_slug, owners):
             # an owner position is precisely the defect this whole module exists for.
             resolved.extend(handles)
         if not resolved:
-            # Every owner on this rule was unfilled. Writing the rule would create a gate
-            # that matches nobody, which is worse than not writing it.
-            continue
+            # Every owner on this rule was unfilled. Dropping the rule would quietly leave a
+            # catastrophic path with NO owner, which is the same silent weakening as the
+            # placeholder itself. Make the human decide.
+            raise Refusal(
+                EXIT_GOVERNANCE,
+                "no owner supplied for the rule %s" % pattern,
+                ["supply a handle for %s, or delete the rule from the template on purpose"
+                 % ", ".join(sorted(set(PLACEHOLDER_RE.findall(line))))],
+            )
         out_lines.append("%-27s %s" % (pattern, " ".join(resolved)))
     text = "\n".join(out_lines).rstrip("\n") + "\n"
 

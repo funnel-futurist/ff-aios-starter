@@ -1,7 +1,33 @@
 {
+  "_comment": "skills/skill_count are asserted against the tree by tests/aios/test_governance_and_sanitize.py. The authoritative version of an installed workspace is .aios/install.json, not this file.",
+  "skill_count": 24,
+  "skills": [
+    "changelog",
+    "context_load",
+    "dashboard",
+    "docx",
+    "f6_completeness_check",
+    "file_audit",
+    "financial_teardown",
+    "grill_me",
+    "humanize",
+    "onboard_wizard",
+    "pdf",
+    "pptx",
+    "pr_review",
+    "project_management",
+    "qc_review",
+    "resolve-conflict",
+    "review-queue",
+    "security_check",
+    "start",
+    "start-my-day",
+    "upskill",
+    "workspace_health",
+    "wrap-up",
+    "xlsx"
+  ],
   "template": "ff-aios-starter",
-  "version": "2.5.1",
-  "updated": "2026-06-09",
-  "skills": ["context_load", "dashboard", "qc_review", "workspace_health", "changelog", "security_check", "humanize", "file_audit", "f6_completeness_check", "pr_review", "onboard_wizard", "docx", "pdf", "xlsx", "pptx", "upskill", "grill_me", "project_management"],
-  "skill_count": 18
+  "updated": "2026-09-22",
+  "version": "2.6.0"
 }
