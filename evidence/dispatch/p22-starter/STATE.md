@@ -67,10 +67,12 @@ the internal client roster and pass `--denylist`.
 3. **AI reviewer credential** - admin. Zero Actions secrets is why `ai_review` has failed since
    2026-06-09. Recommendation recorded: accept manual review here.
 4. **One sanitization finding** - Phoenix. A publicly-readable Google Doc in a client-facing
-   skill, now IDENTIFIED and measured per founder correction 97f2671: public (HTTP 200, full
-   45,328 bytes to an anonymous request) but carrying nothing sensitive (0 findings from our own
-   scanner, including the generic-term pass). Governance, not exposure. One line from Phoenix
-   closes it, and it does not hold the release.
+   skill, IDENTIFIED per founder correction 97f2671: fully public (HTTP 200, all 45,328 bytes to
+   an anonymous request). No credentials, no client names, no internal hosts - but it IS a
+   worked case study of FF's own subscription spend and support correspondence, which an earlier
+   version of this file wrongly called a blank template. His own rule ("if it contains
+   Funnel Futurist internal-only material, restrict access") points to restrict; he may still
+   judge his own numbers publishable. Does not hold the release.
 5. **Reader access** - Phoenix. This repo is public and a template; evidence here is published.
 
 Full runbooks for all five are in the receipt, section 11.
