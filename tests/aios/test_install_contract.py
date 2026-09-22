@@ -472,3 +472,127 @@ class Concurrency(Sandbox):
             install_mod.upgrade(self.target, self.v1, self.source)  # downgrade, refused
         self.assertFalse(os.path.exists(os.path.join(self.target, install_mod.LOCK_PATH)),
                          "a refusal must not leave the workspace locked")
+
+
+class TwoFamilyReviewRegressions(Sandbox):
+    """Seven defects found by a Gemini + DeepSeek review of this change, each reproduced
+    before being fixed. Two of them - the symlink write and the missing `adopt` role check -
+    were found by BOTH families independently, which is the strongest signal the routing
+    produced."""
+
+    def _installed(self, version="1.0.0"):
+        man = harness.approve(harness.build_manifest(self.source, self.rev, version))
+        install_mod.install(self.target, man, self.source, harness.config())
+        return man
+
+    def test_rollback_refuses_to_overwrite_work_in_a_path_the_release_freed(self):
+        rev1 = harness.bump_source(self.source, {"dropped.txt": "managed in v1\n"})
+        v1 = harness.approve(harness.build_manifest(self.source, rev1, "1.0.0"))
+        install_mod.install(self.target, v1, self.source, harness.config())
+        harness.run_git(self.source, "rm", "-q", "dropped.txt")
+        harness.run_git(self.source, "commit", "-qm", "drop it")
+        v2 = harness.approve(harness.build_manifest(
+            self.source, util.git(self.source, ["rev-parse", "HEAD"]), "2.0.0"))
+        install_mod.upgrade(self.target, v2, self.source)
+        # the path is free; the operator puts their own work there
+        harness.write(self.target, "dropped.txt", "operator's precious work\n")
+        with self.assertRaises(Refusal) as ctx:
+            install_mod.rollback(self.target)
+        self.assertEqual(ctx.exception.code, util.EXIT_STATE)
+        self.assertEqual("operator's precious work\n",
+                         open(os.path.join(self.target, "dropped.txt")).read())
+
+    def test_verify_against_the_pin_catches_a_tampered_install_record(self):
+        self._installed()
+        target_file = os.path.join(self.target, "START_HERE.md")
+        with open(target_file, "w") as fh:
+            fh.write("tampered\n")
+        record_path = os.path.join(self.target, ".aios", "install.json")
+        record = util.read_json(record_path)
+        for entry in record["managed"]:
+            if entry["path"] == "START_HERE.md":
+                entry["sha256"] = util.sha256_file(target_file)
+        util.write_json(record_path, record)
+        # circular check agrees with itself...
+        self.assertEqual(install_mod.verify(self.target)[0], [])
+        # ...the cross-check against the pinned release does not
+        problems, _ = install_mod.verify(self.target, None, self.source)
+        self.assertTrue(any("does not match the pinned release" in p for p in problems),
+                        problems)
+
+    def test_upgrade_refuses_to_write_through_a_symlink(self):
+        """Found by both families. The write escaped the workspace entirely."""
+        self._installed()
+        escaped = os.path.join(self.tmp, "escaped.txt")
+        newp = os.path.join(self.target, ".claude", "skills", "new_skill", "SKILL.md")
+        os.makedirs(os.path.dirname(newp), exist_ok=True)
+        os.symlink(escaped, newp)
+        rev2 = harness.bump_source(self.source,
+                                   {".claude/skills/new_skill/SKILL.md": "# shipped later\n"})
+        v2 = harness.approve(harness.build_manifest(self.source, rev2, "1.1.0"))
+        with self.assertRaises(Refusal) as ctx:
+            install_mod.upgrade(self.target, v2, self.source)
+        self.assertEqual(ctx.exception.code, util.EXIT_STATE)
+        self.assertFalse(os.path.exists(escaped), "a release file was written outside the workspace")
+
+    def test_a_corrupt_install_record_refuses_instead_of_crashing_recovery(self):
+        self._installed()
+        with open(os.path.join(self.target, ".aios", "install.json"), "w") as fh:
+            fh.write("{partial_json")
+        with self.assertRaises(Refusal) as ctx:
+            install_mod.rollback(self.target)
+        self.assertEqual(ctx.exception.code, util.EXIT_STATE)
+        self.assertIn("corrupt", ctx.exception.message)
+
+    def test_records_are_written_atomically(self):
+        """A truncating write is what let a kill leave unparseable JSON behind."""
+        self._installed()
+        record_path = os.path.join(self.target, ".aios", "install.json")
+        util.write_json(record_path, {"schema": "x"})
+        self.assertFalse(os.path.exists(record_path + ".tmp"))
+        self.assertEqual(util.read_json(record_path)["schema"], "x")
+
+    def test_upgrade_does_not_resurrect_a_seed_the_operator_deleted(self):
+        self._installed()
+        seed = os.path.join(self.target, "CLAUDE.md")
+        os.remove(seed)
+        rev2 = harness.bump_source(self.source, {"START_HERE.md": "# v2\n"})
+        v2 = harness.approve(harness.build_manifest(self.source, rev2, "1.1.0"))
+        install_mod.upgrade(self.target, v2, self.source)
+        self.assertFalse(os.path.exists(seed),
+                         "'written once, never touched again' includes not undoing a delete")
+
+    def test_a_failed_upgrade_removes_seeds_it_created(self):
+        self._installed()
+        before = install_mod.state_fingerprint(self.target)
+        rev2 = harness.bump_source(self.source, {"START_HERE.md": "# v2\n",
+                                                 "06_Communication/new_seed.md": "new\n"})
+        v2 = harness.approve(harness.build_manifest(self.source, rev2, "1.1.0"))
+        os.environ["AIOS_FAULT"] = "raise:upgrade.before_record"
+        try:
+            with self.assertRaises(Refusal):
+                install_mod.upgrade(self.target, v2, self.source)
+        finally:
+            os.environ.pop("AIOS_FAULT", None)
+        self.assertFalse(os.path.exists(
+            os.path.join(self.target, "06_Communication", "new_seed.md")))
+        self.assertEqual(install_mod.state_fingerprint(self.target), before,
+                         "a rollback that leaves new files behind did not restore state")
+
+    def test_adopt_is_founder_only_through_the_cli(self):
+        """Found by both families: the policy said founder, the CLI never checked."""
+        man = harness.approve(harness.build_manifest(self.source, self.rev, "1.0.0"))
+        subprocess.run(["git", "clone", "-q", self.source, self.target], check=True,
+                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        self.be("acme-va")
+        code, _out, err = self.cli("adopt", "--repo", self.source,
+                                   "--release", self.write_json("man.json", man),
+                                   "--target", self.target,
+                                   "--config", self.write_json("cfg.json", harness.config()))
+        self.assertEqual(code, util.EXIT_ROLE, err)
+        self.be("acme-founder")
+        code, _out, err = self.cli("adopt", "--repo", self.source,
+                                   "--release", self.write_json("man.json", man),
+                                   "--target", self.target,
+                                   "--config", self.write_json("cfg.json", harness.config()))
+        self.assertEqual(code, 0, err)

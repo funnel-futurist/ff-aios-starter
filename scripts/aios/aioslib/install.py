@@ -44,7 +44,7 @@ def load_record(target):
     if not os.path.isfile(path):
         raise Refusal(EXIT_STATE, "no install record at %s; this workspace was never installed "
                                   "from a release" % path)
-    return util.read_json(path)
+    return util.read_json_safe(path, "install record")
 
 
 def journal_path(target):
@@ -107,17 +107,48 @@ class _Lock(object):
 def load_journal(target):
     path = journal_path(target)
     if os.path.isfile(path):
-        return util.read_json(path)
+        return util.read_json_safe(path, "transaction journal")
     return None
 
 
 # ─── verification ───────────────────────────────────────────────────────────
 
-def verify(target, record=None):
-    """Readback. Returns (problems, summary). Never trusts the record's own word."""
+def verify(target, record=None, source_repo=None):
+    """Readback. Returns (problems, summary).
+
+    Two different questions, and it matters which one you asked:
+
+    * without `source_repo`: "does this workspace still match **what was installed**?" The
+      answer comes from `.aios/install.json`, which lives in the workspace.
+    * with `source_repo`: "...and does that record still match **the pinned release**?" The
+      hashes are re-derived from the git tree at the pinned commit.
+
+    The first is circular against a determined local editor: change a managed file, change
+    its hash in the record, and the readback agrees with itself. A review found exactly that.
+    The record is not a security boundary - it is in the operator's own repo - so the fix is
+    to make the stronger check available and to say plainly which one ran.
+    """
     record = record or load_record(target)
     problems = []
     checked = 0
+    if source_repo:
+        rel = record.get("release") or {}
+        rev = rel.get("git_rev")
+        if not rev or not util.rev_exists(source_repo, rev):
+            problems.append("cannot cross-check: commit %s is not in %s" % (rev, source_repo))
+        else:
+            pinned = {}
+            for path, _mode, data in util.read_tree(source_repo, rev):
+                pinned[path] = sha256_bytes(data)
+            for entry in record.get("managed") or []:
+                want = pinned.get(entry["path"])
+                if want is None:
+                    problems.append("install record claims %s, which is not in the pinned "
+                                    "release" % entry["path"])
+                elif want != entry["sha256"]:
+                    problems.append("install record for %s does not match the pinned release "
+                                    "(record %s, release %s)"
+                                    % (entry["path"], entry["sha256"][:12], want[:12]))
     for entry in record.get("managed") or []:
         path = os.path.join(target, entry["path"])
         if not os.path.isfile(path):
@@ -195,7 +226,36 @@ def _backup(target, record, txn_id):
     return backup_root
 
 
-def _restore(target, backup_root, record_to_restore, remove_paths):
+def _restore(target, backup_root, record_to_restore, remove_paths, expected=None):
+    """Put the backed-up managed files back.
+
+    `expected` is the set of paths this restore is allowed to overwrite: what the current
+    release manages, plus anything the interrupted operation created. Anything else at a
+    restore path is the operator's, created after the release stopped owning that path, and
+    overwriting it silently is state loss - so it is refused instead.
+    """
+    if expected is not None:
+        files_root = os.path.join(backup_root, "files")
+        collisions = []
+        for entry in record_to_restore.get("managed") or []:
+            rel = entry["path"]
+            dest = os.path.join(target, rel)
+            if rel in expected or not os.path.lexists(dest):
+                continue
+            src = os.path.join(files_root, rel)
+            if os.path.isfile(src) and os.path.isfile(dest) \
+                    and sha256_file(src) == sha256_file(dest):
+                continue  # identical; restoring it changes nothing
+            collisions.append(rel)
+        if collisions:
+            raise Refusal(
+                EXIT_STATE,
+                "restoring would overwrite %d file(s) this workspace does not manage"
+                % len(collisions),
+                sorted(collisions)[:20]
+                + ["these paths were freed by a later release and now hold your own work",
+                   "move them aside, then run rollback again"],
+            )
     for rel in remove_paths:
         path = os.path.join(target, rel)
         if os.path.isfile(path):
@@ -382,9 +442,14 @@ def _upgrade_locked(target, manifest, source_repo, aios_lookup=None):
         # files the aborted attempt already created. Without this, rollback leaves orphans.
         "adds": sorted({p for p, e in files.items()
                         if e["class"] == "managed" and p not in old_managed}),
+        # Seeds this upgrade may create. A hard kill leaves them behind otherwise, and the
+        # install record still describes the old release, so recovery cannot infer them.
+        "seed_adds": sorted({p for p, e in files.items()
+                             if e["class"] == "seed" and p not in old_seeded
+                             and not os.path.lexists(os.path.join(target, p))}),
     })
 
-    new_managed, new_seeded = [], []
+    new_managed, new_seeded, created_seeds = [], [], []
     written = 0
     try:
         util.fault("upgrade.before_write")
@@ -396,12 +461,19 @@ def _upgrade_locked(target, manifest, source_repo, aios_lookup=None):
                 raise Refusal(EXIT_PACKAGE,
                               "content at the pin does not match the manifest: %s" % path)
             if entry["class"] == "seed":
-                if not os.path.exists(os.path.join(target, path)):
-                    sha = util.write_file(target, path, data, entry.get("mode", "100644"))
-                    new_seeded.append({"path": path, "sha256": sha})
+                dest = os.path.join(target, path)
+                if os.path.lexists(dest):
+                    new_seeded.append({"path": path, "sha256": sha256_file(dest)
+                                       if os.path.isfile(dest) else ""})
+                elif path in old_seeded:
+                    # Seeded once already and the operator deleted it. "Written once, then
+                    # never touched again" has to include not resurrecting it: an upgrade
+                    # that undoes a deletion has not preserved state, whatever it reports.
+                    new_seeded.append({"path": path, "sha256": ""})
                 else:
-                    new_seeded.append({"path": path,
-                                       "sha256": sha256_file(os.path.join(target, path))})
+                    sha = util.write_file(target, path, data, entry.get("mode", "100644"))
+                    created_seeds.append(path)
+                    new_seeded.append({"path": path, "sha256": sha})
                 continue
             previous = old_managed.get(path)
             sha = util.write_file(target, path, data, entry.get("mode", "100644"))
@@ -454,8 +526,12 @@ def _upgrade_locked(target, manifest, source_repo, aios_lookup=None):
         # so a failed upgrade deleted CLAUDE.md, the foundations and the logs while
         # reporting a clean rollback. The state-fingerprint test caught it.
         new_managed_paths = {p for p, e in files.items() if e["class"] == "managed"}
-        _restore(target, backup_root, record,
-                 remove_paths=sorted(new_managed_paths - set(old_managed)))
+        # Seed files this attempt created are part of what it changed, so they come out too.
+        # Without this the workspace "rolled back" while carrying new files, and still
+        # verified clean - the rollback reported a state it had not restored.
+        removable = sorted((new_managed_paths - set(old_managed)) | set(created_seeds))
+        _restore(target, backup_root, record, remove_paths=removable,
+                 expected=set(old_managed) | new_managed_paths | set(created_seeds))
         problems, _ = verify(target, record)
         if os.path.isfile(journal_path(target)):
             os.remove(journal_path(target))
@@ -491,7 +567,22 @@ def rollback(target):
 def _rollback_locked(target):
     journal = load_journal(target)
     record_path = install_record_path(target)
-    current = util.read_json(record_path) if os.path.isfile(record_path) else None
+    current = None
+    if os.path.isfile(record_path):
+        try:
+            current = util.read_json(record_path)
+        except ValueError:
+            # A kill mid-write used to leave unparseable JSON here and the recovery command
+            # died on it - the crash handler crashing is the worst possible failure mode.
+            # The journal and the backup are enough to recover without it.
+            if not journal:
+                raise Refusal(
+                    EXIT_STATE,
+                    "the install record is corrupt and there is no journal to recover from",
+                    [record_path, "restore .aios/install.json from a snapshot under "
+                                  ".aios/backups/ and run verify"],
+                )
+            current = None
 
     if journal:
         backup_root = os.path.join(target, journal["backup"])
@@ -500,8 +591,10 @@ def _rollback_locked(target):
         # old one did not, rather than trusting how far the write loop got.
         prior_paths = {e["path"] for e in prior.get("managed") or []}
         current_paths = {e["path"] for e in (current or {}).get("managed") or []}
-        remove = sorted((current_paths | set(journal.get("adds") or [])) - prior_paths)
-        _restore(target, backup_root, prior, remove)
+        journal_adds = set(journal.get("adds") or []) | set(journal.get("seed_adds") or [])
+        remove = sorted((current_paths | journal_adds) - prior_paths)
+        _restore(target, backup_root, prior, remove,
+                 expected=current_paths | journal_adds)
         os.remove(journal_path(target))
         problems, summary = verify(target, prior)
         if problems:
@@ -521,9 +614,10 @@ def _rollback_locked(target):
                       % previous.get("version"),
                       [backup_root, "re-install the previous release from its pin instead"])
     prior = util.read_json(os.path.join(backup_root, "install.json"))
-    remove = sorted({e["path"] for e in current.get("managed") or []}
-                    - {e["path"] for e in prior.get("managed") or []})
-    _restore(target, backup_root, prior, remove)
+    current_paths = {e["path"] for e in current.get("managed") or []}
+    prior_paths = {e["path"] for e in prior.get("managed") or []}
+    remove = sorted(current_paths - prior_paths)
+    _restore(target, backup_root, prior, remove, expected=current_paths)
     problems, summary = verify(target, prior)
     if problems:
         raise Refusal(EXIT_VERIFY, "rollback did not restore a verifiable workspace", problems)

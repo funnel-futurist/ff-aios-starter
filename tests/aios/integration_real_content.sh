@@ -111,6 +111,44 @@ aios verify --target "$TARGET" > "$WORK/verify.txt" 2>&1
 expect_code 0 $? "readback verify"
 sed 's/^/    /' "$WORK/verify.txt"
 
+step "A1c: cross-check the install record against the pinned release"
+aios verify --target "$TARGET" --repo "$SRC" > "$WORK/verify_pin.txt" 2>&1
+expect_code 0 $? "record matches the pin"
+grep -q "against the pinned release" "$WORK/verify_pin.txt" \
+  && ok "the stronger check is the one that ran" || bad "wrong check reported"
+# tamper with BOTH the file and the record; only the cross-check can see it
+python3 - "$TARGET" <<'PYEOF'
+import json, sys, hashlib, os
+t = sys.argv[1]
+f = os.path.join(t, "START_HERE.md")
+open(f, "w").write("tampered
+")
+rp = os.path.join(t, ".aios", "install.json")
+rec = json.load(open(rp))
+for e in rec["managed"]:
+    if e["path"] == "START_HERE.md":
+        e["sha256"] = hashlib.sha256(open(f, "rb").read()).hexdigest()
+json.dump(rec, open(rp, "w"), indent=2, sort_keys=True)
+PYEOF
+aios verify --target "$TARGET" >/dev/null 2>&1
+expect_code 0 $? "self-consistent tamper passes the plain readback (this is why --repo exists)"
+aios verify --target "$TARGET" --repo "$SRC" >/dev/null 2>&1
+expect_code 6 $? "cross-check against the pin catches it"
+git -C "$SRC" show "$REV:START_HERE.md" > "$TARGET/START_HERE.md"
+python3 - "$TARGET" "$SRC" "$REV" <<'PYEOF'
+import json, sys, hashlib, subprocess, os
+t, src, rev = sys.argv[1], sys.argv[2], sys.argv[3]
+blob = subprocess.check_output(["git", "-C", src, "show", "%s:START_HERE.md" % rev])
+rp = os.path.join(t, ".aios", "install.json")
+rec = json.load(open(rp))
+for e in rec["managed"]:
+    if e["path"] == "START_HERE.md":
+        e["sha256"] = hashlib.sha256(blob).hexdigest()
+json.dump(rec, open(rp, "w"), indent=2, sort_keys=True)
+PYEOF
+aios verify --target "$TARGET" --repo "$SRC" >/dev/null 2>&1
+expect_code 0 $? "restored and clean again"
+
 step "A1b: readback actually catches a hand edit"
 echo "edited by hand" >> "$TARGET/START_HERE.md"
 aios verify --target "$TARGET" >/dev/null 2>&1

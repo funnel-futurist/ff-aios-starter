@@ -144,10 +144,25 @@ def cmd_adopt(args):
     manifest = util.read_json(args.release)
     config = util.read_json(args.config)
     target = os.path.abspath(args.target)
+
+    # `adopt` is listed as a founder lifecycle action, and the CLI simply did not check -
+    # both review families found it. The policy travels in the release, because an
+    # unpinned workspace's own copy is the thing being adopted.
+    policy = None
+    for path, _mode, data in util.read_tree(repo, manifest["created_from"]["git_rev"]):
+        if path == roles.POLICY_PATH.replace(os.sep, "/"):
+            policy = json.loads(data.decode("utf-8"))
+            break
+    if policy is None:
+        raise Refusal(util.EXIT_ROLE, "the release ships no %s, so no role can be checked"
+                      % roles.POLICY_PATH)
+    login, role = roles.require_lifecycle(policy, config, "adopt")
+
     record = install_mod.adopt(target, manifest, repo, config,
                                _aios_lookup_from(args.aios_releases))
     _say("pinned %s to %s (%d managed files matched byte for byte)"
          % (target, record["release"]["release_id"], len(record["managed"])))
+    _say("  by:       %s (%s)" % (login, role))
     return EXIT_OK
 
 
@@ -160,9 +175,14 @@ def cmd_verify(args):
         _say("run `aios rollback` to restore the previous release")
         return util.EXIT_STATE
     record = install_mod.load_record(target)
-    problems, summary = install_mod.verify(target, record)
+    source = os.path.abspath(args.repo) if args.repo else None
+    problems, summary = install_mod.verify(target, record, source)
     _say("workspace: %s" % target)
     _say("release:   %s (%s)" % (summary["release_id"], summary["version"]))
+    _say("checked:   %s" % ("workspace files AND the install record, against the pinned "
+                            "release in %s" % source if source else
+                            "workspace files against the install record "
+                            "(pass --repo to also check the record against the pinned release)"))
     _say("managed:   %d/%d files re-hashed from disk"
          % (summary["managed_checked"], summary["managed_total"]))
     config = None
@@ -380,6 +400,8 @@ def build_parser():
 
     ve = sub.add_parser("verify", help="readback the workspace against its release")
     ve.add_argument("--target", default=".")
+    ve.add_argument("--repo", help="also cross-check the install record against the pinned "
+                                   "release in this source repo")
     ve.set_defaults(func=cmd_verify)
 
     up = sub.add_parser("upgrade", help="move to a newer approved release")

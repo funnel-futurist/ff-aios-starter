@@ -66,9 +66,28 @@ def write_json(path, obj):
     # sort_keys so a manifest is byte-stable across runs and machines: a rebuilt release
     # must hash the same, or "reproducible" is a word we do not get to use.
     text = json.dumps(obj, indent=2, sort_keys=True) + "\n"
-    with open(path, "w", encoding="utf-8") as fh:
+    # Atomic. Mode "w" truncates before writing, so a kill mid-write left a half-written
+    # install record that no recovery path could parse - the crash handler itself crashed.
+    tmp = path + ".tmp"
+    with open(tmp, "w", encoding="utf-8") as fh:
         fh.write(text)
+        fh.flush()
+        os.fsync(fh.fileno())
+    os.replace(tmp, path)
     return text
+
+
+def read_json_safe(path, what="file"):
+    """read_json, but a corrupt file is a refusal with a way out, not a stack trace."""
+    try:
+        return read_json(path)
+    except ValueError as exc:
+        raise Refusal(
+            EXIT_STATE,
+            "%s at %s is corrupt and cannot be read (%s)" % (what, path, exc),
+            ["this usually means a process was killed mid-write",
+             "a snapshot of the last good record is under .aios/backups/"],
+        )
 
 
 def ensure_parent(path):
@@ -220,6 +239,25 @@ def write_file(target_root, relpath, data, mode):
         raise Refusal(EXIT_PACKAGE, "unsafe path refused: %s" % relpath)
     dest = os.path.join(target_root, relpath)
     ensure_parent(dest)
+    # A symlink at a managed path makes `open(dest, "wb")` write wherever it points -
+    # outside the workspace, if that is where it points. Both review families found this
+    # independently; reproduced 2026-09-22 writing a release file to an arbitrary path.
+    # os.path.exists() is False for a BROKEN symlink, which is why the collision check
+    # upstream missed it too; lexists() sees the link itself.
+    if os.path.islink(dest):
+        raise Refusal(
+            EXIT_STATE,
+            "refusing to write through a symlink: %s" % relpath,
+            ["a link at a managed path would send the release's file wherever it points",
+             "remove the link, then run the operation again"],
+        )
+    real_root = os.path.realpath(target_root)
+    real_parent = os.path.realpath(os.path.dirname(dest))
+    if real_parent != real_root and not real_parent.startswith(real_root + os.sep):
+        raise Refusal(
+            EXIT_STATE,
+            "refusing to write outside the workspace: %s resolves to %s" % (relpath, real_parent),
+        )
     with open(dest, "wb") as fh:
         fh.write(data)
     os.chmod(dest, 0o755 if mode == "100755" else 0o644)
