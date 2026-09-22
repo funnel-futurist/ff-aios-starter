@@ -368,3 +368,48 @@ class BytecodeNeverShips(Sandbox):
         spec["exclude"] = list(spec["exclude"]) + ["**/__pycache__/**", "*.pyc"]
         man = release_mod.build(self.source, rev, "1.0.0", spec=spec)
         self.assertFalse([f for f in man["files"] if "__pycache__" in f["path"]])
+
+
+class ProtectionVerifierTellsTheTruth(Sandbox):
+    """The verifier must not report green over a finding it just printed.
+
+    It did exactly that: the unprotected-branch check incremented the failure counter, and a
+    later `fails=0` wiped it, so one run printed "direct pushes, force-pushes and deletions of
+    main are all allowed" AND "all protections in place". Same defect class this whole package
+    exists to kill, introduced by the fix for it.
+    """
+
+    def _run_with_stub_gh(self, protected):
+        """Run the real script with a stub `gh` that reports a given protection state."""
+        import subprocess
+        gh = os.path.join(self.bin, "gh")
+        os.makedirs(self.bin, exist_ok=True)
+        with open(gh, "w") as fh:
+            fh.write(
+                "#!/bin/sh\n"
+                "case \"$*\" in\n"
+                "  *'branches/main/protection'*) echo 'Not Found' >&2; exit 1;;\n"
+                "  *'branches/main'*) echo %s;;\n"
+                "  *'contents/.github/CODEOWNERS'*) echo CODEOWNERS;;\n"
+                "  *) echo ''; ;;\n"
+                "esac\n" % ("true" if protected else "false"))
+        os.chmod(gh, 0o755)
+        env = dict(os.environ, PATH=self.bin + os.pathsep + os.environ["PATH"])
+        return subprocess.run(
+            ["bash", os.path.join(REAL_ROOT, "scripts", "team", "verify-branch-protection.sh"),
+             "acme/acme-aios"],
+            stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env, cwd=REAL_ROOT)
+
+    def test_an_unprotected_branch_makes_the_script_fail(self):
+        proc = self._run_with_stub_gh(protected=False)
+        out = proc.stdout.decode()
+        self.assertIn("NOT protected", out)
+        self.assertNotIn("all protections in place", out,
+                         "the verifier reported green over the finding it had just printed")
+        self.assertEqual(proc.returncode, 1, out)
+
+    def test_the_failure_counter_is_initialised_before_any_check(self):
+        """Structural guard: an increment above the initialisation is silently discarded."""
+        src = open(os.path.join(REAL_ROOT, "scripts", "team",
+                                "verify-branch-protection.sh")).read()
+        self.assertLess(src.index("fails=0"), src.index("fails=$((fails+1))"))

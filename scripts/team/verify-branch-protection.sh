@@ -19,6 +19,12 @@ echo "────────────────────────�
 # The `protected` flag on the branch itself is readable WITHOUT admin, unlike the protection
 # detail below. Without this, a non-admin run reported INCONCLUSIVE on a repo that had no
 # protection at all — the detector stayed quiet about the loudest possible finding.
+# Initialised here, before the first check. It used to be set further down, AFTER the
+# unprotected-branch check had already incremented it, so the increment was wiped and the
+# script printed "direct pushes are allowed" and "all protections in place" in the same run -
+# a detector reporting green over the finding it had just printed.
+fails=0
+
 PROTECTED=$(gh api "repos/$REPO/branches/main" --jq .protected 2>/dev/null)
 if [ "$PROTECTED" = "false" ]; then
   echo "  ✗ FAIL: main is NOT protected (confirmed without admin: branches/main .protected = false)"
@@ -29,8 +35,6 @@ fi
 PROT=$(gh api "repos/$REPO/branches/main/protection" 2>/tmp/_prot_err)
 CODE=$?
 ERR=$(cat /tmp/_prot_err 2>/dev/null); rm -f /tmp/_prot_err
-
-fails=0
 if [ $CODE -ne 0 ]; then
   if echo "$ERR" | grep -qi "Not Found"; then
     if [ "$PROTECTED" != "false" ]; then
