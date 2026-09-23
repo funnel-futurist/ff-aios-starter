@@ -1,7 +1,7 @@
 # P22 STATE - current at every material change
 
-last_updated: 2026-09-22, resumed session (writer: CHAT P22, Claude Opus 5.5)
-branch: exec/p22-install-20260922
+last_updated: 2026-09-23, fix + approve + publish session (writer: CHAT P22, Claude Opus 5.5)
+branch: exec/p22-rc-2.6.0-20260922 (off main at 0af7e9e); exec/p22-install-20260922 merged as PR #12
 starting_repo_sha: c4387053c956e45a3a190c78d3331214a3b09fff (main, confirmed unmoved at preflight)
 starting_master_revision: 71e063f83b202fbf914e3e4bbc2b4ca9fbc42656 (delegation repo, exec/operating-cutover-20260921)
 lease: ACTIVE -> released with the receipt
@@ -20,15 +20,15 @@ receipt: P22-001-2026-09-22.md (in this folder)
 | CODEOWNERS template (placeholders live HERE, not in `.github/`) | `templates/governance/CODEOWNERS.template` |
 | role-scoped entry skill | `.claude/skills/start/SKILL.md` |
 | operator docs | `docs/INSTALL_AND_UPGRADE.md` |
-| unit tests (71) | `tests/aios/test_*.py` |
-| end-to-end on real content (38 assertions) | `tests/aios/integration_real_content.sh` |
+| unit tests (87) | `tests/aios/test_*.py` |
+| end-to-end on real content (47 assertions) | `tests/aios/integration_real_content.sh` |
 | CI | `.github/workflows/install-contract.yml` |
 
 ## How to re-verify everything in two commands
 
 ```bash
-python3 -m unittest discover -s tests/aios -t tests/aios     # 71 tests
-bash tests/aios/integration_real_content.sh                  # 38 assertions, real content
+python3 -m unittest discover -s tests/aios -t tests/aios     # 87 tests
+bash tests/aios/integration_real_content.sh                  # 47 assertions, real content
 ```
 
 The client-name denylist is **not in this repo** and never will be. Build one at run time from
@@ -54,20 +54,18 @@ the internal client roster and pass `--denylist`.
   repository, so generated client repos no longer pay for it on every push.
 - `Install contract / governance`: **PASS** - CODEOWNERS names real accounts. Runs everywhere.
 - `PR Review`: **PASS** - floor clean, `ai_review` reports "not configured"
-- release `starter-2.6.0`: status **draft**, currently pinned to a PR-branch commit. **Must be
-  re-cut from the merge commit on main before it is approved** - see the brief.
-- sanitization: **0 findings** across 282 files
-- PR: #12, MERGEABLE, CLEAN, zero human reviews
+- release `starter-2.6.0`: **APPROVED** 2026-09-23T06:31:16Z by phoenix-ship-it, pinned to
+  `0c0cf170840295c4fd3fa2a6c9de5dd30bbd63d3` on `main` (the PR #14 merge commit). Tag `starter-2.6.0`.
+- sanitization: **0 findings** on specific client names; the ordinary-word matches all read by
+  hand and all ordinary. The 2 client-name-as-example defects fixed in PR #14 - receipt section 14
+- PR #12: MERGED 2026-09-23T04:17:46Z by phoenix-ship-it, merge commit `0af7e9e`
 - **Release brief:** `releases/starter-2.6.0.BRIEF.md` - read this before asking Phoenix to
   approve anything. Asking for approval without it is the defect it was written to fix.
 
 ## Open gates (nothing here blocks the next instance from working)
 
-1. **Release approval** - Phoenix. HUMAN_DECISION. The ask is `releases/starter-2.6.0.BRIEF.md`,
-   not "reply approved". Order matters: merge PR #12, re-cut 2.6.0 from the merge commit on main,
-   re-run every check, THEN record his approval. The current pin sits on the PR branch, and this
-   repo squash-merges, so a pin approved now would survive only until the branch is deleted.
-   Approval must come from Phoenix directly, never through a relay.
+1. **Release approval - DONE.** Approved and published at `0c0cf17` (receipt section 14).
+   Next: P22-002, the first real client install, on dispatch.
 2. **Code owners - DONE.** Phoenix named Phoenix/John/Justine; GitHub was asked who actually has
    access. `.github/CODEOWNERS` now names @phoenix-ship-it (write) and @Joburn-ai (admin), the
    check passes, and the CI `governance` job is GREEN. Remaining: `justine-del` has org-level

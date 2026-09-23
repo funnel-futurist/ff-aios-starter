@@ -2,9 +2,35 @@
 
 **Written for:** Phoenix, before being asked to approve anything. About three minutes.
 
+## Where this stands - APPROVED (2026-09-23)
+
+| step | status |
+|---|---|
+| 1. Merge PR #12 | **DONE** - 2026-09-23 04:17 UTC, merge commit `0af7e9e841a8fad18b9c1087a7ab03b166056f48`, so every tested commit is on `main` |
+| 2. Re-cut, re-test | **DONE** - candidate pinned to `0af7e9e`, every check green (PR #13) |
+| 3. Fix before approving | **DONE** - the re-cut scan found two code comments using a real client's name as the example of a client name. You chose to fix first. Replaced with a nameless phrasing in PR #14, merged 2026-09-23 06:28 UTC |
+| 4. Re-cut from the corrected `main`, re-run every gate | **DONE** - all green, table below |
+| 5. Approve and publish | **DONE** - approved by you (`phoenix-ship-it`), recorded 2026-09-23 06:31 UTC, on your direct instruction to approve if green |
+
+**Final canonical SHA:** `0c0cf170840295c4fd3fa2a6c9de5dd30bbd63d3` - the PR #14 merge commit on `main`. The release installs exactly the files at this commit and nothing else.
+
+Compared with the candidate at `0af7e9e`: the same 282 files, and exactly two changed - `scripts/aios/aios.py` and `scripts/aios/aioslib/sanitize.py`, the two comments. Nothing else moved.
+
+| gate, run against `0c0cf17` | result |
+|---|---|
+| Unit tests | 87 / 87 pass |
+| End-to-end on the real 282 files, clean environment | 47 / 47 pass |
+| PR static checks + dangerous-git guard | 17 / 17 and 49 / 49 pass |
+| Code-owner check | passes - names real owners, bound to this repo |
+| CI on `main` (GitHub's Linux machine) | pass |
+| Secret and client-name scan, 282 files | 0 findings on the specific client names. The two client names that are also ordinary English words were checked too, and every match was read by hand: all are the ordinary word, none is used as a name |
+| `release verify` | *"installable (pinned, intact, approved)"* |
+
+**What "published" means here:** the approved manifest is on `main` at `releases/starter-2.6.0.json`, and the tag `starter-2.6.0` points at the pinned commit. There is no GitHub Release announcement and nothing was pushed to any client. No client workspace changes until someone runs install, upgrade or adopt on it - and the first real client install is the next package, P22-002.
+
 ## The decision in one line
 
-Approve AIOS Starter 2.6.0, the first version of the client template that clients can install, check and upgrade safely - so that from now on you ship a known version instead of whatever happens to be on `main` the day someone clicks "Use this template".
+*(Made - see the top of this page.)* Approve AIOS Starter 2.6.0, the first version of the client template that clients can install, check and upgrade safely - so that from now on you ship a known version instead of whatever happens to be on `main` the day someone clicks "Use this template".
 
 ## What this release is
 
@@ -24,8 +50,8 @@ It also fixes four things that were quietly broken in the template itself (see "
 |---|---|
 | Files in the release | 282 - 246 the release owns and keeps up to date, 36 starter files that become the client's the moment they land |
 | Skills | 24 |
-| Pinned to | one exact commit, plus a fingerprint of every file. If a single byte changes, it refuses to install |
-| Status now | **DRAFT** - built, tested, waiting for you |
+| Pinned to | `0c0cf170840295c4fd3fa2a6c9de5dd30bbd63d3` on `main`, plus a fingerprint of every file. If a single byte changes, it refuses to install |
+| Status now | **APPROVED** 2026-09-23 06:31 UTC by `phoenix-ship-it` |
 
 ## What changes for clients
 
@@ -56,7 +82,7 @@ One side effect you will see: a new workspace made with the old button inherits 
 
 ## Risks, and how to undo
 
-- **Nobody has reviewed PR #12 but AI.** It is large - about 7,200 lines - but almost all of that is the install tool and its tests, which clients do not edit. The nine existing files it changes are the ones worth your eyes:
+- **PR #12 was merged without a human line-by-line review.** It is large - about 7,200 lines - but almost all of that is the install tool and its tests, which clients do not edit. The nine existing files it changes are the ones worth your eyes:
   - `START_HERE.md`, `CONTRIBUTING.md`, `.claude/skills/README.md` - point to the new `/start` and upgrade steps
   - `.claude/skills/financial_teardown/SKILL.md` - names Operator's Reset instead of the old doc
   - `.github/CODEOWNERS` - real owners instead of placeholders
@@ -65,13 +91,15 @@ One side effect you will see: a new workspace made with the old button inherits 
   - `.template_version.json` - it claimed 18 skills while the template shipped 23; it now lists all 24, including the new `/start`, and a test keeps it honest
   - `scripts/team/verify-branch-protection.sh` - now fails when protection is missing instead of passing
 - **If something is wrong after approving:** set the release back to `withdrawn` and the tool refuses to install it. Nobody is on it until someone runs an install, so there is nothing to roll back in the wild.
-- **If the merge itself is wrong:** revert the merge commit. `main` has no protection today, so nothing stops that, or anything else.
+- **If the merge itself is wrong:** revert the merge commit `0af7e9e`. `main` has no protection today, so nothing stops that, or anything else.
 
 ## The order it has to happen in
 
 This is the one thing that is easy to get wrong, and it is why this brief exists rather than a request to "reply approved".
 
-The release is currently pinned to a commit on the PR branch, not on `main`. This repo's recent PRs were squash-merged, and a squash merge creates a **new** commit - so the commit the release points at would not be on `main`, and would survive only as long as nobody deleted the PR branch. Approve now, delete the branch later, and the release you approved points at nothing.
+*Steps 1 to 3 are done - see the top of this page. Kept here so the reason is on record.*
+
+The release was pinned to a commit on the PR branch, not on `main`. This repo's recent PRs were squash-merged, and a squash merge creates a **new** commit - so the commit the release points at would not be on `main`, and would survive only as long as nobody deleted the PR branch. Approve now, delete the branch later, and the release you approved points at nothing.
 
 So:
 
@@ -85,17 +113,11 @@ So:
 
 ## How to do it
 
-**The easy way - one message.** In this chat, say: *"Merge #12 and approve starter 2.6.0."* I will merge it, re-cut the release from `main`, re-run the checks, and record the approval as yours with the time and where you said it. It has to come from you directly - a message relayed through another session cannot approve a release.
+Done. You said, directly in the P22 chat: fix the client-name examples, rerun the release gates, and if green, approve and publish from the corrected SHA. Every gate was green, so the approval is recorded under your handle with the time.
 
-**Or do the merge yourself:**
+**To withdraw it:** set `"status": "withdrawn"` in `releases/starter-2.6.0.json` on `main`. From then on the tool refuses to install it.
 
-1. Open https://github.com/funnel-futurist/ff-aios-starter/pull/12
-2. Scroll to the bottom of the page, to the green merge button.
-3. Click the arrow beside it and choose **"Create a merge commit"** - this keeps the tested commits on `main`. Squash also works, because I re-cut either way.
-4. Click **Confirm merge**.
-5. Tell me it is merged, and whether you approve 2.6.0.
-6. I re-cut, re-check, and record your approval.
-7. **How to verify:** the file `releases/starter-2.6.0.json` on `main` shows `"status": "approved"` with your handle, and running `python3 scripts/aios/aios.py release verify releases/starter-2.6.0.json` prints *"installable (pinned, intact, approved)"*.
+**How to verify:** the file `releases/starter-2.6.0.json` on `main` shows `"status": "approved"` with your handle, and running `python3 scripts/aios/aios.py release verify releases/starter-2.6.0.json` prints *"installable (pinned, intact, approved)"*.
 
 ## Separate from this release - neither one is needed to approve it
 
