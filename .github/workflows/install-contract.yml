@@ -2,9 +2,17 @@
 # CODEOWNERS template loud instead of silent.
 #
 # Two separate jobs on purpose:
-#   tests      - must always be green. Deterministic, offline, stdlib only.
-#   governance - RED until a human decides who the code owners are. That is the defect
-#                reporting itself, not a broken pipeline. It does not gate the tests.
+#   tests      - the install tool's own test suite. Runs ONLY in the template repository.
+#   governance - runs everywhere, including every workspace generated from this template.
+#
+# Why tests is fenced to the template: this file ships to every client repo, and without the
+# guard every push there ran the installer's 134 checks (87 unit, 47 end-to-end) - about two billed Actions minutes
+# per push (GitHub rounds each job up to a minute), doubled on PR branches, spent testing a tool
+# the client did not write and cannot change. Measured 2026-09-22: tests 18s, governance 4s.
+#
+# Why governance is NOT fenced: in a generated repo it is the check that notices CODEOWNERS still
+# names the template publisher's accounts, which have no access there - the inherited-owner
+# defect. Four seconds is the right price for that.
 name: Install contract
 
 on:
@@ -14,6 +22,8 @@ on:
 
 jobs:
   tests:
+    # The template repository only. Anywhere else this is someone else's test suite.
+    if: github.repository == 'funnel-futurist/ff-aios-starter'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
