@@ -1,6 +1,6 @@
 # P22 STATE - current at every material change
 
-last_updated: 2026-09-23, fix + approve + publish session (writer: CHAT P22, Claude Opus 5.5)
+last_updated: 2026-09-23, founder walkthrough delivered (FD-106) (writer: CHAT P22, Claude Opus 5.5)
 branch: exec/p22-rc-2.6.0-20260922 (off main at 0af7e9e); exec/p22-install-20260922 merged as PR #12
 starting_repo_sha: c4387053c956e45a3a190c78d3331214a3b09fff (main, confirmed unmoved at preflight)
 starting_master_revision: 71e063f83b202fbf914e3e4bbc2b4ca9fbc42656 (delegation repo, exec/operating-cutover-20260921)
@@ -65,7 +65,12 @@ the internal client roster and pass `--denylist`.
 ## Open gates (nothing here blocks the next instance from working)
 
 1. **Release approval - DONE.** Approved and published at `0c0cf17` (receipt section 14).
-   Next: P22-002, the first real client install, on dispatch.
+0. **ACTIVE (FD-106): Founder Walkthrough of 2.6.0 - DELIVERED 2026-09-23, awaiting Phoenix's
+   corrections.** Delivered privately, because it covers internal inventory:
+   https://claude.ai/artifact/DF3JJ4X5VC7B2NBdzpHsty. It raises items for a possible 2.6.1 that
+   are Phoenix's decisions. Order after that: his corrections -> (2.6.1 if he agrees, same
+   fix/check/brief/approve path) -> a ClickUp project for the first non-author tester -> only
+   after he accepts AND the tester validates does P22-002 install into a real client.
 2. **Code owners - DONE.** Phoenix named Phoenix/John/Justine; GitHub was asked who actually has
    access. `.github/CODEOWNERS` now names @phoenix-ship-it (write) and @Joburn-ai (admin), the
    check passes, and the CI `governance` job is GREEN. Remaining: `justine-del` has org-level
