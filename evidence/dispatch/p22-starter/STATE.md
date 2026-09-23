@@ -1,6 +1,6 @@
 # P22 STATE - current at every material change
 
-last_updated: 2026-09-22 (writer: CHAT P22, Claude Opus 5)
+last_updated: 2026-09-22, resumed session (writer: CHAT P22, Claude Opus 5.5)
 branch: exec/p22-install-20260922
 starting_repo_sha: c4387053c956e45a3a190c78d3331214a3b09fff (main, confirmed unmoved at preflight)
 starting_master_revision: 71e063f83b202fbf914e3e4bbc2b4ca9fbc42656 (delegation repo, exec/operating-cutover-20260921)
@@ -48,21 +48,26 @@ the internal client roster and pass `--denylist`.
 | 8 | propagation sweep (32 repos) | DONE |
 | 9 | receipt + LANE_RECEIPT | DONE |
 
-## Verified state at release (CI, Ubuntu runner, not a laptop)
+## Verified state (CI, Ubuntu runner, not a laptop)
 
-- `Install contract / tests`: **PASS** - 85 unit tests + 47 end-to-end assertions
-- `Install contract / governance`: **FAIL, by design** - the placeholder CODEOWNERS
-- `PR Review`: **PASS** - floor clean, `ai_review` reports "not configured", `pr-gate` says
-  "AI review not configured - manual merge only"
-- release `starter-2.6.0` pins `fe8e6afa006fac2795552ebcec7a7cdc3ceaaca4`, status **draft**
-- sanitization: 1 finding, the real one (HUMAN_ACTION 4)
-- PR: #12
+- `Install contract / tests`: **PASS** - 87 unit tests + 47 end-to-end checks. Now fenced to this
+  repository, so generated client repos no longer pay for it on every push.
+- `Install contract / governance`: **PASS** - CODEOWNERS names real accounts. Runs everywhere.
+- `PR Review`: **PASS** - floor clean, `ai_review` reports "not configured"
+- release `starter-2.6.0`: status **draft**, currently pinned to a PR-branch commit. **Must be
+  re-cut from the merge commit on main before it is approved** - see the brief.
+- sanitization: **0 findings** across 282 files
+- PR: #12, MERGEABLE, CLEAN, zero human reviews
+- **Release brief:** `releases/starter-2.6.0.BRIEF.md` - read this before asking Phoenix to
+  approve anything. Asking for approval without it is the defect it was written to fix.
 
 ## Open gates (nothing here blocks the next instance from working)
 
-1. **Release approval** - Phoenix. `releases/starter-2.6.0.json` is `draft`. HUMAN_DECISION, not
-   blocked: internal validation used a sandbox-only fixture approval and nothing here claims a
-   human approved anything.
+1. **Release approval** - Phoenix. HUMAN_DECISION. The ask is `releases/starter-2.6.0.BRIEF.md`,
+   not "reply approved". Order matters: merge PR #12, re-cut 2.6.0 from the merge commit on main,
+   re-run every check, THEN record his approval. The current pin sits on the PR branch, and this
+   repo squash-merges, so a pin approved now would survive only until the branch is deleted.
+   Approval must come from Phoenix directly, never through a relay.
 2. **Code owners - DONE.** Phoenix named Phoenix/John/Justine; GitHub was asked who actually has
    access. `.github/CODEOWNERS` now names @phoenix-ship-it (write) and @Joburn-ai (admin), the
    check passes, and the CI `governance` job is GREEN. Remaining: `justine-del` has org-level

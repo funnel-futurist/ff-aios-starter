@@ -18,7 +18,7 @@
   },
   "created_from": {
     "branch": "exec/p22-install-20260922",
-    "git_rev": "dc9699c7f85c770eb5b57715d8bd82346a14f2eb"
+    "git_rev": "f658a070f18a80a4013479a0ccfbb1099e9461ad"
   },
   "credentials": [
     {
@@ -1337,7 +1337,7 @@
       "class": "managed",
       "mode": "100644",
       "path": ".github/workflows/install-contract.yml",
-      "sha256": "484621a3f1729852c4149b5e8d92cdafe01931725ff96f6a87fd1fc4084f4c43"
+      "sha256": "0df631ef084759d6a86a3077a87e680cec9364419a7f4684ce6dacbf499f03ee"
     },
     {
       "class": "managed",
