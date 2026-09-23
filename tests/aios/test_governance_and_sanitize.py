@@ -159,7 +159,7 @@ class Sanitization(Sandbox):
         self.assertTrue(findings, "a secret inside a binary is still a secret")
 
     def test_generic_denylist_words_are_reported_not_silently_dropped(self):
-        """A silent drop is a false negative; a real client can be called Enable."""
+        """A silent drop is a false negative; a real client's name can be an ordinary word."""
         path = os.path.join(self.tmp, "deny2.txt")
         with open(path, "w") as fh:
             fh.write("template\ninternal\nacme_fixture\n")

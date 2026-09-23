@@ -149,9 +149,9 @@ report reports plan plans setup config data info page pages site sites app apps 
 def _denylist_re(terms, allow_generic=False):
     """Returns (compiled_regex_or_None, ignored_terms).
 
-    Generic single words are NOT silently dropped: a real client can be called Enable, and a
-    silent drop is a false negative, which is worse than a false positive. They are reported
-    so the operator decides, and `allow_generic` includes them.
+    Generic single words are NOT silently dropped: a real client's name can be an ordinary
+    word, and a silent drop is a false negative, which is worse than a false positive. They
+    are reported so the operator decides, and `allow_generic` includes them.
     """
     parts, ignored = [], []
     for term in terms:
