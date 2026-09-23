@@ -301,7 +301,7 @@ def cmd_sanitize(args):
     if ignored:
         _say("ignored:  %d denylist term(s) that are ordinary English words, so the scan stays "
              "readable: %s" % (len(ignored), ", ".join(sorted(ignored)[:10])))
-        _say("          (pass --allow-generic to include them; a real client CAN be called Enable)")
+        _say("          (pass --allow-generic to include them; a real client's name CAN be an ordinary word)")
     if findings:
         _say("findings: %d" % len(findings))
         for f in findings[:50]:
