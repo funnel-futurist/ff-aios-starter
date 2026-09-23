@@ -15,6 +15,7 @@ Welcome. This repo is your **AI Operating System** — your second brain. This p
 ## The two commands (this is the whole routine)
 | When | Command | What it does |
 |---|---|---|
+| First time in this workspace, or "what am I allowed to do here?" | **`/start`** | Tells you who you are, what your role may do, which release is installed, and whether it still matches. |
 | Start of a work session | **`/start-my-day`** | Figures out who you are, syncs you to the latest official version, puts you on a clean branch, helps you decide what "done" looks like, and loads your brain (`/context_load`). |
 | End of a work session | **`/wrap-up`** | Reviews your work like a senior engineer (and cleans it up), saves it, pushes it, opens your review request, and writes a plain-English update for your team. |
 

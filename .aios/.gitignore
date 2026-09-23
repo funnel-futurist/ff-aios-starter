@@ -1,0 +1,6 @@
+# Local, per-machine, never committed. Shipped as part of the package so an upgrade can add
+# new ignore rules without touching your root .gitignore, which is yours to edit.
+backups/
+txn.json
+usage/
+local-operator.json

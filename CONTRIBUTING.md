@@ -31,7 +31,16 @@ Now the latest skills are available — use `/start-my-day` and `/wrap-up` as no
 `yourname/short-topic-YYYY-MM-DD` — e.g. `alex/welcome-emails-2026-06-18`. `/start-my-day` makes these for you.
 
 ## What waits for a human
-Set a `CODEOWNERS` file so the catastrophic / irreversible paths (e.g. `.github/`, your `CLAUDE.md`, the skills/hooks engine, any database migrations) require a **code-owner ([PRIMARY_REVIEWER])** to approve before merge. Everything else can move freely. (See `.github/CODEOWNERS` — fill in the placeholders for your repo.)
+Set a `CODEOWNERS` file so the catastrophic / irreversible paths (e.g. `.github/`, your `CLAUDE.md`, the skills/hooks engine, any database migrations) require a **code owner** to approve before merge. Everything else can move freely.
+
+Render yours from the template, rather than editing a file full of placeholders:
+```bash
+python3 scripts/aios/aios.py governance render --repo-slug <owner>/<repo> \
+  --owner "REPO_OWNER=@your-handle" --owner "PRIMARY_REVIEWER=@their-handle" \
+  --out .github/CODEOWNERS
+python3 scripts/aios/aios.py governance check          # proves it names real people
+```
+A file left with `[REPO_OWNER]` in it matches **nobody** and enforces **nothing**, and a filled one still enforces nothing until branch protection requires code-owner review. The check catches the first; `scripts/team/verify-branch-protection.sh` catches the second.
 
 ## If you're the one who reviews / merges (the repo owner)
 Run **`/review-queue`** anytime to see what needs you right now — what's **ready to merge**, what's **waiting on your review**, what's **blocked**, and what's **going stale**. It reads live from GitHub (never a stale list), names who acts next, and lets you merge with one confirmation. This is your "what's on my plate" view so nothing sits unseen.

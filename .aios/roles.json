@@ -1,0 +1,39 @@
+{
+  "schema": "ff-aios-starter/roles@1",
+  "_comment": "Role scoping is a GUARDRAIL, not authentication. Identity comes from the authenticated GitHub CLI; role comes from the people map in .aios/config.json, which sits on a code-owner-reviewed path. It stops an honest operator wandering into the founder's lane. It does not stop anyone who already has your laptop - that boundary is GitHub permissions and branch protection.",
+  "roles": {
+    "founder": {
+      "entries": ["founder", "operator"],
+      "lifecycle": ["install", "adopt", "upgrade", "rollback", "governance"],
+      "paths_denied": []
+    },
+    "co_founder": {
+      "entries": ["founder", "operator"],
+      "lifecycle": ["install", "adopt", "upgrade", "rollback", "governance"],
+      "paths_denied": []
+    },
+    "operator": {
+      "entries": ["operator"],
+      "lifecycle": [],
+      "paths_denied": [
+        "01_Foundations/offer_economics/**",
+        ".github/**",
+        ".aios/config.json",
+        ".aios/roles.json",
+        ".claude/settings.json",
+        ".claude/hooks/**"
+      ]
+    }
+  },
+  "entries": {
+    "operator": {
+      "summary": "run the day, ship the work, hand it over cleanly",
+      "skills": ["start-my-day", "context_load", "dashboard", "qc_review", "review-queue", "humanize", "security_check", "resolve-conflict", "wrap-up"]
+    },
+    "founder": {
+      "summary": "own the brain, the money and the gates",
+      "skills": ["start-my-day", "context_load", "dashboard", "grill_me", "project_management", "f6_completeness_check", "financial_teardown", "upskill", "review-queue", "wrap-up"],
+      "actions": ["aios upgrade", "aios rollback", "aios governance check", "edit .aios/config.json (people and credential references)"]
+    }
+  }
+}

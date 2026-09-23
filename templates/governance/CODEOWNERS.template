@@ -1,5 +1,4 @@
 # CODEOWNERS - only CATASTROPHIC / IRREVERSIBLE paths need an owner.
-# aios-codeowners-for: funnel-futurist/ff-aios-starter
 # Everything else moves freely (no bottleneck). A mistake on the paths below can't be cleanly undone,
 # so they require a code-owner's review before merging into main.
 #
@@ -13,6 +12,9 @@
 # The rendered file carries an `# aios-codeowners-for:` line naming the repository it belongs to,
 # so a workspace generated from a template cannot silently inherit somebody else's owners.
 #
+#   [REPO_OWNER]        = the founder / repo owner
+#   [PRIMARY_REVIEWER]  = whoever approves governance changes (often the same person)
+#   [TECHNICAL_REVIEWER]= optional second owner for code/migrations
 #
 # Naming an owner is necessary but NOT sufficient: GitHub only enforces it when branch protection
 # on main has "Require review from Code Owners" turned on. Check both with:
@@ -20,24 +22,24 @@
 #   bash scripts/team/verify-branch-protection.sh
 
 # Irreversible - a mistake here can't be cleanly undone
-**/migrations/**            @phoenix-ship-it
-**/*.sql                    @phoenix-ship-it
-.env*                       @phoenix-ship-it
-.gitignore                  @phoenix-ship-it
+**/migrations/**            [REPO_OWNER] [TECHNICAL_REVIEWER]
+**/*.sql                    [REPO_OWNER] [TECHNICAL_REVIEWER]
+.env*                       [REPO_OWNER]
+.gitignore                  [REPO_OWNER]
 
 # The review/merge gate itself - weakening this dilutes every other guarantee
-/.github/                   @phoenix-ship-it @Joburn-ai
+/.github/                   [REPO_OWNER] [PRIMARY_REVIEWER]
 
 # The brain's constitution + the skill/hook engine (governs every session + agent)
-/CLAUDE.md                  @phoenix-ship-it @Joburn-ai
-/.claude/skills/            @phoenix-ship-it @Joburn-ai
-/.claude/settings.json      @phoenix-ship-it @Joburn-ai
-/.claude/hooks/             @phoenix-ship-it @Joburn-ai
+/CLAUDE.md                  [REPO_OWNER] [PRIMARY_REVIEWER]
+/.claude/skills/            [REPO_OWNER] [PRIMARY_REVIEWER]
+/.claude/settings.json      [REPO_OWNER] [PRIMARY_REVIEWER]
+/.claude/hooks/             [REPO_OWNER] [PRIMARY_REVIEWER]
 
 # Who may operate this workspace, and which release it runs - the install contract's own gate
-/.aios/config.json          @phoenix-ship-it @Joburn-ai
-/.aios/roles.json           @phoenix-ship-it @Joburn-ai
-/releases/                  @phoenix-ship-it @Joburn-ai
-/release/                   @phoenix-ship-it @Joburn-ai
+/.aios/config.json          [REPO_OWNER] [PRIMARY_REVIEWER]
+/.aios/roles.json           [REPO_OWNER] [PRIMARY_REVIEWER]
+/releases/                  [REPO_OWNER] [PRIMARY_REVIEWER]
+/release/                   [REPO_OWNER] [PRIMARY_REVIEWER]
 
 # Deliberately NOT owner-gated: your normal docs, deliverables, and day-to-day work move freely.

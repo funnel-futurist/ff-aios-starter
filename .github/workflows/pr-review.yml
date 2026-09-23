@@ -1,15 +1,13 @@
 # Converged PR auto-reviewer — event-driven, one brain (pr_review skill), GitHub-enforced gate.
-# Replaces the DO cron (github_pr_autoreviewer_v2.js). See:
-#   11_Operations/overnight/SPEC_converged_pr_autoreviewer_2026_06_08.md
 #
 # Three jobs:
 #   static_checks — deterministic floor (no LLM). REQUIRED status check. Fails only on a true BLOCK.
 #   ai_review     — runs the pr_review skill via claude-code-action. Posts the review, writes verdict.json.
 #   gate          — deterministic. Sets the `pr-gate` commit status + enables native auto-merge if eligible.
 #
-# Gating model (all GitHub-enforced — see SPEC):
+# Gating model (all GitHub-enforced):
 #   Tier 1 (in-lane, low-risk, eligible)        -> auto-merge, no human
-#   Tier 2 (touches a CODEOWNERS path)          -> require_code_owner_reviews holds it for John
+#   Tier 2 (touches a CODEOWNERS path)          -> require_code_owner_reviews holds it for a code owner
 #   Tier 3 (secrets / destructive migration)    -> static_checks fails -> unmergeable
 #
 # Fail asymmetry: blocking fails OPEN (a bug never blocks a human); auto-merge fails CLOSED
@@ -87,15 +85,31 @@ jobs:
     needs: static_checks
     # Skip the (paid) deep review when the deterministic floor already hard-blocks. Matches the cron.
     if: needs.static_checks.outputs.has_block != 'true'
+    env:
+      # "No credential configured" and "the reviewer crashed" are different facts and must not
+      # look the same. Without this, a repo that never configured a key shows a red X on every
+      # single PR — and a check that is always red is a check nobody reads.
+      HAS_CLAUDE_CREDENTIAL: ${{ (secrets.ANTHROPIC_API_KEY != '' || secrets.CLAUDE_CODE_OAUTH_TOKEN != '') && 'yes' || 'no' }}
     steps:
+      - name: AI review is not configured
+        if: env.HAS_CLAUDE_CREDENTIAL != 'yes'
+        run: |
+          echo "::warning title=AI review not configured::No ANTHROPIC_API_KEY or CLAUDE_CODE_OAUTH_TOKEN secret is set for this repository, so no AI review ran. The deterministic floor (static_checks) still ran. This PR needs a human review before merge."
+          printf '%s\n' '{"configured": false, "reason": "no ANTHROPIC_API_KEY or CLAUDE_CODE_OAUTH_TOKEN secret"}' > verdict.json
+          { echo "### AI review"; echo; echo "**Not configured** — no Claude credential secret on this repository."; echo "The deterministic floor still ran. A human reviews this PR."; } >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/checkout@v4          # check out the PR HEAD branch so the reviewer can push auto-fixes (+ discover .claude/skills)
+        if: env.HAS_CLAUDE_CREDENTIAL == 'yes'
         with:
           fetch-depth: 0
           ref: ${{ github.event.pull_request.head.ref }}
       - name: Claude review (pr_review skill)
+        if: env.HAS_CLAUDE_CREDENTIAL == 'yes'
         uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          # A subscription token from `claude setup-token` works too, so a client without API
+          # billing can still run the reviewer.
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           # Allow the action to run on bot-initiated events — needed so the re-run AFTER an auto-fix
           # push (made by the claude bot) is permitted to finalize (review→approve). The skill's
           # [pr-autofix] loop guard prevents an actual loop (the re-run reviews, it never re-fixes).
@@ -151,6 +165,7 @@ jobs:
           try { v = JSON.parse(fs.readFileSync('verdict.json', 'utf8')); } catch {}
 
           const staticBlocked = STATIC_BLOCK === 'true';
+          const notConfigured = !!(v && v.configured === false);
           const aiErrored = AI_RESULT !== 'success' && AI_RESULT !== 'skipped';
           const hasErrorSeverity = !!(v && v.has_error_severity);
           const codeownerTouched = !!(v && v.codeowner_path_touched);
@@ -163,6 +178,7 @@ jobs:
           const state = gateFail ? 'failure' : 'success';
           const desc = staticBlocked ? 'Blocked by deterministic floor'
             : hasErrorSeverity ? 'AI review found error-severity issues'
+            : notConfigured ? 'AI review not configured - manual merge only'
             : aiErrored ? 'AI review did not complete - manual merge only'
             : 'Passed review';
           const safeDesc = desc.replace(/'/g, '').slice(0, 140);
@@ -172,7 +188,7 @@ jobs:
           // Tiering (deterministic — from the cron). Eligible => enable native auto-merge.
           const tierEligible =
             (adds <= 200 && score >= 7) || (adds <= 500 && score >= 8) || (adds <= 1000 && score >= 9);
-          const eligible = !gateFail && !aiErrored && !codeownerTouched && v && tierEligible;
+          const eligible = !gateFail && !aiErrored && !notConfigured && !codeownerTouched && v && tierEligible;
           const armed = process.env.PR_AUTOMERGE === 'on';   // repo variable; OFF during bake = kill-switch
 
           let mergeNote = 'manual merge';
@@ -185,8 +201,10 @@ jobs:
             }
           } else if (eligible && !armed) {
             mergeNote = `eligible (${adds} lines, score ${score}/10) — auto-merge DISARMED (PR_AUTOMERGE != on)`;
+          } else if (notConfigured) {
+            mergeNote = 'AI review not configured - human review required';
           } else if (codeownerTouched) {
-            mergeNote = 'escalated to CODEOWNER (John)';
+            mergeNote = 'escalated to a code owner';
           } else if (staticBlocked || hasErrorSeverity) {
             mergeNote = 'blocked';
           }

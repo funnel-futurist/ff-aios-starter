@@ -1,0 +1,1770 @@
+{
+  "approval": {
+    "approved_at": null,
+    "approved_by": null
+  },
+  "compatibility": {
+    "breaking": [],
+    "min_upgrade_from": null
+  },
+  "consumes": {
+    "aios_release": null
+  },
+  "counts": {
+    "files": 282,
+    "managed": 246,
+    "seed": 36,
+    "skills": 24
+  },
+  "created_from": {
+    "branch": "exec/p22-install-20260922",
+    "git_rev": "f658a070f18a80a4013479a0ccfbb1099e9461ad"
+  },
+  "credentials": [
+    {
+      "name": "ANTHROPIC_API_KEY",
+      "purpose": "Only needed for API billing or the CI reviewer. A Claude subscription needs no key here.",
+      "required": false
+    },
+    {
+      "name": "OPENAI_API_KEY",
+      "purpose": "Only if you use embeddings or Whisper transcription.",
+      "required": false
+    },
+    {
+      "name": "GOOGLE_CLIENT_ID",
+      "purpose": "Only if you connect Google Workspace via API.",
+      "required": false
+    },
+    {
+      "name": "GOOGLE_CLIENT_SECRET",
+      "purpose": "Only if you connect Google Workspace via API.",
+      "required": false
+    }
+  ],
+  "files": [
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".aios/.gitignore",
+      "sha256": "fa208dc1c87cd3b2767d59080ca514c3683ebfb5ed8d0f738653c1c415ab0834"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": ".aios/local-operator.example.json",
+      "sha256": "07df5a30f9f77ec34b4d2c549954d47b56b4da95d267a182f64442d214bb4258"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".aios/roles.json",
+      "sha256": "92a67231fbc550d0542e6ca6d725505a89cd3d1da6519c991015e346c76a5b29"
+    },
+    {
+      "class": "managed",
+      "mode": "100755",
+      "path": ".claude/hooks/git-staleness-check.js",
+      "sha256": "380cebfef94ec6d60124b4189732e30a1a59a226526588ea7dc1b6a33484602c"
+    },
+    {
+      "class": "managed",
+      "mode": "100755",
+      "path": ".claude/hooks/guard-dangerous-git.js",
+      "sha256": "878f7ed6b7f59a8ec162268323c98ab9f23fd4df6c302370d74cb9bdd9da860a"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/settings.json",
+      "sha256": "d692d48d60214703e808013f7dc988f7103d393387ace0ce5f5922cdc6e9dc76"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/README.md",
+      "sha256": "4d08a70f96d65ab9669d80b4484293e89644e961a0a7762d46e478772f8710b4"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/changelog/SKILL.md",
+      "sha256": "42a3079b1dc9f725b5d1f7e50acd0e2f8c9cae6815982b841d513e115f67b743"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/context_load/SKILL.md",
+      "sha256": "7947d736fdfe4ae089adc1777e6ee43557e08e621bcdcb1731f124313e1f925c"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/dashboard/SKILL.md",
+      "sha256": "0d80ab5dd929496d66f4830b0f43ed6747712727075cf1e12fe10f56df405bfa"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/docx/LICENSE.txt",
+      "sha256": "79f6d8f5b427252fa3b1c11ecdbdb6bf610b944f7530b4de78f770f38741cfaa"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/docx/SKILL.md",
+      "sha256": "cfbabd72b1aec7dfaad988fb6e5e16b27dc744b9a00cae15db9045e95f53903e"
+    },
+    {
+      "class": "managed",
+      "mode": "100755",
+      "path": ".claude/skills/docx/scripts/__init__.py",
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    },
+    {
+      "class": "managed",
+      "mode": "100755",
+      "path": ".claude/skills/docx/scripts/accept_changes.py",
+      "sha256": "0c991d2bc7304a1248e9f3bf9b1498f0b6e76641fc457e7cbd73c99b4eef3a74"
+    },
+    {
+      "class": "managed",
+      "mode": "100755",
+      "path": ".claude/skills/docx/scripts/comment.py",
+      "sha256": "e86e4e17ec5805780325206d20d3ed5a8f7024f1e4641ac8f46ef5df0b564f63"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/docx/scripts/office/helpers/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/docx/scripts/office/helpers/merge_runs.py",
+      "sha256": "7c40ed838b88639c51f9ffdcfd564b568f26832b78fe44008c0e01b742669ca7"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/docx/scripts/office/helpers/simplify_redlines.py",
+      "sha256": "560cb55978a834c505406eb18e2c61f62f998fc7a2d8e9721b9c563b42597896"
+    },
+    {
+      "class": "managed",
+      "mode": "100755",
+      "path": ".claude/skills/docx/scripts/office/pack.py",
+      "sha256": "b1800987e568261a31f462df8e1303d386e9e6ccc11a75ef46e60cc528c20683"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/docx/scripts/office/schemas/ISO-IEC29500-4_2016/dml-chart.xsd",
+      "sha256": "41b93bd8857cc68b1e43be2806a872d736a9bdd6566900062d8fdb57d7bbb354"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/docx/scripts/office/schemas/ISO-IEC29500-4_2016/dml-chartDrawing.xsd",
+      "sha256": "3fd0586f2637b98bb9886f0e0b67d89e1cc987c2d158cc7deb5f5b9890ced412"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/docx/scripts/office/schemas/ISO-IEC29500-4_2016/dml-diagram.xsd",
+      "sha256": "29b254ee0d10414a8504b5a08149c7baec35a60d5ff607d6b3f492aa36815f40"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/docx/scripts/office/schemas/ISO-IEC29500-4_2016/dml-lockedCanvas.xsd",
+      "sha256": "5cb76dabd8b97d1e9308a1700b90c20139be4d50792d21a7f09789f5cccd6026"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/docx/scripts/office/schemas/ISO-IEC29500-4_2016/dml-main.xsd",
+      "sha256": "5375417f0f5394b8dd1a7035b9679151f19a6b65df309dec10cfb4a420cb00e9"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/docx/scripts/office/schemas/ISO-IEC29500-4_2016/dml-picture.xsd",
+      "sha256": "5d389d42befbebd91945d620242347caecd3367f9a3a7cf8d97949507ae1f53c"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/docx/scripts/office/schemas/ISO-IEC29500-4_2016/dml-spreadsheetDrawing.xsd",
+      "sha256": "b4532b6d258832953fbb3ee4c711f4fe25d3faf46a10644b2505f17010d01e88"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/docx/scripts/office/schemas/ISO-IEC29500-4_2016/dml-wordprocessingDrawing.xsd",
+      "sha256": "bdad416b096b61d37b71603b2c949484f9070c830bdaeba93bf35e15c8900614"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/docx/scripts/office/schemas/ISO-IEC29500-4_2016/pml.xsd",
+      "sha256": "d173c3e5d61e42e2e3a97226c632fd2ab7cc481fc4e492365b87024ab546daff"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/docx/scripts/office/schemas/ISO-IEC29500-4_2016/shared-additionalCharacteristics.xsd",
+      "sha256": "3c6709101c6aaa82888df5d8795c33f9e857196790eb320d9194e64be2b6bdd8"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/docx/scripts/office/schemas/ISO-IEC29500-4_2016/shared-bibliography.xsd",
+      "sha256": "0b364451dc36a48dd6dae0f3b6ada05fd9b71e5208211f8ee5537d7e51a587e2"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/docx/scripts/office/schemas/ISO-IEC29500-4_2016/shared-commonSimpleTypes.xsd",
+      "sha256": "e2abacbb9a55ce1365f8961bc1b1395bbc811e512b111000d8c333f98458dece"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/docx/scripts/office/schemas/ISO-IEC29500-4_2016/shared-customXmlDataProperties.xsd",
+      "sha256": "0ef4bb354ff44b923564c4ddbdda5987919d220225129ec94614a618ceafc281"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/docx/scripts/office/schemas/ISO-IEC29500-4_2016/shared-customXmlSchemaProperties.xsd",
+      "sha256": "0d103b99a4a8652f8871552a69d42d2a3760ac6a5e3ef02d979c4273257ff6a4"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/docx/scripts/office/schemas/ISO-IEC29500-4_2016/shared-documentPropertiesCustom.xsd",
+      "sha256": "9c085407751b9061c1f996f6c39ce58451be22a8d334f09175f0e89e42736285"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/docx/scripts/office/schemas/ISO-IEC29500-4_2016/shared-documentPropertiesExtended.xsd",
+      "sha256": "bc92e36ccd233722d4c5869bec71ddc7b12e2df56059942cce5a39065cc9c368"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/docx/scripts/office/schemas/ISO-IEC29500-4_2016/shared-documentPropertiesVariantTypes.xsd",
+      "sha256": "7b5b7413e2c895b1e148e82e292a117d53c7ec65b0696c992edca57b61b4a74b"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/docx/scripts/office/schemas/ISO-IEC29500-4_2016/shared-math.xsd",
+      "sha256": "3213ef1631606250f5010b42cad7ef716f7c59426367798e33c374c0ec391d3a"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/docx/scripts/office/schemas/ISO-IEC29500-4_2016/shared-relationshipReference.xsd",
+      "sha256": "12264f3c03d738311cd9237d212f1c07479e70f0cbe1ae725d29b36539aef637"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/docx/scripts/office/schemas/ISO-IEC29500-4_2016/sml.xsd",
+      "sha256": "beffeed56945c22a77440122c8bdc426f3fcbe7f3b12ea0976c770d1f8d54578"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/docx/scripts/office/schemas/ISO-IEC29500-4_2016/vml-main.xsd",
+      "sha256": "f5ee623b08b6a66935e5aced2f5d8ad0fc71bf9e8e833cd490150c0fa94b8763"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/docx/scripts/office/schemas/ISO-IEC29500-4_2016/vml-officeDrawing.xsd",
+      "sha256": "585bedc1313b40888dcc544cb74cd939a105ee674f3b1d3aa1cc6d34f70ff155"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/docx/scripts/office/schemas/ISO-IEC29500-4_2016/vml-presentationDrawing.xsd",
+      "sha256": "133c9f64a5c5d573b78d0a474122b22506d8eadb5e063f67cdbbb8fa2f161d0e"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/docx/scripts/office/schemas/ISO-IEC29500-4_2016/vml-spreadsheetDrawing.xsd",
+      "sha256": "6bdeb169c3717eb01108853bd9fc5a3750fb1fa5b82abbdd854d49855a40f519"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/docx/scripts/office/schemas/ISO-IEC29500-4_2016/vml-wordprocessingDrawing.xsd",
+      "sha256": "475dcae1e7d1ea46232db6f8481040c15e53a52a3c256831d3df204212b0e831"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/docx/scripts/office/schemas/ISO-IEC29500-4_2016/wml.xsd",
+      "sha256": "c2dd9f61f892deae6acd8d20771ea79b12018af25f3bf8d06639c8542d218cfd"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/docx/scripts/office/schemas/ISO-IEC29500-4_2016/xml.xsd",
+      "sha256": "a539aa2fb154fa50e0f5cc97e6ad7cbc66f8ec3e3746f61ec6a8b0d5d15ecdf2"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/docx/scripts/office/schemas/ecma/fouth-edition/opc-contentTypes.xsd",
+      "sha256": "9e0b7209fc69ab11987900404540969976000c5ebe4d4f58c43dc3842886bf3a"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/docx/scripts/office/schemas/ecma/fouth-edition/opc-coreProperties.xsd",
+      "sha256": "451958454e8588dfc7cd945981ada142ca06ff3307937f5700df059c2b307fa8"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/docx/scripts/office/schemas/ecma/fouth-edition/opc-digSig.xsd",
+      "sha256": "6de111e11403f7cd49027400755bae0ea1cabef2815f09bd40a24f0017613b24"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/docx/scripts/office/schemas/ecma/fouth-edition/opc-relationships.xsd",
+      "sha256": "f565adfef5a502044abc3a9153e157edc25af78304d335994afb958874b15e26"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/docx/scripts/office/schemas/mce/mc.xsd",
+      "sha256": "3a37e461ecf5a8670fdec34029703401f8728ab9c96ec1739a6ae58d55212413"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/docx/scripts/office/schemas/microsoft/wml-2010.xsd",
+      "sha256": "568b26ee156cb9549aa439ca2158965f77b7c1602b7e0316f40ac6cf586e35f2"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/docx/scripts/office/schemas/microsoft/wml-2012.xsd",
+      "sha256": "0fa75578a000439a7988ba0c59fdc69f774bbd416cbacc14d07125b3f686cb74"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/docx/scripts/office/schemas/microsoft/wml-2018.xsd",
+      "sha256": "be0ff793a22dd31384650c3a4da14c2fa8062751c2e97b0e5ee852bda13c60ad"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/docx/scripts/office/schemas/microsoft/wml-cex-2018.xsd",
+      "sha256": "fddc2b880cabb9005aebbc7e783e53c19fec1c03df7d0e2f2076a33a0fdfd081"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/docx/scripts/office/schemas/microsoft/wml-cid-2016.xsd",
+      "sha256": "127ca209fa73d7cb708449cb355c871867948a96e4a74f7bf5811ef62d17991d"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/docx/scripts/office/schemas/microsoft/wml-sdtdatahash-2020.xsd",
+      "sha256": "842e7163409c8d74f4d7088a8bc99500d80bc75332681a0980055b08f374a604"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/docx/scripts/office/schemas/microsoft/wml-symex-2015.xsd",
+      "sha256": "16f6f8072249f431370723c2cd8974672e0d9c897e00e97dd918079df934871b"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/docx/scripts/office/soffice.py",
+      "sha256": "a3e21840e29e32f947d5286028931b96eaf2dee63f75d883b8eb19c943c80aa0"
+    },
+    {
+      "class": "managed",
+      "mode": "100755",
+      "path": ".claude/skills/docx/scripts/office/unpack.py",
+      "sha256": "83f69cecc87910183654c06345837244402e8a99edbf3bdddc1cf72f11304b62"
+    },
+    {
+      "class": "managed",
+      "mode": "100755",
+      "path": ".claude/skills/docx/scripts/office/validate.py",
+      "sha256": "1aef24f8e316965a0584c30859776bd2c82a9fb69f72d79cfed041119cf95514"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/docx/scripts/office/validators/__init__.py",
+      "sha256": "83e0f035c5abea238d3f2c3968afbd511ed022b527b7c9cb60a9434cc34ff987"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/docx/scripts/office/validators/base.py",
+      "sha256": "d6358b67252df4dbfe4fa6647423a765960c949346ef6a8c4eb8722bb1108d25"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/docx/scripts/office/validators/docx.py",
+      "sha256": "0ef04ce86b2e6b6a1cb088c0276fd0bd5b770d96fdfe7a6cc73d005feb3f0345"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/docx/scripts/office/validators/pptx.py",
+      "sha256": "f937961e62a5fa0d002b8dc51a4c4e2cd8fcd59fe65853fa54edaca3fe99eccc"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/docx/scripts/office/validators/redlining.py",
+      "sha256": "f4c33fdb9da0651d1d9aa76f0d5294cc9955869339ae131b2f75f3b2e366cb40"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/docx/scripts/templates/comments.xml",
+      "sha256": "a08ba83ee8790ac9e3dc61921f4988f19edd7e06ac09d6f1897a877c1581818d"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/docx/scripts/templates/commentsExtended.xml",
+      "sha256": "544eeecfeceed4b468fff163cd9c366d33641c8b8ab691ce002576197846afe8"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/docx/scripts/templates/commentsExtensible.xml",
+      "sha256": "bad10b3283e6ad6e7ef6d1ca5169683721ed690ee331282c65df04017e080631"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/docx/scripts/templates/commentsIds.xml",
+      "sha256": "db20f9616e004ec42ef736e80c2384e45db0f8d1194d31dc8b37c7d6ecdd6420"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/docx/scripts/templates/people.xml",
+      "sha256": "056f63aa1197fd8c9dda980c9f1b9ff016fd5fa4a462df8aec5f384f39d23e37"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/f6_completeness_check/SKILL.md",
+      "sha256": "552117dbe0d38e5ce918b9b4409421ef73caf870442eb1b9e63babd12267993d"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/file_audit/SKILL.md",
+      "sha256": "043f038f6f12804604989d590e0654ffd74dc8c57d6c64162282425bd18091d5"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/financial_teardown/SKILL.md",
+      "sha256": "737a859e1ccab7373f91da9b8fe5abb7844c51423daf71d2c71d0213e5d10fa6"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/grill_me/SKILL.md",
+      "sha256": "414c9c0ccd64b8fb033582a4592cf5667a1067ce1dd1140ca8d598aa5f085bf5"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/humanize/SKILL.md",
+      "sha256": "b83a72452477f597061e968c2658a5f61dba9a6ef4c18d9bfb695df04126f657"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/onboard_wizard/SKILL.md",
+      "sha256": "81f116b63f31dda099e0eb187f21efd9248513514917559339f7ec5dfc3969cf"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/pdf/LICENSE.txt",
+      "sha256": "79f6d8f5b427252fa3b1c11ecdbdb6bf610b944f7530b4de78f770f38741cfaa"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/pdf/SKILL.md",
+      "sha256": "9f78b8359fbd4943ad260a7a1e436e5a96503406d6c34e99f69223d647d85b9c"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/pdf/forms.md",
+      "sha256": "9530b3f57034792e0242a3abfe8b3c296466329551916f2ff6c5a70db78f7e44"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/pdf/reference.md",
+      "sha256": "03a5f964f8abecbbe156f363356e927e864d7ee964f1012c84ee1bfc8acbeb95"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/pdf/scripts/check_bounding_boxes.py",
+      "sha256": "0ced522402dd7b3c82a0be9518cf4e485fa9cc0467d7beab6ddb04cb36fcc3e1"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/pdf/scripts/check_fillable_fields.py",
+      "sha256": "1fe10b9980a5493c9bbec8c20630c603eaa475b45403751c08f26738736647b8"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/pdf/scripts/convert_pdf_to_images.py",
+      "sha256": "7f58e292a67e18a8ff000d30bad2469389546731f7e8a698cc1d0aed001ea15d"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/pdf/scripts/create_validation_image.py",
+      "sha256": "8fa9fd7962c9f940045b81cf6b991e7c1057c1838e3f9cc6d305007a222ffebf"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/pdf/scripts/extract_form_field_info.py",
+      "sha256": "bb235b36f497bbb1c7c6821cecf527bbba7213520de11219da99f7b13a38c109"
+    },
+    {
+      "class": "managed",
+      "mode": "100755",
+      "path": ".claude/skills/pdf/scripts/extract_form_structure.py",
+      "sha256": "6814e3fe8f78c2b16d766c132b5a727ff7a31b71d76a7d46bd6e40fe50bc97c5"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/pdf/scripts/fill_fillable_fields.py",
+      "sha256": "d140872c2e92e41b1e05370ae8d270c5b7f5ebdf55d9905f03bc974a9c708ff5"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/pdf/scripts/fill_pdf_form_with_annotations.py",
+      "sha256": "8a56e063a49ed53c0b0e1d312ecf8023af76816ed139486ec3b539873de202fd"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/pptx/LICENSE.txt",
+      "sha256": "79f6d8f5b427252fa3b1c11ecdbdb6bf610b944f7530b4de78f770f38741cfaa"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/pptx/SKILL.md",
+      "sha256": "e5b0df918cbe9d62508b3cf808d73899633f82fc19f6258a25ef9f0de7e62125"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/pptx/editing.md",
+      "sha256": "6cb47c3ab17e60b7de37e83131c409ef5a90a01bfb54e999905a9c9f7dd88e68"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/pptx/pptxgenjs.md",
+      "sha256": "9539534d92b7170813b735a448750df3580390da2da6c52a02b687ed53ecba86"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/pptx/scripts/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "class": "managed",
+      "mode": "100755",
+      "path": ".claude/skills/pptx/scripts/add_slide.py",
+      "sha256": "04233ba3932c6b8611677347891616456e243cc09b7f9769408b8c83d9acfe64"
+    },
+    {
+      "class": "managed",
+      "mode": "100755",
+      "path": ".claude/skills/pptx/scripts/clean.py",
+      "sha256": "3e3966a17f488a1ddc7145f0b7ec9f25595afa1f3a427ab05e610f1a328feea9"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/pptx/scripts/office/helpers/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/pptx/scripts/office/helpers/merge_runs.py",
+      "sha256": "7c40ed838b88639c51f9ffdcfd564b568f26832b78fe44008c0e01b742669ca7"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/pptx/scripts/office/helpers/simplify_redlines.py",
+      "sha256": "560cb55978a834c505406eb18e2c61f62f998fc7a2d8e9721b9c563b42597896"
+    },
+    {
+      "class": "managed",
+      "mode": "100755",
+      "path": ".claude/skills/pptx/scripts/office/pack.py",
+      "sha256": "b1800987e568261a31f462df8e1303d386e9e6ccc11a75ef46e60cc528c20683"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/pptx/scripts/office/schemas/ISO-IEC29500-4_2016/dml-chart.xsd",
+      "sha256": "41b93bd8857cc68b1e43be2806a872d736a9bdd6566900062d8fdb57d7bbb354"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/pptx/scripts/office/schemas/ISO-IEC29500-4_2016/dml-chartDrawing.xsd",
+      "sha256": "3fd0586f2637b98bb9886f0e0b67d89e1cc987c2d158cc7deb5f5b9890ced412"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/pptx/scripts/office/schemas/ISO-IEC29500-4_2016/dml-diagram.xsd",
+      "sha256": "29b254ee0d10414a8504b5a08149c7baec35a60d5ff607d6b3f492aa36815f40"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/pptx/scripts/office/schemas/ISO-IEC29500-4_2016/dml-lockedCanvas.xsd",
+      "sha256": "5cb76dabd8b97d1e9308a1700b90c20139be4d50792d21a7f09789f5cccd6026"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/pptx/scripts/office/schemas/ISO-IEC29500-4_2016/dml-main.xsd",
+      "sha256": "5375417f0f5394b8dd1a7035b9679151f19a6b65df309dec10cfb4a420cb00e9"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/pptx/scripts/office/schemas/ISO-IEC29500-4_2016/dml-picture.xsd",
+      "sha256": "5d389d42befbebd91945d620242347caecd3367f9a3a7cf8d97949507ae1f53c"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/pptx/scripts/office/schemas/ISO-IEC29500-4_2016/dml-spreadsheetDrawing.xsd",
+      "sha256": "b4532b6d258832953fbb3ee4c711f4fe25d3faf46a10644b2505f17010d01e88"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/pptx/scripts/office/schemas/ISO-IEC29500-4_2016/dml-wordprocessingDrawing.xsd",
+      "sha256": "bdad416b096b61d37b71603b2c949484f9070c830bdaeba93bf35e15c8900614"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/pptx/scripts/office/schemas/ISO-IEC29500-4_2016/pml.xsd",
+      "sha256": "d173c3e5d61e42e2e3a97226c632fd2ab7cc481fc4e492365b87024ab546daff"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/pptx/scripts/office/schemas/ISO-IEC29500-4_2016/shared-additionalCharacteristics.xsd",
+      "sha256": "3c6709101c6aaa82888df5d8795c33f9e857196790eb320d9194e64be2b6bdd8"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/pptx/scripts/office/schemas/ISO-IEC29500-4_2016/shared-bibliography.xsd",
+      "sha256": "0b364451dc36a48dd6dae0f3b6ada05fd9b71e5208211f8ee5537d7e51a587e2"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/pptx/scripts/office/schemas/ISO-IEC29500-4_2016/shared-commonSimpleTypes.xsd",
+      "sha256": "e2abacbb9a55ce1365f8961bc1b1395bbc811e512b111000d8c333f98458dece"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/pptx/scripts/office/schemas/ISO-IEC29500-4_2016/shared-customXmlDataProperties.xsd",
+      "sha256": "0ef4bb354ff44b923564c4ddbdda5987919d220225129ec94614a618ceafc281"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/pptx/scripts/office/schemas/ISO-IEC29500-4_2016/shared-customXmlSchemaProperties.xsd",
+      "sha256": "0d103b99a4a8652f8871552a69d42d2a3760ac6a5e3ef02d979c4273257ff6a4"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/pptx/scripts/office/schemas/ISO-IEC29500-4_2016/shared-documentPropertiesCustom.xsd",
+      "sha256": "9c085407751b9061c1f996f6c39ce58451be22a8d334f09175f0e89e42736285"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/pptx/scripts/office/schemas/ISO-IEC29500-4_2016/shared-documentPropertiesExtended.xsd",
+      "sha256": "bc92e36ccd233722d4c5869bec71ddc7b12e2df56059942cce5a39065cc9c368"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/pptx/scripts/office/schemas/ISO-IEC29500-4_2016/shared-documentPropertiesVariantTypes.xsd",
+      "sha256": "7b5b7413e2c895b1e148e82e292a117d53c7ec65b0696c992edca57b61b4a74b"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/pptx/scripts/office/schemas/ISO-IEC29500-4_2016/shared-math.xsd",
+      "sha256": "3213ef1631606250f5010b42cad7ef716f7c59426367798e33c374c0ec391d3a"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/pptx/scripts/office/schemas/ISO-IEC29500-4_2016/shared-relationshipReference.xsd",
+      "sha256": "12264f3c03d738311cd9237d212f1c07479e70f0cbe1ae725d29b36539aef637"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/pptx/scripts/office/schemas/ISO-IEC29500-4_2016/sml.xsd",
+      "sha256": "beffeed56945c22a77440122c8bdc426f3fcbe7f3b12ea0976c770d1f8d54578"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/pptx/scripts/office/schemas/ISO-IEC29500-4_2016/vml-main.xsd",
+      "sha256": "f5ee623b08b6a66935e5aced2f5d8ad0fc71bf9e8e833cd490150c0fa94b8763"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/pptx/scripts/office/schemas/ISO-IEC29500-4_2016/vml-officeDrawing.xsd",
+      "sha256": "585bedc1313b40888dcc544cb74cd939a105ee674f3b1d3aa1cc6d34f70ff155"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/pptx/scripts/office/schemas/ISO-IEC29500-4_2016/vml-presentationDrawing.xsd",
+      "sha256": "133c9f64a5c5d573b78d0a474122b22506d8eadb5e063f67cdbbb8fa2f161d0e"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/pptx/scripts/office/schemas/ISO-IEC29500-4_2016/vml-spreadsheetDrawing.xsd",
+      "sha256": "6bdeb169c3717eb01108853bd9fc5a3750fb1fa5b82abbdd854d49855a40f519"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/pptx/scripts/office/schemas/ISO-IEC29500-4_2016/vml-wordprocessingDrawing.xsd",
+      "sha256": "475dcae1e7d1ea46232db6f8481040c15e53a52a3c256831d3df204212b0e831"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/pptx/scripts/office/schemas/ISO-IEC29500-4_2016/wml.xsd",
+      "sha256": "c2dd9f61f892deae6acd8d20771ea79b12018af25f3bf8d06639c8542d218cfd"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/pptx/scripts/office/schemas/ISO-IEC29500-4_2016/xml.xsd",
+      "sha256": "a539aa2fb154fa50e0f5cc97e6ad7cbc66f8ec3e3746f61ec6a8b0d5d15ecdf2"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/pptx/scripts/office/schemas/ecma/fouth-edition/opc-contentTypes.xsd",
+      "sha256": "9e0b7209fc69ab11987900404540969976000c5ebe4d4f58c43dc3842886bf3a"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/pptx/scripts/office/schemas/ecma/fouth-edition/opc-coreProperties.xsd",
+      "sha256": "451958454e8588dfc7cd945981ada142ca06ff3307937f5700df059c2b307fa8"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/pptx/scripts/office/schemas/ecma/fouth-edition/opc-digSig.xsd",
+      "sha256": "6de111e11403f7cd49027400755bae0ea1cabef2815f09bd40a24f0017613b24"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/pptx/scripts/office/schemas/ecma/fouth-edition/opc-relationships.xsd",
+      "sha256": "f565adfef5a502044abc3a9153e157edc25af78304d335994afb958874b15e26"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/pptx/scripts/office/schemas/mce/mc.xsd",
+      "sha256": "3a37e461ecf5a8670fdec34029703401f8728ab9c96ec1739a6ae58d55212413"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/pptx/scripts/office/schemas/microsoft/wml-2010.xsd",
+      "sha256": "568b26ee156cb9549aa439ca2158965f77b7c1602b7e0316f40ac6cf586e35f2"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/pptx/scripts/office/schemas/microsoft/wml-2012.xsd",
+      "sha256": "0fa75578a000439a7988ba0c59fdc69f774bbd416cbacc14d07125b3f686cb74"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/pptx/scripts/office/schemas/microsoft/wml-2018.xsd",
+      "sha256": "be0ff793a22dd31384650c3a4da14c2fa8062751c2e97b0e5ee852bda13c60ad"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/pptx/scripts/office/schemas/microsoft/wml-cex-2018.xsd",
+      "sha256": "fddc2b880cabb9005aebbc7e783e53c19fec1c03df7d0e2f2076a33a0fdfd081"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/pptx/scripts/office/schemas/microsoft/wml-cid-2016.xsd",
+      "sha256": "127ca209fa73d7cb708449cb355c871867948a96e4a74f7bf5811ef62d17991d"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/pptx/scripts/office/schemas/microsoft/wml-sdtdatahash-2020.xsd",
+      "sha256": "842e7163409c8d74f4d7088a8bc99500d80bc75332681a0980055b08f374a604"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/pptx/scripts/office/schemas/microsoft/wml-symex-2015.xsd",
+      "sha256": "16f6f8072249f431370723c2cd8974672e0d9c897e00e97dd918079df934871b"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/pptx/scripts/office/soffice.py",
+      "sha256": "a3e21840e29e32f947d5286028931b96eaf2dee63f75d883b8eb19c943c80aa0"
+    },
+    {
+      "class": "managed",
+      "mode": "100755",
+      "path": ".claude/skills/pptx/scripts/office/unpack.py",
+      "sha256": "83f69cecc87910183654c06345837244402e8a99edbf3bdddc1cf72f11304b62"
+    },
+    {
+      "class": "managed",
+      "mode": "100755",
+      "path": ".claude/skills/pptx/scripts/office/validate.py",
+      "sha256": "1aef24f8e316965a0584c30859776bd2c82a9fb69f72d79cfed041119cf95514"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/pptx/scripts/office/validators/__init__.py",
+      "sha256": "83e0f035c5abea238d3f2c3968afbd511ed022b527b7c9cb60a9434cc34ff987"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/pptx/scripts/office/validators/base.py",
+      "sha256": "d6358b67252df4dbfe4fa6647423a765960c949346ef6a8c4eb8722bb1108d25"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/pptx/scripts/office/validators/docx.py",
+      "sha256": "0ef04ce86b2e6b6a1cb088c0276fd0bd5b770d96fdfe7a6cc73d005feb3f0345"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/pptx/scripts/office/validators/pptx.py",
+      "sha256": "f937961e62a5fa0d002b8dc51a4c4e2cd8fcd59fe65853fa54edaca3fe99eccc"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/pptx/scripts/office/validators/redlining.py",
+      "sha256": "f4c33fdb9da0651d1d9aa76f0d5294cc9955869339ae131b2f75f3b2e366cb40"
+    },
+    {
+      "class": "managed",
+      "mode": "100755",
+      "path": ".claude/skills/pptx/scripts/thumbnail.py",
+      "sha256": "e959ecd4f19735161218bc44d0648a46da17874323fb3e19c2e9cb50cefe6ce7"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/pr_review/SKILL.md",
+      "sha256": "b2ed39d837b03794f0ea496265e94d6cce9a04db7ea127e456edd448aeac5224"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/project_management/SKILL.md",
+      "sha256": "9b4ac4c185ba8f4e9e6e97fc5d596ff22ae6c63afdb8f214f3d98c1aaba1f20f"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/qc_review/SKILL.md",
+      "sha256": "7a59c965484709b8accd9a838072db628de624a093750f91915aaa93d5d4a7d8"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/resolve-conflict/SKILL.md",
+      "sha256": "db72946f6024ef79fee3931363eaf073898e1573977c87e2bf1c0e26c5ac77d3"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/review-queue/SKILL.md",
+      "sha256": "683a4a8d32d04926370ce334b7e30077da76d40d73310b7043192b403d4c28f7"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/security_check/SKILL.md",
+      "sha256": "241d286a3ba660e1a5dd576fb6f4f61bb48b3363aa0369ee2e581f51ba481c5c"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/start-my-day/SKILL.md",
+      "sha256": "59ffad8f7191ef42d38b4774c06757a592d35f6e9be900e9b2c87e7bf2eda3a5"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/start/SKILL.md",
+      "sha256": "fd5c0f477eb22d82065d2ac9f9a7765535e950e6e58697bf4a4495cb70df8dc0"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/upskill/SKILL.md",
+      "sha256": "a010336b23e4058fa5b240d43e87fd05cc923bf2b71bf30517378967af7a1505"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/workspace_health/SKILL.md",
+      "sha256": "0a36f3dc8242b9ea0d8bb7b90807fa35c9c1a2026253f8ff0744c5a8375fb4cd"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/wrap-up/SKILL.md",
+      "sha256": "d136c4d11ea8763e6771f540eb0b775387494b9121b66de474450a103478be7d"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/xlsx/LICENSE.txt",
+      "sha256": "79f6d8f5b427252fa3b1c11ecdbdb6bf610b944f7530b4de78f770f38741cfaa"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/xlsx/SKILL.md",
+      "sha256": "dd316db7785a6be12966c2a2d848931fbf5f518b3cdb0a66fa62ee835ead1cfc"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/xlsx/scripts/office/helpers/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/xlsx/scripts/office/helpers/merge_runs.py",
+      "sha256": "7c40ed838b88639c51f9ffdcfd564b568f26832b78fe44008c0e01b742669ca7"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/xlsx/scripts/office/helpers/simplify_redlines.py",
+      "sha256": "560cb55978a834c505406eb18e2c61f62f998fc7a2d8e9721b9c563b42597896"
+    },
+    {
+      "class": "managed",
+      "mode": "100755",
+      "path": ".claude/skills/xlsx/scripts/office/pack.py",
+      "sha256": "b1800987e568261a31f462df8e1303d386e9e6ccc11a75ef46e60cc528c20683"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/xlsx/scripts/office/schemas/ISO-IEC29500-4_2016/dml-chart.xsd",
+      "sha256": "41b93bd8857cc68b1e43be2806a872d736a9bdd6566900062d8fdb57d7bbb354"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/xlsx/scripts/office/schemas/ISO-IEC29500-4_2016/dml-chartDrawing.xsd",
+      "sha256": "3fd0586f2637b98bb9886f0e0b67d89e1cc987c2d158cc7deb5f5b9890ced412"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/xlsx/scripts/office/schemas/ISO-IEC29500-4_2016/dml-diagram.xsd",
+      "sha256": "29b254ee0d10414a8504b5a08149c7baec35a60d5ff607d6b3f492aa36815f40"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/xlsx/scripts/office/schemas/ISO-IEC29500-4_2016/dml-lockedCanvas.xsd",
+      "sha256": "5cb76dabd8b97d1e9308a1700b90c20139be4d50792d21a7f09789f5cccd6026"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/xlsx/scripts/office/schemas/ISO-IEC29500-4_2016/dml-main.xsd",
+      "sha256": "5375417f0f5394b8dd1a7035b9679151f19a6b65df309dec10cfb4a420cb00e9"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/xlsx/scripts/office/schemas/ISO-IEC29500-4_2016/dml-picture.xsd",
+      "sha256": "5d389d42befbebd91945d620242347caecd3367f9a3a7cf8d97949507ae1f53c"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/xlsx/scripts/office/schemas/ISO-IEC29500-4_2016/dml-spreadsheetDrawing.xsd",
+      "sha256": "b4532b6d258832953fbb3ee4c711f4fe25d3faf46a10644b2505f17010d01e88"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/xlsx/scripts/office/schemas/ISO-IEC29500-4_2016/dml-wordprocessingDrawing.xsd",
+      "sha256": "bdad416b096b61d37b71603b2c949484f9070c830bdaeba93bf35e15c8900614"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/xlsx/scripts/office/schemas/ISO-IEC29500-4_2016/pml.xsd",
+      "sha256": "d173c3e5d61e42e2e3a97226c632fd2ab7cc481fc4e492365b87024ab546daff"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/xlsx/scripts/office/schemas/ISO-IEC29500-4_2016/shared-additionalCharacteristics.xsd",
+      "sha256": "3c6709101c6aaa82888df5d8795c33f9e857196790eb320d9194e64be2b6bdd8"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/xlsx/scripts/office/schemas/ISO-IEC29500-4_2016/shared-bibliography.xsd",
+      "sha256": "0b364451dc36a48dd6dae0f3b6ada05fd9b71e5208211f8ee5537d7e51a587e2"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/xlsx/scripts/office/schemas/ISO-IEC29500-4_2016/shared-commonSimpleTypes.xsd",
+      "sha256": "e2abacbb9a55ce1365f8961bc1b1395bbc811e512b111000d8c333f98458dece"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/xlsx/scripts/office/schemas/ISO-IEC29500-4_2016/shared-customXmlDataProperties.xsd",
+      "sha256": "0ef4bb354ff44b923564c4ddbdda5987919d220225129ec94614a618ceafc281"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/xlsx/scripts/office/schemas/ISO-IEC29500-4_2016/shared-customXmlSchemaProperties.xsd",
+      "sha256": "0d103b99a4a8652f8871552a69d42d2a3760ac6a5e3ef02d979c4273257ff6a4"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/xlsx/scripts/office/schemas/ISO-IEC29500-4_2016/shared-documentPropertiesCustom.xsd",
+      "sha256": "9c085407751b9061c1f996f6c39ce58451be22a8d334f09175f0e89e42736285"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/xlsx/scripts/office/schemas/ISO-IEC29500-4_2016/shared-documentPropertiesExtended.xsd",
+      "sha256": "bc92e36ccd233722d4c5869bec71ddc7b12e2df56059942cce5a39065cc9c368"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/xlsx/scripts/office/schemas/ISO-IEC29500-4_2016/shared-documentPropertiesVariantTypes.xsd",
+      "sha256": "7b5b7413e2c895b1e148e82e292a117d53c7ec65b0696c992edca57b61b4a74b"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/xlsx/scripts/office/schemas/ISO-IEC29500-4_2016/shared-math.xsd",
+      "sha256": "3213ef1631606250f5010b42cad7ef716f7c59426367798e33c374c0ec391d3a"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/xlsx/scripts/office/schemas/ISO-IEC29500-4_2016/shared-relationshipReference.xsd",
+      "sha256": "12264f3c03d738311cd9237d212f1c07479e70f0cbe1ae725d29b36539aef637"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/xlsx/scripts/office/schemas/ISO-IEC29500-4_2016/sml.xsd",
+      "sha256": "beffeed56945c22a77440122c8bdc426f3fcbe7f3b12ea0976c770d1f8d54578"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/xlsx/scripts/office/schemas/ISO-IEC29500-4_2016/vml-main.xsd",
+      "sha256": "f5ee623b08b6a66935e5aced2f5d8ad0fc71bf9e8e833cd490150c0fa94b8763"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/xlsx/scripts/office/schemas/ISO-IEC29500-4_2016/vml-officeDrawing.xsd",
+      "sha256": "585bedc1313b40888dcc544cb74cd939a105ee674f3b1d3aa1cc6d34f70ff155"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/xlsx/scripts/office/schemas/ISO-IEC29500-4_2016/vml-presentationDrawing.xsd",
+      "sha256": "133c9f64a5c5d573b78d0a474122b22506d8eadb5e063f67cdbbb8fa2f161d0e"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/xlsx/scripts/office/schemas/ISO-IEC29500-4_2016/vml-spreadsheetDrawing.xsd",
+      "sha256": "6bdeb169c3717eb01108853bd9fc5a3750fb1fa5b82abbdd854d49855a40f519"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/xlsx/scripts/office/schemas/ISO-IEC29500-4_2016/vml-wordprocessingDrawing.xsd",
+      "sha256": "475dcae1e7d1ea46232db6f8481040c15e53a52a3c256831d3df204212b0e831"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/xlsx/scripts/office/schemas/ISO-IEC29500-4_2016/wml.xsd",
+      "sha256": "c2dd9f61f892deae6acd8d20771ea79b12018af25f3bf8d06639c8542d218cfd"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/xlsx/scripts/office/schemas/ISO-IEC29500-4_2016/xml.xsd",
+      "sha256": "a539aa2fb154fa50e0f5cc97e6ad7cbc66f8ec3e3746f61ec6a8b0d5d15ecdf2"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/xlsx/scripts/office/schemas/ecma/fouth-edition/opc-contentTypes.xsd",
+      "sha256": "9e0b7209fc69ab11987900404540969976000c5ebe4d4f58c43dc3842886bf3a"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/xlsx/scripts/office/schemas/ecma/fouth-edition/opc-coreProperties.xsd",
+      "sha256": "451958454e8588dfc7cd945981ada142ca06ff3307937f5700df059c2b307fa8"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/xlsx/scripts/office/schemas/ecma/fouth-edition/opc-digSig.xsd",
+      "sha256": "6de111e11403f7cd49027400755bae0ea1cabef2815f09bd40a24f0017613b24"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/xlsx/scripts/office/schemas/ecma/fouth-edition/opc-relationships.xsd",
+      "sha256": "f565adfef5a502044abc3a9153e157edc25af78304d335994afb958874b15e26"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/xlsx/scripts/office/schemas/mce/mc.xsd",
+      "sha256": "3a37e461ecf5a8670fdec34029703401f8728ab9c96ec1739a6ae58d55212413"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/xlsx/scripts/office/schemas/microsoft/wml-2010.xsd",
+      "sha256": "568b26ee156cb9549aa439ca2158965f77b7c1602b7e0316f40ac6cf586e35f2"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/xlsx/scripts/office/schemas/microsoft/wml-2012.xsd",
+      "sha256": "0fa75578a000439a7988ba0c59fdc69f774bbd416cbacc14d07125b3f686cb74"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/xlsx/scripts/office/schemas/microsoft/wml-2018.xsd",
+      "sha256": "be0ff793a22dd31384650c3a4da14c2fa8062751c2e97b0e5ee852bda13c60ad"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/xlsx/scripts/office/schemas/microsoft/wml-cex-2018.xsd",
+      "sha256": "fddc2b880cabb9005aebbc7e783e53c19fec1c03df7d0e2f2076a33a0fdfd081"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/xlsx/scripts/office/schemas/microsoft/wml-cid-2016.xsd",
+      "sha256": "127ca209fa73d7cb708449cb355c871867948a96e4a74f7bf5811ef62d17991d"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/xlsx/scripts/office/schemas/microsoft/wml-sdtdatahash-2020.xsd",
+      "sha256": "842e7163409c8d74f4d7088a8bc99500d80bc75332681a0980055b08f374a604"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/xlsx/scripts/office/schemas/microsoft/wml-symex-2015.xsd",
+      "sha256": "16f6f8072249f431370723c2cd8974672e0d9c897e00e97dd918079df934871b"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/xlsx/scripts/office/soffice.py",
+      "sha256": "a3e21840e29e32f947d5286028931b96eaf2dee63f75d883b8eb19c943c80aa0"
+    },
+    {
+      "class": "managed",
+      "mode": "100755",
+      "path": ".claude/skills/xlsx/scripts/office/unpack.py",
+      "sha256": "83f69cecc87910183654c06345837244402e8a99edbf3bdddc1cf72f11304b62"
+    },
+    {
+      "class": "managed",
+      "mode": "100755",
+      "path": ".claude/skills/xlsx/scripts/office/validate.py",
+      "sha256": "1aef24f8e316965a0584c30859776bd2c82a9fb69f72d79cfed041119cf95514"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/xlsx/scripts/office/validators/__init__.py",
+      "sha256": "83e0f035c5abea238d3f2c3968afbd511ed022b527b7c9cb60a9434cc34ff987"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/xlsx/scripts/office/validators/base.py",
+      "sha256": "d6358b67252df4dbfe4fa6647423a765960c949346ef6a8c4eb8722bb1108d25"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/xlsx/scripts/office/validators/docx.py",
+      "sha256": "0ef04ce86b2e6b6a1cb088c0276fd0bd5b770d96fdfe7a6cc73d005feb3f0345"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/xlsx/scripts/office/validators/pptx.py",
+      "sha256": "f937961e62a5fa0d002b8dc51a4c4e2cd8fcd59fe65853fa54edaca3fe99eccc"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/xlsx/scripts/office/validators/redlining.py",
+      "sha256": "f4c33fdb9da0651d1d9aa76f0d5294cc9955869339ae131b2f75f3b2e366cb40"
+    },
+    {
+      "class": "managed",
+      "mode": "100755",
+      "path": ".claude/skills/xlsx/scripts/recalc.py",
+      "sha256": "cf419d15e02965aeaec17773c05b61303f7f520f67fa2696547e7da07502eac7"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".env.example",
+      "sha256": "5fa90cdde04b3aad3ceec7aa4328faf9cd7ba150a57eb76087ad6050dbe37798"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".github/pull_request_template.md",
+      "sha256": "6603c27e95439367d7d1fdfb4032bfbafba42abc7ec1ac6cc1c9f070a7cafeee"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".github/workflows/install-contract.yml",
+      "sha256": "0df631ef084759d6a86a3077a87e680cec9364419a7f4684ce6dacbf499f03ee"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".github/workflows/pr-review.yml",
+      "sha256": "2bbafa6f56d7f5dfcf9151da8ec03597f3ba456e625b936fbf8505a087117c75"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".github/workflows/verify-protection.yml",
+      "sha256": "167bf902e501ccae60db50ad53d6f5108e16dabab6edd22d953f2a893301e4ee"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": ".gitignore",
+      "sha256": "c4d81682464c4ee7746dc36275252122cd8abab79f51bde342dce3fefa4c1f26"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".template_version.json",
+      "sha256": "a71126a20850bee0054ded45b5b347c9a596a20a6dac795ba083c6e5db5a225b"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "01_Foundations/avatar_analysis/_workspace.md",
+      "sha256": "5918cc17690d6580f433dac5ab609405e874f06a91118e09b616264226e2f94f"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "01_Foundations/market_analysis/_workspace.md",
+      "sha256": "6cfedd52dde9bc567447e02823cc0c9decef369a3e4b8eec11d613491d33febf"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "01_Foundations/offer_economics/_workspace.md",
+      "sha256": "b74035fdf6888fa11411cc312324720281d025dbaa43a29d35501aa0e1504cf8"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "01_Foundations/offer_optimization/_workspace.md",
+      "sha256": "066a4a0d5dafb1049c65a2649981ae9a1c1663f1344f29a2872e5edf80949c06"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "01_Foundations/pitch_and_messaging/_workspace.md",
+      "sha256": "41cf227f6a646d0f2ee931fb646e3a658ec40b383d1be44fecba1069919c81bd"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "01_Foundations/profile_snapshot/_workspace.md",
+      "sha256": "c45472daa650e6c92b5163c23030c5d23d1dfdbcd1e4ff2188380375238acf74"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "02_Deliverables/_review_queue/.gitkeep",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "02_Deliverables/ads/.gitkeep",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "02_Deliverables/audits/.gitkeep",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "02_Deliverables/copy/.gitkeep",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "02_Deliverables/emails/.gitkeep",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "02_Deliverables/funnels/.gitkeep",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "02_Deliverables/reports/.gitkeep",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "02_Deliverables/webinars/.gitkeep",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "03_Quality_Control/qc_approval_rubric.md",
+      "sha256": "c984102580027f594d945c7be0b58f7eac889898741b4741c5f6411a997ad358"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "03_Quality_Control/qc_preferences.md",
+      "sha256": "430ad12f1fefee9ae0c21b90f1b5a4c9fe9029158751af60e0bb9e75a64c507e"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "03_Quality_Control/qc_revision_log.md",
+      "sha256": "c0d4b44653fcd11b7c754f97e7fa347a6baa203cae92ef05e3e0e5e269723ff1"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "04_Customer_Journey/engagement_timeline.md",
+      "sha256": "ca5fba4fed173a4260bd36212d348f2a87b638a8af3c492e77fc8c163be460b6"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "04_Customer_Journey/journey_map.md",
+      "sha256": "986953f6aa460719a4a6d08222eb92df468d4ddc9a9249684313abdf0e8d6e46"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "04_Customer_Journey/success_metrics.md",
+      "sha256": "2eb3df94c5922446fd978e266ede4db567bce63af5b723dd28bc367bd03771ba"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "04_Customer_Journey/support_touchpoints.md",
+      "sha256": "6e829398be36b0678c8708e78c8d08f781d27387165159e73483595101122901"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "04_Customer_Journey/task_tracker.md",
+      "sha256": "3f9a0775e37caddb491eaf26ac4d37463d0c6cd90d458bbcde45ce08ae769a81"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "05_Assets/brand_guide/README.md",
+      "sha256": "15cc43767310aaba12be4294df4a4725f1dcdd614bde19c478030f9c709710ca"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "06_Communication/daily_handoff.md",
+      "sha256": "5ee2cea9220c4022a796b8e8cc025d271df6f4e57cdc014ef956330035699114"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "06_Communication/decisions_log.md",
+      "sha256": "6674ffbfb6d5734a9e3975dba62077a6b654c1c0e6b6de93c6fb79ae7bdeb7c2"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "06_Communication/feedback_log.md",
+      "sha256": "5f551b2a0a00710096601cb9643514d9fbf4f47e221c41122785211e848b84b7"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "06_Communication/meeting_notes/.gitkeep",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "06_Communication/unstuck_protocol.md",
+      "sha256": "f04a7abff584ec7f6a4f45b2c9e168742c83bddf8741e16e69ee811c8375c11d"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": "07_Setup/founder_setup_walkthrough.md",
+      "sha256": "03b82bd7fd8ddb889aca2112276c9ae8d302019c8aeacc5038f3663c1cfc4f65"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": "07_Setup/sop_aios_setup_checklist.md",
+      "sha256": "b8888ba659a4c336bef40a9c55a1d612d27bfe6d73d97b09c8066a985bdcc356"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": "07_Setup/va_setup_walkthrough.md",
+      "sha256": "45aac988c9d2315dd506ab5cfa01856bc923d2f2177a73115a2916eb9fe3646b"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "08_Automations/_about.md",
+      "sha256": "789db4de248c984cf2aeac4d62d2b26d8beaeb6492fe5a5c94bdfc9bb0169f45"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "09_Archive/_about.md",
+      "sha256": "ab7903a9f4ed8660e999e89946c9fa8832400d606ec702572460fe4bb1b5a807"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "11_Projects/README.md",
+      "sha256": "2e299766fea55b76cb072b3ffdead938f2ff0f1cb63e3aeb773b9772e23015e0"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "11_Projects/main-website/main-website.md",
+      "sha256": "a9b3b631cc61130353f1a0e3f2aead9950f3cc7caba895b50fb087a9c8a96598"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "CLAUDE.md",
+      "sha256": "6220436310969c10c0507ea2847b1491b928cf1ab32dbb35f80e84423e79f660"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": "CONTRIBUTING.md",
+      "sha256": "d7ae69dbb509d8f83e9be3b8c9c282a2331bc9565ace5e763254726b477ed5ed"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": "GETTING_STARTED.md",
+      "sha256": "f46268edb63dc23533548d0c30a88df7299cc5e84ff3131899b202af6603f721"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": "LICENSE",
+      "sha256": "64e64ef5649c0106380b334ef8f6af7edb5d79e7adddcb02f4436d19354ea67a"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "README.md",
+      "sha256": "c4e82c764c54ec6580f20e6a17c0f81ff5691fe49c01fb590f83f0747ca43b55"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": "SECURITY.md",
+      "sha256": "354d684113f231c92c5081ab548d49deeeb3c75f815bca3a56ef32620958a514"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": "START_HERE.md",
+      "sha256": "6652e1bb9e9e55bf4d5bb62daa96da3b52a26c0a5e1743eda44cd10809b20985"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": "docs/INSTALL_AND_UPGRADE.md",
+      "sha256": "b8809be9e0afe1b2cdc574e684a6c66b5938153861a6720a9ac2723a2915d79b"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": "docs/PR_REVIEWER_SETUP.md",
+      "sha256": "aef4ba904812e49d31e389d2c4d9eb25f80a6dd215651c55eb90d602e9d70638"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": "docs/UNSTUCK_PROTOCOL.md",
+      "sha256": "cdf8fb7537652df95b2ef627f45b9fd807d85f3d40e4e5f6191a7e1d759e73b7"
+    },
+    {
+      "class": "managed",
+      "mode": "100755",
+      "path": "scripts/aios/aios.py",
+      "sha256": "a5563f54e18354964e307198de637694250424937aedabd2b120556e73290e0a"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": "scripts/aios/aioslib/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": "scripts/aios/aioslib/governance.py",
+      "sha256": "158904e3709ac853de7f635c9f415dcf9da65886753f5da9830583b282a0ac64"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": "scripts/aios/aioslib/install.py",
+      "sha256": "0e2383692e5deac44f03ad74038e87afa7e28f98361c7b794e13cc7d0615f076"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": "scripts/aios/aioslib/orgconfig.py",
+      "sha256": "06f52e233964e4ffa047bb97d0156c73d00aca7a650d9f345a208f26f5f611d8"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": "scripts/aios/aioslib/release.py",
+      "sha256": "bd9b03a1ae5951d20f2cc07ac2ada142bcb76b22d2cb344cbf87a3a15949686f"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": "scripts/aios/aioslib/roles.py",
+      "sha256": "b58697abbbc7db9c1f45f324d71beea713f7844ae3f045468ce6f2d94292d66b"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": "scripts/aios/aioslib/sanitize.py",
+      "sha256": "40c4bdde85f23d54d683783684adf8b5fd0863e67d51461dbaee4b5a030842d2"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": "scripts/aios/aioslib/util.py",
+      "sha256": "e6424b41bff8b0eda26cb5a3818652054f6c04e443b406fe6551425cdc70bade"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": "scripts/pr_review/static_checks.mjs",
+      "sha256": "84372592c3b7c52dc011669e95e2e6d0653953205b48db90c8c44b900d161793"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": "scripts/pr_review/static_checks.test.mjs",
+      "sha256": "6ab05d3dd42c9820750acc5096f1f09cd0a7abf75961e8470fd1c5ffd68a3d00"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": "scripts/pr_review/symlink_audit.mjs",
+      "sha256": "de8c7066dc59ca1dc1e84ab7c4d3530d61d675e616cf1705253715f8386b1d5b"
+    },
+    {
+      "class": "managed",
+      "mode": "100755",
+      "path": "scripts/team/git-safety-check.sh",
+      "sha256": "b54cfe644245219e52844da75346f846f21d7085960c00530abf0bd4895c84b6"
+    },
+    {
+      "class": "managed",
+      "mode": "100755",
+      "path": "scripts/team/guard-dangerous-git.test.js",
+      "sha256": "dffe4b519505e6597441b99dd9f29e3f88e138eea695c9b76a330ab2a0c003b0"
+    },
+    {
+      "class": "managed",
+      "mode": "100755",
+      "path": "scripts/team/verify-branch-protection.sh",
+      "sha256": "56fdf45f1fe99fbff6bd1d83d45e3f68064fe1e726be92c8fd9c1b60d2e20771"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": "taxonomy_rules.md",
+      "sha256": "3c1b687f2be04fb03f5c08f2117bad3bf6e70e343ab0b6df496ba32139c6d34e"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": "templates/governance/CODEOWNERS.template",
+      "sha256": "7a46cf59d99467f2a13690321c68418f3cb1950dc1c6420f4a1d3043c00f43b8"
+    }
+  ],
+  "package": "ff-aios-starter",
+  "release_id": "starter-2.6.0",
+  "schema": "ff-aios-starter/release@1",
+  "skills": [
+    "changelog",
+    "context_load",
+    "dashboard",
+    "docx",
+    "f6_completeness_check",
+    "file_audit",
+    "financial_teardown",
+    "grill_me",
+    "humanize",
+    "onboard_wizard",
+    "pdf",
+    "pptx",
+    "pr_review",
+    "project_management",
+    "qc_review",
+    "resolve-conflict",
+    "review-queue",
+    "security_check",
+    "start",
+    "start-my-day",
+    "upskill",
+    "workspace_health",
+    "wrap-up",
+    "xlsx"
+  ],
+  "status": "draft",
+  "version": "2.6.0"
+}

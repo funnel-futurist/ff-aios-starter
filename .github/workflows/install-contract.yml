@@ -1,0 +1,48 @@
+# The install contract's own tests, plus the governance check that makes an unfilled
+# CODEOWNERS template loud instead of silent.
+#
+# Two separate jobs on purpose:
+#   tests      - the install tool's own test suite. Runs ONLY in the template repository.
+#   governance - runs everywhere, including every workspace generated from this template.
+#
+# Why tests is fenced to the template: this file ships to every client repo, and without the
+# guard every push there ran the installer's 134 checks (87 unit, 47 end-to-end) - about two billed Actions minutes
+# per push (GitHub rounds each job up to a minute), doubled on PR branches, spent testing a tool
+# the client did not write and cannot change. Measured 2026-09-22: tests 18s, governance 4s.
+#
+# Why governance is NOT fenced: in a generated repo it is the check that notices CODEOWNERS still
+# names the template publisher's accounts, which have no access there - the inherited-owner
+# defect. Four seconds is the right price for that.
+name: Install contract
+
+on:
+  push:
+    branches-ignore: []
+  pull_request:
+
+jobs:
+  tests:
+    # The template repository only. Anywhere else this is someone else's test suite.
+    if: github.repository == 'funnel-futurist/ff-aios-starter'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Python version (the floor a client machine has to clear)
+        run: python3 --version
+      - name: Install contract tests
+        run: python3 -m unittest discover -s tests/aios -t tests/aios -v
+      - name: End-to-end on the real content, in a scrubbed environment
+        run: bash tests/aios/integration_real_content.sh
+      - name: PR floor tests (unchanged, run here too so one command covers the repo)
+        run: |
+          node --test scripts/pr_review/static_checks.test.mjs
+          node scripts/team/guard-dangerous-git.test.js
+
+  governance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: CODEOWNERS names real owners, bound to this repository
+        run: python3 scripts/aios/aios.py governance check --repo-slug "${GITHUB_REPOSITORY}"

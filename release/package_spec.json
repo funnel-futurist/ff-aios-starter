@@ -1,0 +1,37 @@
+{
+  "schema": "ff-aios-starter/package-spec@1",
+  "_comment": "Which paths ship in a release, and who owns each one after install. managed = the release owns it (replaced on upgrade, verified by readback). seed = written once if absent, then yours forever. Anything excluded never ships; anything you create yourself is invisible to the installer.",
+  "exclude": [
+    "evidence/**",
+    "releases/**",
+    "release/**",
+    "tests/**",
+    ".github/CODEOWNERS",
+    ".githooks/**",
+    "**/__pycache__/**",
+    "*.pyc",
+    "*.pyo"
+  ],
+  "seed": [
+    "CLAUDE.md",
+    "README.md",
+    ".gitignore",
+    ".aios/local-operator.example.json",
+    "01_Foundations/**",
+    "02_Deliverables/**",
+    "03_Quality_Control/**",
+    "04_Customer_Journey/**",
+    "05_Assets/**",
+    "06_Communication/**",
+    "08_Automations/**",
+    "09_Archive/**",
+    "11_Projects/**"
+  ],
+  "render": [
+    {
+      "template": "templates/governance/CODEOWNERS.template",
+      "out": ".github/CODEOWNERS",
+      "why": "CODEOWNERS must name owners who actually have access to THIS repository, so it is rendered per workspace, never copied."
+    }
+  ]
+}

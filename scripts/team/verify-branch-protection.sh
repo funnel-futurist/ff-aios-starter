@@ -16,15 +16,31 @@ REPO="${1:-$(gh repo view --json nameWithOwner --jq .nameWithOwner 2>/dev/null)}
 echo "Verifying protection for: $REPO"
 echo "─────────────────────────────────────────────"
 
+# The `protected` flag on the branch itself is readable WITHOUT admin, unlike the protection
+# detail below. Without this, a non-admin run reported INCONCLUSIVE on a repo that had no
+# protection at all — the detector stayed quiet about the loudest possible finding.
+# Initialised here, before the first check. It used to be set further down, AFTER the
+# unprotected-branch check had already incremented it, so the increment was wiped and the
+# script printed "direct pushes are allowed" and "all protections in place" in the same run -
+# a detector reporting green over the finding it had just printed.
+fails=0
+
+PROTECTED=$(gh api "repos/$REPO/branches/main" --jq .protected 2>/dev/null)
+if [ "$PROTECTED" = "false" ]; then
+  echo "  ✗ FAIL: main is NOT protected (confirmed without admin: branches/main .protected = false)"
+  echo "         direct pushes, force-pushes and deletions of main are all allowed"
+  fails=$((fails+1))
+fi
+
 PROT=$(gh api "repos/$REPO/branches/main/protection" 2>/tmp/_prot_err)
 CODE=$?
 ERR=$(cat /tmp/_prot_err 2>/dev/null); rm -f /tmp/_prot_err
-
-fails=0
 if [ $CODE -ne 0 ]; then
   if echo "$ERR" | grep -qi "Not Found"; then
-    echo "  ✗ FAIL: main has NO branch protection (direct pushes to main are NOT blocked)"
-    fails=$((fails+1))
+    if [ "$PROTECTED" != "false" ]; then
+      echo "  ✗ FAIL: main has NO branch protection (direct pushes to main are NOT blocked)"
+      fails=$((fails+1))
+    fi
   elif echo "$ERR" | grep -qiE "403|admin"; then
     echo "  ⚠ NOTE: can't read protection (needs an admin token). Re-run as an admin to verify."
     echo "─────────────────────────────────────────────"; echo "INCONCLUSIVE (no admin access) — not a failure."; exit 0
@@ -49,9 +65,23 @@ sys.exit(f)
   fails=$((fails+$?))
 fi
 
-# CODEOWNERS present?
+# CODEOWNERS present AND actually naming somebody.
+#
+# This used to check only that the file EXISTS. A file full of [REPO_OWNER] placeholders
+# exists, so this reported a green tick over a rule that matched nobody and enforced nothing
+# — exactly the drift this script was written to catch. Presence is not enforcement.
 if gh api "repos/$REPO/contents/.github/CODEOWNERS" --jq .name >/dev/null 2>&1; then
   echo "  ✓ .github/CODEOWNERS present"
+  SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+  if python3 "$SCRIPT_DIR/../aios/aios.py" governance check --root "$SCRIPT_DIR/../.." \
+       --repo-slug "$REPO" >/tmp/_co_out 2>&1; then
+    echo "  ✓ .github/CODEOWNERS names real owners, bound to this repository"
+  else
+    echo "  ✗ FAIL: .github/CODEOWNERS does not enforce anything:"
+    sed 's/^/      /' /tmp/_co_out
+    fails=$((fails+1))
+  fi
+  rm -f /tmp/_co_out
 else
   echo "  ✗ FAIL: no .github/CODEOWNERS (owned-path reviews can't route)"; fails=$((fails+1))
 fi
