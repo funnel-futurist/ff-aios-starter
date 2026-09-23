@@ -1,7 +1,8 @@
 {
   "approval": {
-    "approved_at": null,
-    "approved_by": null
+    "approved_by": "phoenix-ship-it",
+    "approved_at": "2026-09-23T06:31:16Z",
+    "basis": "Phoenix, directly in the CHAT P22 session on 2026-09-22: fix the two client-name examples, rerun the complete release gates, and if green approve and publish starter-2.6.0 from the corrected SHA. Gates green at 0c0cf170840295c4fd3fa2a6c9de5dd30bbd63d3; evidence in evidence/dispatch/p22-starter/P22-001-2026-09-22.md section 14."
   },
   "compatibility": {
     "breaking": [],
@@ -18,7 +19,7 @@
   },
   "created_from": {
     "branch": "main",
-    "git_rev": "0af7e9e841a8fad18b9c1087a7ab03b166056f48"
+    "git_rev": "0c0cf170840295c4fd3fa2a6c9de5dd30bbd63d3"
   },
   "credentials": [
     {
@@ -1637,7 +1638,7 @@
       "class": "managed",
       "mode": "100755",
       "path": "scripts/aios/aios.py",
-      "sha256": "a5563f54e18354964e307198de637694250424937aedabd2b120556e73290e0a"
+      "sha256": "00e99499c5efa70ae270428a28f188748de47a14250b249643e666005dd2954b"
     },
     {
       "class": "managed",
@@ -1679,7 +1680,7 @@
       "class": "managed",
       "mode": "100644",
       "path": "scripts/aios/aioslib/sanitize.py",
-      "sha256": "40c4bdde85f23d54d683783684adf8b5fd0863e67d51461dbaee4b5a030842d2"
+      "sha256": "781f97b62b2697397c2185fa8b8b28b6adc1d2ad602110c37da0c8767b10a4a6"
     },
     {
       "class": "managed",
@@ -1765,6 +1766,6 @@
     "wrap-up",
     "xlsx"
   ],
-  "status": "draft",
+  "status": "approved",
   "version": "2.6.0"
 }

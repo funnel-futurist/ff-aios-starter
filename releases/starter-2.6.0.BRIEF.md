@@ -2,37 +2,35 @@
 
 **Written for:** Phoenix, before being asked to approve anything. About three minutes.
 
-## Where this stands (2026-09-22)
+## Where this stands - APPROVED (2026-09-23)
 
 | step | status |
 |---|---|
-| 1. Merge PR #12 | **DONE** - merged by you at 2026-09-23 04:17 UTC as a merge commit, so every tested commit is on `main` |
-| 2. Re-cut 2.6.0 from `main` | **DONE** - pinned to `0af7e9e841a8fad18b9c1087a7ab03b166056f48`, the merge commit. All 282 files are byte-for-byte the ones tested before the merge; only the pin moved |
-| 3. Re-run every check against that commit | **DONE** - all pass (table below) |
-| 4. Approve | **WAITING FOR YOU** - not recorded. The release is still `draft` |
+| 1. Merge PR #12 | **DONE** - 2026-09-23 04:17 UTC, merge commit `0af7e9e841a8fad18b9c1087a7ab03b166056f48`, so every tested commit is on `main` |
+| 2. Re-cut, re-test | **DONE** - candidate pinned to `0af7e9e`, every check green (PR #13) |
+| 3. Fix before approving | **DONE** - the re-cut scan found two code comments using a real client's name as the example of a client name. You chose to fix first. Replaced with a nameless phrasing in PR #14, merged 2026-09-23 06:28 UTC |
+| 4. Re-cut from the corrected `main`, re-run every gate | **DONE** - all green, table below |
+| 5. Approve and publish | **DONE** - approved by you (`phoenix-ship-it`), recorded 2026-09-23 06:31 UTC, on your direct instruction to approve if green |
 
-**Final canonical SHA:** `0af7e9e841a8fad18b9c1087a7ab03b166056f48` (on `main`, cannot disappear when a branch is deleted).
+**Final canonical SHA:** `0c0cf170840295c4fd3fa2a6c9de5dd30bbd63d3` - the PR #14 merge commit on `main`. The release installs exactly the files at this commit and nothing else.
 
-| check, run against `0af7e9e` | result |
+Compared with the candidate at `0af7e9e`: the same 282 files, and exactly two changed - `scripts/aios/aios.py` and `scripts/aios/aioslib/sanitize.py`, the two comments. Nothing else moved.
+
+| gate, run against `0c0cf17` | result |
 |---|---|
 | Unit tests | 87 / 87 pass |
 | End-to-end on the real 282 files, clean environment | 47 / 47 pass |
 | PR static checks + dangerous-git guard | 17 / 17 and 49 / 49 pass |
 | Code-owner check | passes - names real owners, bound to this repo |
-| CI on `main` after the merge (GitHub's Linux machine) | pass |
-| Secret and client-name scan, 282 files | 0 findings on the 23 specific client names; see "One thing to decide first" for the 2 names that are ordinary words |
-| `release verify` | refuses to install - correctly, because it is a draft. After approval it must say *"installable (pinned, intact, approved)"* |
+| CI on `main` (GitHub's Linux machine) | pass |
+| Secret and client-name scan, 282 files | 0 findings on the specific client names. The two client names that are also ordinary English words were checked too, and every match was read by hand: all are the ordinary word, none is used as a name |
+| `release verify` | *"installable (pinned, intact, approved)"* |
 
-### One thing to decide first
-
-The scan checks two client names that are also ordinary English words - "enable" and "supported" - only when asked, because they match everywhere. I asked. All 25 matches are the ordinary word ("Enable verbose output", "not supported for file type") except two, which are mine: two comments in the install tool use **Enable** as the example of a client name ("a real client can be called Enable"). Enable is a real client on the roster. Nothing says it is a client of ours, and the repo is already public, so this is not a leak today - but it would ship that line into every client's workspace.
-
-- **Fix it first (recommended):** I change the two comments to a made-up example in a small PR, you merge it, I re-cut and re-run everything exactly as above. About 15 minutes, and 2.6.0 ships clean.
-- **Approve as is:** say so, and it goes into 2.7.0.
+**What "published" means here:** the approved manifest is on `main` at `releases/starter-2.6.0.json`, and the tag `starter-2.6.0` points at the pinned commit. There is no GitHub Release announcement and nothing was pushed to any client. No client workspace changes until someone runs install, upgrade or adopt on it - and the first real client install is the next package, P22-002.
 
 ## The decision in one line
 
-Approve AIOS Starter 2.6.0, the first version of the client template that clients can install, check and upgrade safely - so that from now on you ship a known version instead of whatever happens to be on `main` the day someone clicks "Use this template".
+*(Made - see the top of this page.)* Approve AIOS Starter 2.6.0, the first version of the client template that clients can install, check and upgrade safely - so that from now on you ship a known version instead of whatever happens to be on `main` the day someone clicks "Use this template".
 
 ## What this release is
 
@@ -52,8 +50,8 @@ It also fixes four things that were quietly broken in the template itself (see "
 |---|---|
 | Files in the release | 282 - 246 the release owns and keeps up to date, 36 starter files that become the client's the moment they land |
 | Skills | 24 |
-| Pinned to | `0af7e9e841a8fad18b9c1087a7ab03b166056f48` on `main`, plus a fingerprint of every file. If a single byte changes, it refuses to install |
-| Status now | **DRAFT** - merged, re-cut from `main`, re-tested, waiting for you |
+| Pinned to | `0c0cf170840295c4fd3fa2a6c9de5dd30bbd63d3` on `main`, plus a fingerprint of every file. If a single byte changes, it refuses to install |
+| Status now | **APPROVED** 2026-09-23 06:31 UTC by `phoenix-ship-it` |
 
 ## What changes for clients
 
@@ -115,14 +113,11 @@ So:
 
 ## How to do it
 
-The merge is done. What is left is one message in this chat, from you directly - a message relayed through another session cannot approve a release:
+Done. You said, directly in the P22 chat: fix the client-name examples, rerun the release gates, and if green, approve and publish from the corrected SHA. Every gate was green, so the approval is recorded under your handle with the time.
 
-- *"Fix the Enable comments, then approve starter 2.6.0."* - I fix, you merge the small PR, I re-cut, re-run everything, and record your approval against the new `main` commit. (Recommended.)
-- or *"Approve starter 2.6.0 at 0af7e9e."* - I record your approval against this exact commit, with your handle, the time, and where you said it.
+**To withdraw it:** set `"status": "withdrawn"` in `releases/starter-2.6.0.json` on `main`. From then on the tool refuses to install it.
 
-Either way, no client install starts until the approval is recorded.
-
-**How to verify afterwards:** the file `releases/starter-2.6.0.json` on `main` shows `"status": "approved"` with your handle, and running `python3 scripts/aios/aios.py release verify releases/starter-2.6.0.json` prints *"installable (pinned, intact, approved)"*.
+**How to verify:** the file `releases/starter-2.6.0.json` on `main` shows `"status": "approved"` with your handle, and running `python3 scripts/aios/aios.py release verify releases/starter-2.6.0.json` prints *"installable (pinned, intact, approved)"*.
 
 ## Separate from this release - neither one is needed to approve it
 
