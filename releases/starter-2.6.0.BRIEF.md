@@ -2,6 +2,34 @@
 
 **Written for:** Phoenix, before being asked to approve anything. About three minutes.
 
+## Where this stands (2026-09-22)
+
+| step | status |
+|---|---|
+| 1. Merge PR #12 | **DONE** - merged by you at 2026-09-23 04:17 UTC as a merge commit, so every tested commit is on `main` |
+| 2. Re-cut 2.6.0 from `main` | **DONE** - pinned to `0af7e9e841a8fad18b9c1087a7ab03b166056f48`, the merge commit. All 282 files are byte-for-byte the ones tested before the merge; only the pin moved |
+| 3. Re-run every check against that commit | **DONE** - all pass (table below) |
+| 4. Approve | **WAITING FOR YOU** - not recorded. The release is still `draft` |
+
+**Final canonical SHA:** `0af7e9e841a8fad18b9c1087a7ab03b166056f48` (on `main`, cannot disappear when a branch is deleted).
+
+| check, run against `0af7e9e` | result |
+|---|---|
+| Unit tests | 87 / 87 pass |
+| End-to-end on the real 282 files, clean environment | 47 / 47 pass |
+| PR static checks + dangerous-git guard | 17 / 17 and 49 / 49 pass |
+| Code-owner check | passes - names real owners, bound to this repo |
+| CI on `main` after the merge (GitHub's Linux machine) | pass |
+| Secret and client-name scan, 282 files | 0 findings on the 23 specific client names; see "One thing to decide first" for the 2 names that are ordinary words |
+| `release verify` | refuses to install - correctly, because it is a draft. After approval it must say *"installable (pinned, intact, approved)"* |
+
+### One thing to decide first
+
+The scan checks two client names that are also ordinary English words - "enable" and "supported" - only when asked, because they match everywhere. I asked. All 25 matches are the ordinary word ("Enable verbose output", "not supported for file type") except two, which are mine: two comments in the install tool use **Enable** as the example of a client name ("a real client can be called Enable"). Enable is a real client on the roster. Nothing says it is a client of ours, and the repo is already public, so this is not a leak today - but it would ship that line into every client's workspace.
+
+- **Fix it first (recommended):** I change the two comments to a made-up example in a small PR, you merge it, I re-cut and re-run everything exactly as above. About 15 minutes, and 2.6.0 ships clean.
+- **Approve as is:** say so, and it goes into 2.7.0.
+
 ## The decision in one line
 
 Approve AIOS Starter 2.6.0, the first version of the client template that clients can install, check and upgrade safely - so that from now on you ship a known version instead of whatever happens to be on `main` the day someone clicks "Use this template".
@@ -24,8 +52,8 @@ It also fixes four things that were quietly broken in the template itself (see "
 |---|---|
 | Files in the release | 282 - 246 the release owns and keeps up to date, 36 starter files that become the client's the moment they land |
 | Skills | 24 |
-| Pinned to | one exact commit, plus a fingerprint of every file. If a single byte changes, it refuses to install |
-| Status now | **DRAFT** - built, tested, waiting for you |
+| Pinned to | `0af7e9e841a8fad18b9c1087a7ab03b166056f48` on `main`, plus a fingerprint of every file. If a single byte changes, it refuses to install |
+| Status now | **DRAFT** - merged, re-cut from `main`, re-tested, waiting for you |
 
 ## What changes for clients
 
@@ -56,7 +84,7 @@ One side effect you will see: a new workspace made with the old button inherits 
 
 ## Risks, and how to undo
 
-- **Nobody has reviewed PR #12 but AI.** It is large - about 7,200 lines - but almost all of that is the install tool and its tests, which clients do not edit. The nine existing files it changes are the ones worth your eyes:
+- **PR #12 was merged without a human line-by-line review.** It is large - about 7,200 lines - but almost all of that is the install tool and its tests, which clients do not edit. The nine existing files it changes are the ones worth your eyes:
   - `START_HERE.md`, `CONTRIBUTING.md`, `.claude/skills/README.md` - point to the new `/start` and upgrade steps
   - `.claude/skills/financial_teardown/SKILL.md` - names Operator's Reset instead of the old doc
   - `.github/CODEOWNERS` - real owners instead of placeholders
@@ -65,13 +93,15 @@ One side effect you will see: a new workspace made with the old button inherits 
   - `.template_version.json` - it claimed 18 skills while the template shipped 23; it now lists all 24, including the new `/start`, and a test keeps it honest
   - `scripts/team/verify-branch-protection.sh` - now fails when protection is missing instead of passing
 - **If something is wrong after approving:** set the release back to `withdrawn` and the tool refuses to install it. Nobody is on it until someone runs an install, so there is nothing to roll back in the wild.
-- **If the merge itself is wrong:** revert the merge commit. `main` has no protection today, so nothing stops that, or anything else.
+- **If the merge itself is wrong:** revert the merge commit `0af7e9e`. `main` has no protection today, so nothing stops that, or anything else.
 
 ## The order it has to happen in
 
 This is the one thing that is easy to get wrong, and it is why this brief exists rather than a request to "reply approved".
 
-The release is currently pinned to a commit on the PR branch, not on `main`. This repo's recent PRs were squash-merged, and a squash merge creates a **new** commit - so the commit the release points at would not be on `main`, and would survive only as long as nobody deleted the PR branch. Approve now, delete the branch later, and the release you approved points at nothing.
+*Steps 1 to 3 are done - see the top of this page. Kept here so the reason is on record.*
+
+The release was pinned to a commit on the PR branch, not on `main`. This repo's recent PRs were squash-merged, and a squash merge creates a **new** commit - so the commit the release points at would not be on `main`, and would survive only as long as nobody deleted the PR branch. Approve now, delete the branch later, and the release you approved points at nothing.
 
 So:
 
@@ -85,17 +115,14 @@ So:
 
 ## How to do it
 
-**The easy way - one message.** In this chat, say: *"Merge #12 and approve starter 2.6.0."* I will merge it, re-cut the release from `main`, re-run the checks, and record the approval as yours with the time and where you said it. It has to come from you directly - a message relayed through another session cannot approve a release.
+The merge is done. What is left is one message in this chat, from you directly - a message relayed through another session cannot approve a release:
 
-**Or do the merge yourself:**
+- *"Fix the Enable comments, then approve starter 2.6.0."* - I fix, you merge the small PR, I re-cut, re-run everything, and record your approval against the new `main` commit. (Recommended.)
+- or *"Approve starter 2.6.0 at 0af7e9e."* - I record your approval against this exact commit, with your handle, the time, and where you said it.
 
-1. Open https://github.com/funnel-futurist/ff-aios-starter/pull/12
-2. Scroll to the bottom of the page, to the green merge button.
-3. Click the arrow beside it and choose **"Create a merge commit"** - this keeps the tested commits on `main`. Squash also works, because I re-cut either way.
-4. Click **Confirm merge**.
-5. Tell me it is merged, and whether you approve 2.6.0.
-6. I re-cut, re-check, and record your approval.
-7. **How to verify:** the file `releases/starter-2.6.0.json` on `main` shows `"status": "approved"` with your handle, and running `python3 scripts/aios/aios.py release verify releases/starter-2.6.0.json` prints *"installable (pinned, intact, approved)"*.
+Either way, no client install starts until the approval is recorded.
+
+**How to verify afterwards:** the file `releases/starter-2.6.0.json` on `main` shows `"status": "approved"` with your handle, and running `python3 scripts/aios/aios.py release verify releases/starter-2.6.0.json` prints *"installable (pinned, intact, approved)"*.
 
 ## Separate from this release - neither one is needed to approve it
 

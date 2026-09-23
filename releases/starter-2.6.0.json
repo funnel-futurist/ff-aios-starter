@@ -17,8 +17,8 @@
     "skills": 24
   },
   "created_from": {
-    "branch": "exec/p22-install-20260922",
-    "git_rev": "f658a070f18a80a4013479a0ccfbb1099e9461ad"
+    "branch": "main",
+    "git_rev": "0af7e9e841a8fad18b9c1087a7ab03b166056f48"
   },
   "credentials": [
     {
