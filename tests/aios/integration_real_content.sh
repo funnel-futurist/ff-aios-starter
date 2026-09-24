@@ -276,6 +276,20 @@ grep -q "shipped in 9.1.0" "$TARGET/START_HERE.md" && bad "refused upgrade still
   || ok "refused upgrade wrote nothing"
 git -C "$SRC" show "$REV:START_HERE.md" > "$TARGET/START_HERE.md"
 
+step "the workspace is under git, like every real client workspace"
+# Until 2026-09-24 this whole script upgraded a workspace with no git at all, where the
+# "uncommitted changes" check is skipped. A real 2.6.0 -> 2.6.1 upgrade then showed that the
+# upgrade's own lock file made every git-tracked workspace refuse itself. From here on the
+# target is committed, so the upgrades below go through that check for real.
+commit_target() {
+  git -C "$TARGET" -c user.email=e2e@example.com -c user.name=e2e add -A >/dev/null 2>&1
+  git -C "$TARGET" -c user.email=e2e@example.com -c user.name=e2e commit -qm "$1" >/dev/null 2>&1
+}
+git -C "$TARGET" init -q -b main >/dev/null 2>&1
+commit_target "installed 9.0.0"
+[ -z "$(git -C "$TARGET" status --porcelain)" ] && ok "workspace committed and clean" \
+  || bad "workspace not clean after commit"
+
 step "A4: upgrade preserves state"
 aios upgrade --repo "$SRC" --release "$WORK/v9.1.0.json" --target "$TARGET" \
   > "$WORK/upgrade.txt" 2>&1
@@ -320,6 +334,7 @@ else
 fi
 
 step "N5: hard kill mid-upgrade, then rollback recovers it"
+commit_target "back on 9.0.0"
 AIOS_FAULT="crash:upgrade.mid_write" aios upgrade --repo "$SRC" --release "$WORK/v9.1.0.json" \
   --target "$TARGET" >/dev/null 2>&1
 expect_code 137 $? "upgrade died mid-write with no cleanup"

@@ -25,9 +25,21 @@ one whose files no longer hash to what the manifest recorded.
 python3 scripts/aios/aios.py start                 # who you are, what you may do, what is installed
 python3 scripts/aios/aios.py verify --target .     # does this workspace still match its release?
 python3 scripts/aios/aios.py verify --target . --repo ../ff-aios-starter   # ...and does the record still match the pin?
-python3 scripts/aios/aios.py upgrade --release releases/starter-X.Y.Z.json --target .
 python3 scripts/aios/aios.py rollback --target .   # back to the previous release
 ```
+
+**Upgrade runs from a fresh copy of the Starter, not from inside your workspace.** The releases
+and the exact commits they pin live in the Starter repository, and your workspace carries
+neither. So, from an up-to-date clone of `ff-aios-starter` next to your workspace:
+
+```bash
+cd ../ff-aios-starter && git pull
+python3 scripts/aios/aios.py upgrade --release releases/starter-X.Y.Z.json --target ../my-workspace
+```
+
+That also means the upgrade always runs the *new* release's tool, so a fix in the tool reaches
+you on the upgrade that installs it. Commit your workspace first: an upgrade refuses a workspace
+with uncommitted work.
 
 `start` and `verify` are safe to run any time and change nothing. `upgrade` and `rollback` are
 founder-only.

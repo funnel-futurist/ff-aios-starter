@@ -4,3 +4,5 @@ backups/
 txn.json
 usage/
 local-operator.json
+# the install tool's own lock while an upgrade or rollback runs
+lock
