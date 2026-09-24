@@ -346,7 +346,8 @@ class Inventory(Sandbox):
             self.assertFalse(os.path.exists(os.path.join(REAL_ROOT, ".claude", "skills", name)),
                              name)
         tracked = util.git(REAL_ROOT, ["ls-files"]).splitlines()
-        marker = "Anthropic, PBC. All rights reserved"
+        # Assembled, so this file does not match itself once it is tracked.
+        marker = "Anthropic, PBC. " + "All rights " + "reserved"
         carrying = [p for p in tracked if os.path.isfile(os.path.join(REAL_ROOT, p))
                     and marker in open(os.path.join(REAL_ROOT, p), "rb").read()
                     .decode("utf-8", "replace")]
