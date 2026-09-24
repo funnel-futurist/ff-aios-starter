@@ -168,12 +168,21 @@ def is_git_repo(path):
     return proc.returncode == 0 and proc.stdout.decode().strip() == "true"
 
 
+# Files the install tool itself creates while it works. They are never the operator's change,
+# so they never make a workspace "dirty". The lock is the one that matters: an upgrade takes it
+# BEFORE checking the worktree, so counting it meant every git-tracked workspace refused its
+# own upgrade. Listed here as well as in .aios/.gitignore, because a workspace installed from
+# 2.6.0 has the old .gitignore until its first upgrade succeeds.
+TOOL_OWNED_PATHS = (".aios/lock",)
+
+
 def worktree_dirty(path):
     """True when a git worktree has uncommitted changes. False for a non-repo."""
     if not is_git_repo(path):
         return False
-    out = git(path, ["status", "--porcelain"])
-    return bool(out.strip())
+    out = git(path, ["status", "--porcelain", "--untracked-files=all"])
+    changes = [line[3:].strip().strip('"') for line in out.splitlines() if line.strip()]
+    return any(p not in TOOL_OWNED_PATHS for p in changes)
 
 
 def read_tree(repo, rev, include_links=False):

@@ -59,7 +59,15 @@ password manager. **Never put a key in `.aios/config.json`, in a skill, or in ch
 
 ```bash
 python3 scripts/aios/aios.py verify --target .      # does the workspace still match its release?
-python3 scripts/aios/aios.py upgrade --release releases/<next>.json --target .
+git status                                          # commit first: upgrade refuses uncommitted work
+```
+
+The upgrade itself runs from an up-to-date clone of the Starter, pointed at this workspace,
+because the releases and their pinned commits live there, not here:
+
+```bash
+cd ../ff-aios-starter && git pull
+python3 scripts/aios/aios.py upgrade --release releases/<next>.json --target <this workspace>
 ```
 
 Upgrade only touches files the release owns. Their foundations, deliverables, logs, `CLAUDE.md`

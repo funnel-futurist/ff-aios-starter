@@ -337,6 +337,44 @@ class UpgradeAndRollback(Sandbox):
                          open(os.path.join(self.target, "START_HERE.md")).read(),
                          "a refused upgrade must not have written anything")
 
+    def _commit_workspace(self):
+        """Put the workspace under git, the way every real client workspace is."""
+        harness.run_git(self.target, "init", "-q", "-b", "main")
+        harness.run_git(self.target, "-c", "user.email=t@example.com", "-c", "user.name=t",
+                        "add", "-A")
+        harness.run_git(self.target, "-c", "user.email=t@example.com", "-c", "user.name=t",
+                        "commit", "-qm", "installed")
+
+    def test_a4b_a_clean_git_workspace_can_upgrade_and_roll_back(self):
+        """Found by running a real 2.6.0 -> 2.6.1 upgrade on 2026-09-24, not by any test.
+
+        The upgrade took its lock (.aios/lock) BEFORE checking the worktree, and the lock was
+        not ignored, so every git-tracked workspace - every real one - refused its own upgrade
+        as "uncommitted changes". Every other test used a workspace with no git at all, where
+        the dirty check is skipped. The fixture's .aios/.gitignore deliberately lacks `lock`,
+        like a workspace installed from 2.6.0.
+        """
+        self._commit_workspace()
+        record = install_mod.upgrade(self.target, self.v2, self.source)
+        self.assertEqual(record["release"]["version"], "1.1.0")
+        self.assertFalse(os.path.exists(os.path.join(self.target, ".aios", "lock")))
+        harness.run_git(self.target, "-c", "user.email=t@example.com", "-c", "user.name=t",
+                        "add", "-A")
+        harness.run_git(self.target, "-c", "user.email=t@example.com", "-c", "user.name=t",
+                        "commit", "-qm", "upgraded")
+        install_mod.rollback(self.target)
+        self.assertEqual(install_mod.verify(self.target)[0], [])
+        self.assertEqual(install_mod.state_fingerprint(self.target), self.state_before)
+
+    def test_n4c_real_uncommitted_work_still_blocks_an_upgrade(self):
+        """The fix ignores the tool's own lock, and nothing else."""
+        self._commit_workspace()
+        harness.write(self.target, "02_Deliverables/copy/unsaved.md", "not committed yet\n")
+        with self.assertRaises(Refusal) as ctx:
+            install_mod.upgrade(self.target, self.v2, self.source)
+        self.assertEqual(ctx.exception.code, util.EXIT_STATE)
+        self.assertIn("uncommitted", ctx.exception.message)
+
     def test_n4b_upgrade_over_a_partial_install_is_refused(self):
         util.write_json(os.path.join(self.target, ".aios", "txn.json"),
                         {"op": "upgrade", "phase": "applying", "backup": "x"})
