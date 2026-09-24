@@ -1,9 +1,11 @@
 # The install contract's own tests, plus the governance check that makes an unfilled
 # CODEOWNERS template loud instead of silent.
 #
-# Two separate jobs on purpose:
+# Three separate jobs on purpose:
 #   tests      - the install tool's own test suite. Runs ONLY in the template repository.
 #   governance - runs everywhere, including every workspace generated from this template.
+#   boundary   - runs on every pull request everywhere: a change to a founder-lane path by
+#                someone who is not a founder fails until a founder approves that exact commit.
 #
 # Why tests is fenced to the template: this file ships to every client repo, and without the
 # guard every push there ran the installer's 134 checks (87 unit, 47 end-to-end) - about two billed Actions minutes
@@ -19,11 +21,14 @@ on:
   push:
     branches-ignore: []
   pull_request:
+  # An approval changes the boundary answer, so the boundary check re-runs on review.
+  pull_request_review:
+    types: [submitted, dismissed]
 
 jobs:
   tests:
     # The template repository only. Anywhere else this is someone else's test suite.
-    if: github.repository == 'funnel-futurist/ff-aios-starter'
+    if: github.repository == 'funnel-futurist/ff-aios-starter' && github.event_name != 'pull_request_review'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -40,9 +45,47 @@ jobs:
           node scripts/team/guard-dangerous-git.test.js
 
   governance:
+    if: github.event_name != 'pull_request_review'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
       - name: CODEOWNERS names real owners, bound to this repository
         run: python3 scripts/aios/aios.py governance check --repo-slug "${GITHUB_REPOSITORY}"
+
+  boundary:
+    # Holds the founder lane at the pull request. Everything it trusts - the role policy, the
+    # people map AND the checker's own code - is read from the BASE commit, so a pull request
+    # cannot loosen the rule it is being checked against. It only BLOCKS a merge when branch
+    # protection makes it a required check; otherwise it is a red X a founder can see.
+    if: github.event_name == 'pull_request' || github.event_name == 'pull_request_review'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Founder-lane files need a founder's approval
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          git worktree add --detach "$RUNNER_TEMP/base" "$BASE_SHA" >/dev/null 2>&1
+          checker="$RUNNER_TEMP/base/scripts/aios/aios.py"
+          if [ ! -f "$RUNNER_TEMP/base/scripts/aios/aioslib/boundary.py" ]; then
+            echo "the base branch has no boundary check yet, so there is nothing to hold this pull request to"
+            exit 0
+          fi
+          # Only approvals of THIS head commit count. A new push needs a new approval.
+          approvers="$(gh api "repos/${GITHUB_REPOSITORY}/pulls/${PR_NUMBER}/reviews" --paginate \
+            --jq '.[] | select(.state == "APPROVED" and .commit_id == env.HEAD_SHA) | .user.login' \
+            | sort -u | paste -sd, -)"
+          python3 "$checker" boundary check-pr --repo . --base "$BASE_SHA" --head "$HEAD_SHA" \
+            --author "$PR_AUTHOR" --approved-by "$approvers"

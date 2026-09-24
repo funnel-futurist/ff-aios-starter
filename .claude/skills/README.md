@@ -2,10 +2,15 @@
 
 Skills are pre-built moves your AIOS can run by name. Type `/` in Claude Code to see them live. Here's the full list with a one-line description and how to trigger each.
 
-## The core set (shipped with your AIOS)
+## The core set (20 ship in this repo, plus Anthropic's four document skills)
 
 | Skill | What it does | Trigger |
 |---|---|---|
+| **start** | The role-based way in: who you are, what your role may do, which release is installed and whether it still matches, and which files are the founder's. | `/start` |
+| **start-my-day** | Begin a session safely: syncs you to the latest, puts you on your own branch, loads your brain. | `/start-my-day` |
+| **wrap-up** | End a session safely: self-review, save, push, open the review request, write a plain-English handover. | `/wrap-up` |
+| **review-queue** | The reviewer's live queue: every open change, sorted into ready, waiting on you, stuck and stale. | `/review-queue` |
+| **resolve-conflict** | A calm, plain-English path through a merge conflict, when two people changed the same lines. | `/resolve-conflict` |
 | **onboard_wizard** | First-run setup walk: tool → repo → keys → invite team; captures your vision / mission / values; proves the brain works. Run it first, and again when a teammate joins. | `/onboard_wizard` |
 | **context_load** | Reads your whole workspace and gives you a session brief (what's here, what's active). | `/context_load` |
 | **dashboard** | Quick status: open tasks, what's in the review queue, what's coming up. | `/dashboard` |
@@ -21,7 +26,7 @@ Skills are pre-built moves your AIOS can run by name. Type `/` in Claude Code to
 | **changelog** | Generates a clean changelog entry from your recent changes. | `/changelog` |
 | **humanize** | Strips AI-tells from copy (em-dashes, filler, robotic phrasing) so it reads like you. | `/humanize` |
 | **financial_teardown** | Runs a full subscription/software teardown: AI reads your bank statements to inventory every recurring charge, sorts each tool by "would anything break?", cancels dead weight, claws back refunds with proven templates, and sets up prevention (dedicated card + limits). Cuts monthly burn, recovers cash, frees bandwidth. | `/financial_teardown` |
-| **docx** · **pdf** · **xlsx** · **pptx** | Your document factory: create and edit Word docs, PDFs, Excel sheets, and PowerPoint decks. Claude reaches for these automatically when you ask for a document. | automatic |
+| **docx** · **pdf** · **xlsx** · **pptx** | Your document factory: create and edit Word docs, PDFs, Excel sheets, and PowerPoint decks. **Made by Anthropic, installed from Anthropic** as the `document-skills` plugin, not copied into this repo (see `THIRD_PARTY_NOTICES.md`). `/onboard_wizard` installs it; after that Claude reaches for these automatically when you ask for a document. | automatic, once installed |
 
 ## How to add your own
 When you catch yourself explaining the same task twice, make it a skill: a folder under `.claude/skills/<name>/` with a `SKILL.md` (a name, a description of when to use it, and the steps). Ask Claude Code to scaffold one for you. **Never run a skill from a source you don't trust**, it runs with your access; read it first.
@@ -36,5 +41,5 @@ When you catch yourself explaining the same task twice, make it a skill: a folde
 ## Useful source docs (always current, never stale)
 - Claude + Claude Code: https://docs.claude.com
 - GitHub: https://docs.github.com
-- The open skills library (where the document skills come from): github.com/anthropics/skills
+- Anthropic's skills repo, where the document skills come from: github.com/anthropics/skills. The document skills there are Anthropic's, under Anthropic's terms (source-available, not open source), which is why this AIOS installs them from Anthropic instead of copying them.
 - When a setup looks out of date, go to the source above or use your unstuck protocol (`docs/UNSTUCK_PROTOCOL.md`).

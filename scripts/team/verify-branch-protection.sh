@@ -63,6 +63,22 @@ print('  '+('✓' if de else '✗ FAIL')+' main deletion blocked'); f+= 0 if de 
 sys.exit(f)
 "
   fails=$((fails+$?))
+  # In an installed workspace (it has a people map), the founder-lane boundary only BLOCKS a
+  # merge when it is a required check. Otherwise it is a red X anyone with merge rights can
+  # click past, and /start's "held at the pull request" would overstate it.
+  ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+  if [ -f "$ROOT_DIR/.aios/config.json" ]; then
+    if echo "$PROT" | python3 -c "
+import sys,json
+c=(json.load(sys.stdin).get('required_status_checks') or {})
+names=set(c.get('contexts') or [])|{x.get('context') for x in (c.get('checks') or [])}
+sys.exit(0 if 'boundary' in names else 1)"; then
+      echo "  ✓ the founder-lane boundary check is required before merge"
+    else
+      echo "  ✗ FAIL: the 'boundary' check is not a required status check - a founder-lane change can be merged past it"
+      fails=$((fails+1))
+    fi
+  fi
 fi
 
 # CODEOWNERS present AND actually naming somebody.

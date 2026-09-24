@@ -180,6 +180,39 @@ aios upgrade --repo "$SRC" --release "$WORK/v9.0.0.json" --target "$TARGET" \
   >/dev/null 2>"$WORK/upgrade_denied.txt"
 expect_code 3 $? "operator refused upgrade"
 
+step "2.6.1: the founder lane is HELD in the session, by the workspace's own installed hook"
+# /start used to list "not yours" paths and nothing stopped the edit. Drive the exact command
+# .claude/settings.json wires, from inside the installed workspace, as each role.
+hook_event() {
+  printf '{"tool_name":"%s","cwd":"%s","tool_input":{"file_path":"%s/%s"}}' "$1" "$TARGET" "$TARGET" "$2"
+}
+run_hook() {
+  ( cd "$TARGET" && env -i PATH="$BIN:/usr/bin:/bin" HOME="$HOMEDIR" CLAUDE_PROJECT_DIR="$TARGET" \
+      python3 scripts/aios/aios.py hook pre-edit )
+}
+grep -q 'hook pre-edit' "$TARGET/.claude/settings.json" \
+  && ok "installed settings wire the pre-edit hook" || bad "the hook is not wired in the installed settings"
+mk_gh acme-va
+hook_event Edit .aios/config.json | run_hook > "$WORK/hook_operator.json" 2>&1
+grep -q '"permissionDecision": "deny"' "$WORK/hook_operator.json" \
+  && ok "operator's edit to the people map is refused" || bad "operator edited the people map"
+hook_event Write 02_Deliverables/draft.md | run_hook > "$WORK/hook_operator_ok.json" 2>&1
+[ ! -s "$WORK/hook_operator_ok.json" ] && ok "operator's ordinary work is untouched" \
+  || bad "the hook got in the way of ordinary work"
+mk_gh acme-founder
+hook_event Edit .aios/config.json | run_hook > "$WORK/hook_founder.json" 2>&1
+[ ! -s "$WORK/hook_founder.json" ] && ok "founder may change it, straight after the operator (no stale cached role)" \
+  || bad "founder was refused - the operator's cached login outlived the switch"
+
+step "2.6.1: the document skills come from Anthropic, not from a copy"
+for s in docx pdf pptx xlsx; do
+  [ -e "$TARGET/.claude/skills/$s" ] && bad "a copy of Anthropic's $s skill shipped"
+done
+ok "no copy of Anthropic's document skills landed"
+grep -q 'document-skills@anthropic-agent-skills' "$TARGET/.claude/settings.json" \
+  && ok "installed settings enable Anthropic's document-skills plugin" || bad "plugin not declared"
+[ -f "$TARGET/THIRD_PARTY_NOTICES.md" ] && ok "attribution shipped" || bad "no third-party notice"
+
 step "the operator does real work (this is the state that must survive)"
 mk_gh acme-founder
 printf '# Your AIOS\n\nMY OWN CONSTITUTION, edited by the founder.\n' > "$TARGET/CLAUDE.md"

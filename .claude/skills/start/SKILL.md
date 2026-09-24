@@ -30,6 +30,7 @@ wrong, a founder changes the people map through a reviewed pull request.
 | `UNPINNED` | this workspace was never installed from an approved release. See below. |
 | `DRIFTED` | a file the release owns has been edited by hand. See below. |
 | `cred:` | each credential **reference** and whether it resolves. Never a value. |
+| `founder lane:` | paths their role may not change. Say it plainly: *"these are the founder's - I will not edit them for you, and a pull request that changes them needs a founder's approval."* If Claude's edit is refused on one of these, that refusal is the feature. Offer to write the proposed change up for a founder instead. |
 
 ## The three answers that need a human sentence, not a shrug
 

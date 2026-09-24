@@ -40,4 +40,11 @@
 /releases/                  @phoenix-ship-it @Joburn-ai
 /release/                   @phoenix-ship-it @Joburn-ai
 
+# The founder lane: every path an operator's role may not change (.aios/roles.json paths_denied).
+# The boundary check fails an operator's PR here until a founder approves; this makes GitHub
+# ask the right person for that approval.
+/01_Foundations/offer_economics/ @phoenix-ship-it
+/scripts/aios/              @phoenix-ship-it @Joburn-ai
+/templates/governance/      @phoenix-ship-it @Joburn-ai
+
 # Deliberately NOT owner-gated: your normal docs, deliverables, and day-to-day work move freely.

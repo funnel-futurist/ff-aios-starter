@@ -38,4 +38,10 @@ The Template is provided "as is", without warranty of any kind, express or
 implied. You are responsible for how you use it, including the security of
 your own keys, data, and integrations.
 
+THIRD-PARTY COMPONENTS
+Some capabilities this Template sets up are made by others and are not part of
+the Template. They are not copied into it, and this license does not cover
+them. Each is installed from its maker under the maker's own terms. They are
+listed in THIRD_PARTY_NOTICES.md.
+
 For permissions beyond this license, contact Funnel Futurist.

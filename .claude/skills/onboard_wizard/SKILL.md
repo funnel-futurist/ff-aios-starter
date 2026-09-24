@@ -23,7 +23,8 @@ Ask: **"Are you the founder, a co-founder, or a cyborg VA / operator?"**
 2. **Your template repo**, get it through the portal (one-click "Use this template" link).
 3. **Pick your surface:** Web (easiest, no install) / Desktop / **VS Code (recommended, full control + you see your files)**.
 4. **If local (Desktop/VS Code):** install **git** once (search "install git for [your OS]" if needed); then **clone your repo into a folder on your computer, that folder IS your AIOS.**
-5. **Open Claude Code** in that folder and run your first session (load your foundational docs).
+5. **Open Claude Code** in that folder and run your first session (load your foundational docs). When Claude Code asks whether you trust this folder, say yes - that is what turns on the safety settings.
+   - **Install your document skills** (Word, PDF, PowerPoint, Excel). They are made by Anthropic and installed from Anthropic, not copied into your repo. Type `/plugin install document-skills@anthropic-agent-skills` and confirm. If Claude Code says the marketplace is unknown, first type `/plugin marketplace add anthropics/skills`. **Check it worked:** type `/plugin` and look for `document-skills` as installed.
 6. **Invite your team**, GitHub repo → Settings → Collaborators → add each teammate's GitHub username. Now everyone shares the **same brain.**
 7. **Secure it (airlocks):** turn on **2FA**; keep keys in `.env` (it's gitignored, so it never reaches GitHub); set a **spend limit** on your API key.
 
@@ -46,6 +47,7 @@ Now show them what's on hand, so they finish onboarding knowing their capabiliti
 - **/dashboard**, where things stand right now.
 - **/grill_me**, before you build, pressure-test the decision so you do not build the wrong thing.
 - **/project_management**, when your plate is overwhelming, dump it here and it triages the whole thing.
+- **Documents:** ask for a Word doc, PDF, deck or spreadsheet and Claude uses the document skills you installed in Step 2.
 - And the quiet guardians that run on their own: **pr_review** (watches every change), **security_check** (catches leaked keys), and a **staleness nudge** (tells you if you're behind, see Step 7).
 The point is not to memorize all of them. These are curated should-do moves, not bloat, so you reach for the same handful daily and the rest are there when you need them. Type `/` anytime.
 

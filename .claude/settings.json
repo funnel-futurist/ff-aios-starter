@@ -26,6 +26,15 @@
             "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard-dangerous-git.js\""
           }
         ]
+      },
+      {
+        "matcher": "Edit|Write|MultiEdit|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/scripts/aios/aios.py\" hook pre-edit"
+          }
+        ]
       }
     ],
     "SessionStart": [
@@ -38,5 +47,16 @@
         ]
       }
     ]
+  },
+  "extraKnownMarketplaces": {
+    "anthropic-agent-skills": {
+      "source": {
+        "source": "github",
+        "repo": "anthropics/skills"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "document-skills@anthropic-agent-skills": true
   }
 }

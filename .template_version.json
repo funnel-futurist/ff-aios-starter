@@ -1,19 +1,16 @@
 {
-  "_comment": "skills/skill_count are asserted against the tree by tests/aios/test_governance_and_sanitize.py. The authoritative version of an installed workspace is .aios/install.json, not this file.",
-  "skill_count": 24,
+  "_comment": "skills/skill_count are asserted against the tree, and plugins against .claude/settings.json, by tests/aios/test_governance_and_sanitize.py. skills = the skills that ship in this repo; plugins = capabilities installed from their makers, not copied. The authoritative version of an installed workspace is .aios/install.json, not this file.",
+  "skill_count": 20,
   "skills": [
     "changelog",
     "context_load",
     "dashboard",
-    "docx",
     "f6_completeness_check",
     "file_audit",
     "financial_teardown",
     "grill_me",
     "humanize",
     "onboard_wizard",
-    "pdf",
-    "pptx",
     "pr_review",
     "project_management",
     "qc_review",
@@ -24,10 +21,23 @@
     "start-my-day",
     "upskill",
     "workspace_health",
-    "wrap-up",
-    "xlsx"
+    "wrap-up"
   ],
   "template": "ff-aios-starter",
-  "updated": "2026-09-22",
-  "version": "2.6.0"
+  "updated": "2026-09-23",
+  "version": "2.6.1",
+  "plugins": [
+    {
+      "id": "document-skills@anthropic-agent-skills",
+      "by": "Anthropic",
+      "provides": [
+        "docx",
+        "pdf",
+        "pptx",
+        "xlsx"
+      ],
+      "installed_by": "/plugin install document-skills@anthropic-agent-skills (declared in .claude/settings.json)",
+      "notice": "THIRD_PARTY_NOTICES.md"
+    }
+  ]
 }
