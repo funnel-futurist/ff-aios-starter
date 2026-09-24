@@ -42,4 +42,11 @@
 /releases/                  [REPO_OWNER] [PRIMARY_REVIEWER]
 /release/                   [REPO_OWNER] [PRIMARY_REVIEWER]
 
+# The founder lane: every path an operator's role may not change (.aios/roles.json paths_denied).
+# The boundary check fails an operator's PR here until a founder approves; this makes GitHub
+# ask the right person for that approval.
+/01_Foundations/offer_economics/  [REPO_OWNER]
+/scripts/aios/              [REPO_OWNER] [PRIMARY_REVIEWER]
+/templates/governance/      [REPO_OWNER] [PRIMARY_REVIEWER]
+
 # Deliberately NOT owner-gated: your normal docs, deliverables, and day-to-day work move freely.

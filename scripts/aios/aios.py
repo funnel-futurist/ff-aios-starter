@@ -11,6 +11,8 @@
     start             role-scoped entry point
     sanitize          what would ship: secrets, client names, internal URLs
     governance        CODEOWNERS check / render
+    boundary          does this pull request touch the founder lane without a founder?
+    hook              Claude Code hooks (pre-edit: hold the founder lane in the session)
 
 Exit codes are part of the contract: 0 ok, 1 error, 2 package, 3 role, 4 credential,
 5 state, 6 verify, 7 sanitize, 8 governance.
@@ -26,7 +28,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from aioslib import governance, install as install_mod, orgconfig, release as release_mod  # noqa: E402
-from aioslib import roles, sanitize, util  # noqa: E402
+from aioslib import boundary, roles, sanitize, util  # noqa: E402
 from aioslib.util import (EXIT_ERROR, EXIT_GOVERNANCE, EXIT_OK, EXIT_SANITIZE, Refusal)  # noqa: E402
 
 
@@ -279,7 +281,10 @@ def cmd_start(args):
     denied = roles.denied_paths(policy, role)
     if denied:
         _say("")
-        _say("not yours in this workspace: %s" % ", ".join(denied))
+        _say("founder lane (ask a founder first): %s" % ", ".join(denied))
+        _say("  held two ways: Claude will not edit these for you, and a pull request that")
+        _say("  changes them fails its boundary check until a founder approves that commit.")
+        _say("  a direct push to main is stopped only if branch protection is on.")
     return EXIT_OK
 
 
@@ -352,6 +357,24 @@ def cmd_governance_render(args):
     else:
         sys.stdout.write(text)
     return EXIT_OK
+
+
+def cmd_boundary_check_pr(args):
+    approvers = [a.strip() for a in (args.approved_by or "").split(",") if a.strip()]
+    code, lines = boundary.check_pr(os.path.abspath(args.repo), args.base, args.head,
+                                    args.author, approvers)
+    for line in lines:
+        _say(line)
+    return code
+
+
+def cmd_hook_pre_edit(args):
+    # A hook that crashes must not wedge the session: Claude Code treats a non-2 exit as a
+    # non-blocking error. The refusal path is a printed decision, never an exception.
+    code, out = boundary.hook_pre_edit(sys.stdin.read())
+    if out:
+        _say(out)
+    return code
 
 
 # ─── argument parsing ───────────────────────────────────────────────────────
@@ -451,6 +474,23 @@ def build_parser():
                     help="NAME=@handle [@handle...] (repeatable)")
     gr.add_argument("--out")
     gr.set_defaults(func=cmd_governance_render)
+
+    bd = sub.add_parser("boundary", help="founder-lane checks")
+    bdsub = bd.add_subparsers(dest="subcommand")
+    bp = bdsub.add_parser("check-pr", help="fail a PR that changes founder-lane paths "
+                                            "without a founder's approval of its head commit")
+    bp.add_argument("--repo", default=".")
+    bp.add_argument("--base", required=True)
+    bp.add_argument("--head", required=True)
+    bp.add_argument("--author", required=True)
+    bp.add_argument("--approved-by", dest="approved_by", default="",
+                    help="comma-separated logins that approved THIS head commit")
+    bp.set_defaults(func=cmd_boundary_check_pr)
+
+    hk = sub.add_parser("hook", help="Claude Code hooks")
+    hksub = hk.add_subparsers(dest="subcommand")
+    hp = hksub.add_parser("pre-edit", help="PreToolUse: hold the founder lane in the session")
+    hp.set_defaults(func=cmd_hook_pre_edit)
 
     return p
 

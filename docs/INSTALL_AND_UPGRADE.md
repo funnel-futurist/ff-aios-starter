@@ -110,12 +110,21 @@ fingerprint of every non-managed file is identical after an upgrade *and* after 
 
 Identity comes from your authenticated GitHub CLI. Your role comes from the people map in
 `.aios/config.json`. An operator gets the operator lane; upgrades, rollbacks and governance are
-founder-only.
+founder-only, and the tool refuses anyone else.
 
-This is a **guardrail, not authentication**. Anyone who can edit files on that laptop can edit
-the people map. The real boundary is GitHub repository permissions plus branch protection and
-code-owner review on `.aios/config.json` - which is why `governance check` and
-`verify-branch-protection.sh` matter:
+Some paths belong to the founder lane: the offer economics folder, `.github/`, the people map and
+role policy, Claude's safety settings and hooks, and the install tool itself (the full list is
+`paths_denied` in `.aios/roles.json`). They are held in two places:
+
+1. **In the session.** Claude will not edit them for an operator, or for anyone it cannot
+   identify. It says why and offers to hand the change to a founder.
+2. **At the pull request.** The `boundary` check fails a pull request that changes them, unless
+   the author is a founder or a founder has approved that exact commit. It reads the rules from
+   the base branch, so a pull request cannot loosen its own check.
+
+What neither stops, honestly: somebody editing files by hand in their own terminal and pushing
+straight to `main`. Only GitHub can stop that, with branch protection that requires pull
+requests, code-owner review and the `boundary` check. Turn it on, then prove it:
 
 ```bash
 python3 scripts/aios/aios.py governance check

@@ -1,6 +1,6 @@
 # P22 STATE - current at every material change
 
-last_updated: 2026-09-23, fix + approve + publish session (writer: CHAT P22, Claude Opus 5.5)
+last_updated: 2026-09-23, 2.6.1 built on a branch, walkthrough corrected (writer: CHAT P22, Claude Opus 5.5)
 branch: exec/p22-rc-2.6.0-20260922 (off main at 0af7e9e); exec/p22-install-20260922 merged as PR #12
 starting_repo_sha: c4387053c956e45a3a190c78d3331214a3b09fff (main, confirmed unmoved at preflight)
 starting_master_revision: 71e063f83b202fbf914e3e4bbc2b4ca9fbc42656 (delegation repo, exec/operating-cutover-20260921)
@@ -20,15 +20,15 @@ receipt: P22-001-2026-09-22.md (in this folder)
 | CODEOWNERS template (placeholders live HERE, not in `.github/`) | `templates/governance/CODEOWNERS.template` |
 | role-scoped entry skill | `.claude/skills/start/SKILL.md` |
 | operator docs | `docs/INSTALL_AND_UPGRADE.md` |
-| unit tests (87) | `tests/aios/test_*.py` |
-| end-to-end on real content (47 assertions) | `tests/aios/integration_real_content.sh` |
+| unit tests (118) | `tests/aios/test_*.py` |
+| end-to-end on real content (54 assertions) | `tests/aios/integration_real_content.sh` |
 | CI | `.github/workflows/install-contract.yml` |
 
 ## How to re-verify everything in two commands
 
 ```bash
-python3 -m unittest discover -s tests/aios -t tests/aios     # 87 tests
-bash tests/aios/integration_real_content.sh                  # 47 assertions, real content
+python3 -m unittest discover -s tests/aios -t tests/aios     # 118 tests
+bash tests/aios/integration_real_content.sh                  # 54 assertions, real content
 ```
 
 The client-name denylist is **not in this repo** and never will be. Build one at run time from
@@ -65,7 +65,16 @@ the internal client roster and pass `--denylist`.
 ## Open gates (nothing here blocks the next instance from working)
 
 1. **Release approval - DONE.** Approved and published at `0c0cf17` (receipt section 14).
-   Next: P22-002, the first real client install, on dispatch.
+0. **ACTIVE: 2.6.1 on branch `exec/p22-2.6.1-20260923`, NOT merged, waiting for Phoenix.** Founder
+   amendment 2026-09-23 (night), P22 section: keep the document-skill capability but install it
+   from Anthropic instead of vendoring it; make the "ask a founder first" boundary real; reconcile
+   the skill inventory; update the walkthrough. All four done on the branch - receipt section 15.
+   Walkthrough (private, covers internal inventory): https://claude.ai/artifact/DF3JJ4X5VC7B2NBdzpHsty
+   Order from here: Phoenix accepts -> merge -> cut 2.6.1 from the merge commit on main -> full
+   gates -> brief -> his approval -> Febi's dogfood project (project document first, ClickUp
+   second) -> only after Phoenix accepts AND Febi validates does P22-002 install into a client.
+1. **2.6.0 - approved and published** at `0c0cf17` (receipt section 14). To be marked
+   `superseded` when 2.6.1 is approved, not before.
 2. **Code owners - DONE.** Phoenix named Phoenix/John/Justine; GitHub was asked who actually has
    access. `.github/CODEOWNERS` now names @phoenix-ship-it (write) and @Joburn-ai (admin), the
    check passes, and the CI `governance` job is GREEN. Remaining: `justine-del` has org-level

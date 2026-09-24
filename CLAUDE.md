@@ -19,4 +19,14 @@ Edit this `CLAUDE.md` freely as your business and workflow evolve, it's your bra
 `01_Foundations/` (your Foundational 6: market, avatar, offer, economics, pitch, profile) · `02_Deliverables/` · `03_Quality_Control/` · `04_Customer_Journey/` · `05_Assets/` · `06_Communication/` · `07_Setup/` · `08_Automations/` · `09_Archive/`. Add folders as you grow. File naming: lowercase, underscores, no spaces (`taxonomy_rules.md`).
 
 ## Your skills
-Type `/` to see them (full list + what each does: `.claude/skills/README.md`). Highlights: **onboard_wizard** (first-run setup) · context_load · dashboard · qc_review · workspace_health · **pr_review** (your guardian) · **grill_me** (pressure-test before you build) · **project_management** (triage your whole plate) · **upskill** (stay current, stay lean) · changelog · security_check · file_audit · humanize · f6_completeness_check · **docx · pdf · xlsx · pptx** (your document factory: Word, PDF, Excel, PowerPoint). Add your own (see `docs/UNSTUCK_PROTOCOL.md` and the skills folder for how). Never run skills from sources you don't trust.
+Type `/` to see them. What each one does: `.claude/skills/README.md`. Run `/start` any time to see the moves for your role.
+- **Start and end every session:** start · start-my-day · wrap-up · context_load · dashboard
+- **Setup and staying current:** onboard_wizard (run it first) · upskill
+- **Think before you build:** grill_me · project_management
+- **Your foundations and quality:** f6_completeness_check · qc_review · humanize
+- **Keep the workspace healthy:** workspace_health · file_audit · security_check · changelog
+- **Working as a team:** review-queue · resolve-conflict · pr_review (your guardian, runs on every change)
+- **Money:** financial_teardown
+- **Documents:** Word, PDF, PowerPoint and Excel come from Anthropic's `document-skills` plugin, which `/onboard_wizard` installs. They are Anthropic's, not copied here (`THIRD_PARTY_NOTICES.md`).
+
+Add your own (see `docs/UNSTUCK_PROTOCOL.md` and the skills folder for how). Never run skills from sources you don't trust.
