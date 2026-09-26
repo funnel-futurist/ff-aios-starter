@@ -1,0 +1,17 @@
+{
+  "alwaysUpdateLinks": false,
+  "newLinkFormat": "relative",
+  "useMarkdownLinks": true,
+  "showUnsupportedFiles": false,
+  "promptDelete": true,
+  "userIgnoreFilters": [
+    "node_modules/",
+    ".venv/",
+    "venv/",
+    "dist/",
+    "build/",
+    "__pycache__/",
+    ".next/",
+    "coverage/"
+  ]
+}

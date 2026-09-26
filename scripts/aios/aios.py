@@ -13,6 +13,7 @@
     governance        CODEOWNERS check / render
     boundary          does this pull request touch the founder lane without a founder?
     hook              Claude Code hooks (pre-edit: hold the founder lane in the session)
+    workspace         Obsidian Workspace Kit: one vault over separate authorized repositories
 
 Exit codes are part of the contract: 0 ok, 1 error, 2 package, 3 role, 4 credential,
 5 state, 6 verify, 7 sanitize, 8 governance.
@@ -28,7 +29,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from aioslib import governance, install as install_mod, orgconfig, release as release_mod  # noqa: E402
-from aioslib import boundary, roles, sanitize, util  # noqa: E402
+from aioslib import boundary, roles, sanitize, util, workspace  # noqa: E402
 from aioslib.util import (EXIT_ERROR, EXIT_GOVERNANCE, EXIT_OK, EXIT_SANITIZE, Refusal)  # noqa: E402
 
 
@@ -377,6 +378,56 @@ def cmd_hook_pre_edit(args):
     return code
 
 
+def _print_workspace_report(report):
+    for r in report["repos"]:
+        rev = (" @ %s" % r["revision"][:12]) if r.get("revision") else ""
+        extra = " (cloned)" if r.get("cloned") else (" (moved forward)" if r.get("fast_forwarded") else "")
+        _say("  %-12s %-14s %s%s%s" % (r["name"], r["domain"], r["status"], rev, extra))
+        if r.get("next"):
+            _say("               next: %s" % r["next"])
+        for w in r.get("warnings", []):
+            _say("               warning: %s" % w)
+    kept = [v["file"] for v in report["maps"].values() if v["kept_your_edit"]]
+    _say("maps written to %s/%s" % (report["parent"], workspace.MAPS_DIR))
+    if kept:
+        _say("kept your edits; fresh copies written as: %s" % ", ".join(kept))
+    _say("open %s in Obsidian, then START-HERE.md" % report["parent"])
+
+
+def cmd_workspace_plan(args):
+    manifest = util.read_json(args.manifest)
+    problems = workspace.validate(manifest)
+    if problems:
+        raise Refusal(util.EXIT_PACKAGE, "the workspace manifest is not valid", problems)
+    for row in workspace.plan(manifest, os.path.abspath(args.parent),
+                              check_remote=not args.offline):
+        _say("  %-12s %-10s %-12s %s" % (row["name"], row["state"], row["local"], row["action"]))
+    _say("nothing was changed")
+    return EXIT_OK
+
+
+def cmd_workspace_init(args):
+    report = workspace.init(util.read_json(args.manifest), args.parent,
+                            clone_filter=args.filter)
+    if report["settings_written"]:
+        _say("Obsidian settings: %s" % ", ".join(report["settings_written"]))
+    _print_workspace_report(report)
+    return report["code"]
+
+
+def cmd_workspace_sync(args):
+    report = workspace.sync(args.parent, clone_filter=args.filter)
+    _print_workspace_report(report)
+    return report["code"]
+
+
+def cmd_workspace_status(args):
+    for row in workspace.status(os.path.abspath(args.parent)):
+        rev = (" @ %s" % row["revision"][:12]) if row.get("revision") else ""
+        _say("  %-12s %s%s" % (row["name"], row["status"], rev))
+    return EXIT_OK
+
+
 # ─── argument parsing ───────────────────────────────────────────────────────
 
 def build_parser():
@@ -491,6 +542,26 @@ def build_parser():
     hksub = hk.add_subparsers(dest="subcommand")
     hp = hksub.add_parser("pre-edit", help="PreToolUse: hold the founder lane in the session")
     hp.set_defaults(func=cmd_hook_pre_edit)
+
+    ws = sub.add_parser("workspace", help="Obsidian Workspace Kit over separate repositories")
+    wssub = ws.add_subparsers(dest="workspace_command")
+    wp = wssub.add_parser("plan", help="show what init/sync would do; changes nothing")
+    wp.add_argument("--manifest", required=True)
+    wp.add_argument("--parent", required=True)
+    wp.add_argument("--offline", action="store_true", help="skip checking remote access")
+    wp.set_defaults(func=cmd_workspace_plan)
+    wi = wssub.add_parser("init", help="create the workspace folder and clone what is active")
+    wi.add_argument("--manifest", required=True)
+    wi.add_argument("--parent", required=True)
+    wi.add_argument("--filter", help="partial clone filter for large repositories, e.g. blob:none")
+    wi.set_defaults(func=cmd_workspace_init)
+    wsy = wssub.add_parser("sync", help="clone newly active repositories and rebuild the maps")
+    wsy.add_argument("--parent", required=True)
+    wsy.add_argument("--filter")
+    wsy.set_defaults(func=cmd_workspace_sync)
+    wst = wssub.add_parser("status", help="each repository's state, without fetching")
+    wst.add_argument("--parent", required=True)
+    wst.set_defaults(func=cmd_workspace_status)
 
     return p
 
