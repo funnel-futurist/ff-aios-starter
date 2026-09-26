@@ -1,0 +1,7 @@
+{
+  "search": "-path:node_modules",
+  "showTags": false,
+  "showAttachments": false,
+  "hideUnresolved": false,
+  "showOrphans": true
+}

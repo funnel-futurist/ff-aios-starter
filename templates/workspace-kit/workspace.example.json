@@ -1,0 +1,64 @@
+{
+  "schema": "ff-aios-starter/workspace@1",
+  "_comment": "Maps stable names to the repositories this workspace may show. It holds credential REFERENCES (env:NAME), never a token, password or key. Change 'state' to 'active' when a phase is unlocked, then run `aios workspace sync`.",
+  "workspace_name": "Example Company Operating System",
+  "company": "Example Company",
+  "repos": {
+    "aios": {
+      "domain": "aios",
+      "title": "AIOS - company context",
+      "url": "https://github.com/example-org/example-aios.git",
+      "branch": "main",
+      "path": "aios",
+      "state": "active",
+      "start_page": "START_HERE.md"
+    },
+    "creation": {
+      "domain": "creation",
+      "title": "Creation - brand, assets and documents",
+      "url": "https://github.com/example-org/example-creation.git",
+      "branch": "main",
+      "path": "creation",
+      "state": "active"
+    },
+    "team-ops": {
+      "domain": "team-ops",
+      "title": "Team Ops - people, delegation and delivery",
+      "url": "https://github.com/example-org/example-team-ops.git",
+      "branch": "main",
+      "path": "team-ops",
+      "state": "active"
+    },
+    "command-os": {
+      "domain": "command-os",
+      "title": "Command OS - operating visibility",
+      "url": "https://github.com/example-org/example-command-os.git",
+      "branch": "main",
+      "path": "command-os",
+      "state": "reference",
+      "reference_note": "Shown as an interface until this company's Command OS repository exists."
+    },
+    "revops": {
+      "domain": "revops",
+      "title": "RevOps - pipeline and revenue systems",
+      "url": "https://github.com/example-org/example-revops.git",
+      "branch": "main",
+      "path": "revops",
+      "state": "inactive"
+    },
+    "attention": {
+      "domain": "attention",
+      "title": "Attention - content and ads",
+      "url": "https://github.com/example-org/example-attention.git",
+      "branch": "main",
+      "path": "attention",
+      "state": "inactive"
+    }
+  },
+  "capabilities": [
+    {"name": "Document production", "provider": "Funnel Futurist", "domain": "creation", "status": "interface",
+     "description": "Send an approved brief; receive a formatted document in your own Drive. The production method stays with FF."},
+    {"name": "Architecture Health", "provider": "Funnel Futurist", "domain": "aios", "status": "interface",
+     "description": "Reads your repositories at a pinned revision and returns findings. It does not change your files."}
+  ]
+}
