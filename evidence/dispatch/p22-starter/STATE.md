@@ -1,6 +1,6 @@
 # P22 STATE - current at every material change
 
-last_updated: 2026-09-24, 2.6.1 candidate + dogfood project drafted (writer: CHAT P22, Claude Opus 5.5)
+last_updated: 2026-09-26, V2 direction applied: Workspace Kit (PR #19) + Febi pilot revision 2 (writer: CHAT P22, Claude Opus 5.5)
 branch: exec/p22-rc-2.6.0-20260922 (off main at 0af7e9e); exec/p22-install-20260922 merged as PR #12
 starting_repo_sha: c4387053c956e45a3a190c78d3331214a3b09fff (main, confirmed unmoved at preflight)
 starting_master_revision: 71e063f83b202fbf914e3e4bbc2b4ca9fbc42656 (delegation repo, exec/operating-cutover-20260921)
@@ -61,6 +61,16 @@ the internal client roster and pass `--denylist`.
 - PR #12: MERGED 2026-09-23T04:17:46Z by phoenix-ship-it, merge commit `0af7e9e`
 - **Release brief:** `releases/starter-2.6.0.BRIEF.md` - read this before asking Phoenix to
   approve anything. Asking for approval without it is the defect it was written to fix.
+
+## 2026-09-26 - V2 founder direction applied (receipt: P22-WS-2026-09-26.md, on PR #19)
+
+- **2.6.1** is still a DRAFT on PR #18 and still waiting for Phoenix. The V2 package does not approve it.
+- **Workspace Kit** is on PR #19 at `2fac0d1`, with 141/141 tests passing. It has not been merged or released; the proposed release is 2.7.0, after 2.6.1.
+  - A real FF canary is built at `~/Documents/FF-Operating-System`, with the dirty, unavailable and edited-map scenarios all passing.
+  - The daily checkout was not touched.
+- **Febi pilot Doc**, revision 2, is at the same link. It was rendered through Creation's house route and is pageless with 0 empty paragraphs.
+  - It holds the eight tested areas (checklist T1 to T14), the expected mismatches M1 to M4, and decisions D1 to D8.
+- **ClickUp:** nothing written. The projection waits on D1 to D8.
 
 ## Open gates (nothing here blocks the next instance from working)
 
