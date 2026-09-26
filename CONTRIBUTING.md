@@ -72,3 +72,7 @@ A tiny program runs automatically when you open the repo: a **staleness nudge** 
 - Protect `main`: require a PR before merge, block force-pushes and deletions.
 - Require **code-owner review** so the `CODEOWNERS` paths can't merge without a human.
 - (Optional) add the AI PR reviewer for automatic first-pass review.
+
+## Validate skill contributions
+
+After cloning, run `bash .githooks/install.sh` to install the skill-validation pre-push gate. It preserves other hooks and refuses conflicting hook configuration. See [Skill validation](docs/SKILL_VALIDATION.md) for the contract, manual report command and local push tests.

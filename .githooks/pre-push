@@ -1,0 +1,9 @@
+#!/bin/sh
+# Validate outgoing commit snapshots, including non-current branches.
+set -eu
+root=$(git rev-parse --show-toplevel)
+cd "$root"
+command -v python3 >/dev/null
+test -f scripts/verify_skills.py
+test -f scripts/verify_skill_push.py
+exec python3 scripts/verify_skill_push.py "$1"
