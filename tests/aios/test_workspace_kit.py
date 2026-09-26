@@ -68,7 +68,10 @@ class KitCase(unittest.TestCase):
         self.bare = {}
         for name, files in {
             "aios": {"START_HERE.md": "# Company context\n\nSee [the offer](01/offer.md).\n",
-                     "01/offer.md": "# Offer\n\nBroken: [missing](nowhere.md) line.\n"},
+                     "01/offer.md": ("# Offer\n\nBroken: [missing](nowhere.md) line.\n"
+                                     "Root link [home](/START_HERE.md) and [memory](~/notes/x.md).\n"
+                                     "```\n[code](not-a-real-file.md)\n```\n"
+                                     "Inline `[code](inline.md)` and [prose](URL).\n")},
             "creation": {"README.md": "# Creation\n\n[brand](brand/guide.md)\n",
                          "brand/guide.md": "# Offer\n\nSame title as the AIOS offer page.\n"},
             "team-ops": {"README.md": "# Team Ops\n"},
@@ -327,6 +330,13 @@ class Maps(KitCase):
         self.assertIn("`aios/01/offer.md:3` -> `nowhere.md`", health)
         self.assertIn('"offer"', health, "same title in two repositories is a candidate")
         self.assertIn("not a defect", health)
+        # A repository-root link resolves; code and prose placeholders are not file links;
+        # a home-folder link is reported as pointing outside, not as broken.
+        self.assertNotIn("START_HERE.md`", health.split("outside this repository")[0])
+        for noise in ("not-a-real-file.md", "inline.md", "-> `URL`"):
+            self.assertNotIn(noise, health)
+        self.assertIn("`aios/01/offer.md:4` -> `~/notes/x.md`", health)
+        self.assertIn("Links that point at a missing file: 1", health)
 
     def test_generated_pages_say_so_and_record_revisions(self):
         self.init()

@@ -571,6 +571,33 @@ def _markdown_files(root):
                 yield os.path.join(dirpath, f)
 
 
+FENCE_RE = re.compile(r"^\s{0,3}(```|~~~)")
+INLINE_CODE_RE = re.compile(r"`[^`]*`")
+
+
+def _link_kind(root, path, target):
+    """'ok', 'missing', 'outside' or 'not-a-file' for one Markdown link target."""
+    if re.match(r"^[a-z][a-z0-9+.-]*:", target, re.I) or target.startswith(("#", "mailto")):
+        return "not-a-file"
+    target = unquote(target.split("#", 1)[0].split("?", 1)[0])
+    if not target or "{{" in target or "<" in target or "..." in target:
+        return "not-a-file"
+    if "/" not in target and "." not in target:
+        return "not-a-file"  # a bare word such as (URL) or (path): prose, not a file link
+    if target.startswith("~"):
+        return "outside"
+    if target.startswith("/"):
+        # GitHub resolves a leading slash from the repository root; so does this check.
+        resolved = os.path.normpath(os.path.join(root, target.lstrip("/")))
+    else:
+        resolved = os.path.normpath(os.path.join(os.path.dirname(path), target))
+    real_root = os.path.realpath(root)
+    if not os.path.realpath(resolved).startswith(real_root + os.sep) and \
+            os.path.realpath(resolved) != real_root:
+        return "outside"
+    return "ok" if os.path.exists(resolved) else "missing"
+
+
 def knowledge_health(parent, results, specs):
     """Deterministic checks only. Every item is a candidate for review, not a verdict."""
     lines = ["# Knowledge Health", "",
@@ -582,7 +609,7 @@ def knowledge_health(parent, results, specs):
         if not r.get("revision"):
             continue
         root = os.path.join(parent, specs[r["name"]]["path"])
-        broken, oversized, count = [], [], 0
+        broken, outside, oversized, count = [], [], [], 0
         for path in _markdown_files(root):
             count += 1
             rel = os.path.relpath(path, parent).replace(os.sep, "/")
@@ -591,25 +618,32 @@ def knowledge_health(parent, results, specs):
                 oversized.append("`%s` (%d KB)" % (rel, size // 1024))
             with open(path, encoding="utf-8", errors="replace") as fh:
                 text = fh.read()
+            fence = None
             for lineno, line in enumerate(text.splitlines(), 1):
                 if lineno == 1 and line.startswith("# "):
                     titles.setdefault(line[2:].strip().lower(), []).append(rel)
-                for target in LINK_RE.findall(line):
-                    if re.match(r"^[a-z][a-z0-9+.-]*:", target, re.I) or target.startswith("#"):
-                        continue
-                    target = target.split("#", 1)[0]
-                    if not target:
-                        continue
-                    resolved = os.path.normpath(os.path.join(os.path.dirname(path),
-                                                             unquote(target)))
-                    if not os.path.exists(resolved):
+                marker = FENCE_RE.match(line)
+                if marker:
+                    fence = None if fence and marker.group(1)[0] == fence else (
+                        fence or marker.group(1)[0])
+                    continue
+                if fence:
+                    continue
+                for target in LINK_RE.findall(INLINE_CODE_RE.sub("", line)):
+                    kind = _link_kind(root, path, target)
+                    if kind == "missing":
                         broken.append("`%s:%d` -> `%s`" % (rel, lineno, target))
+                    elif kind == "outside":
+                        outside.append("`%s:%d` -> `%s`" % (rel, lineno, target))
         lines += ["## %s" % r["name"], "",
                   "- Revision `%s`, %d Markdown files." % (r["revision"][:12], count)]
         lines.append("- Links that point at a missing file: %d" % len(broken))
         lines += ["  - %s" % b for b in broken[:25]]
         if len(broken) > 25:
             lines.append("  - ... and %d more" % (len(broken) - 25))
+        lines.append("- Links that point outside this repository (another repository, a "
+                     "home folder or a server path): %d" % len(outside))
+        lines += ["  - %s" % o for o in outside[:10]]
         lines.append("- Unusually large documents (over %d KB): %d"
                      % (OVERSIZED_BYTES // 1024, len(oversized)))
         lines += ["  - %s" % o for o in oversized[:10]]
