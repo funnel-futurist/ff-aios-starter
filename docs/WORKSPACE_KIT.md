@@ -36,7 +36,7 @@ Run these from a copy of the Starter, the same way you run upgrades.
 | `WORKSPACE.json` | The manifest | Yes. It's how you switch a phase on |
 | `.obsidian/` | Obsidian's settings: built-in plugins only, links left alone when you rename, and Publish and Sync off | Yes. Your changes are kept |
 
-A folder shown as **inactive** or **reference** isn't missing or broken. It's a part of the system this company hasn't set up yet. A box marked **Interface only** on the canvas is a job Funnel Futurist does for you: you ask for it and get the result in your own systems. The method behind it isn't in this folder.
+A folder shown as **inactive** or **reference** isn't missing or broken. If a folder is marked **inactive** or **reference** but a copy is still sitting in the workspace (for example, after you switched a repository from `active` to `reference`), `sync` and `status` show it as **present-not-active** and tell you to move it out. The kit never deletes it for you, and until it is moved the vault still shows everything in it. It's a part of the system this company hasn't set up yet. A box marked **Interface only** on the canvas is a job Funnel Futurist does for you: you ask for it and get the result in your own systems. The method behind it isn't in this folder.
 
 ## Day to day
 

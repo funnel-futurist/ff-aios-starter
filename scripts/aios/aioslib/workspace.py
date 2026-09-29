@@ -211,6 +211,10 @@ NEXT_ACTION = {
     "not-git": "{path} exists but is not a Git checkout. Move it aside, then sync again. "
                "Nothing was changed.",
     "ahead": "{path} has commits that are not on GitHub yet. Push them when they are ready.",
+    "present-not-active": "{path} is marked {state} in WORKSPACE.json, but a full copy is still in "
+                          "this folder, so the vault still shows its contents. Move {path} out of "
+                          "the workspace (or delete it if it has nothing unsaved), then run "
+                          "`aios workspace status` again. Nothing was changed.",
     "unavailable": "This computer cannot read {url}. Sign in with `gh auth login` as someone "
                    "who has access, or ask an owner to grant it. The rest of the workspace "
                    "still works.",
@@ -298,6 +302,12 @@ def sync(parent, clone_filter=None, now=None):
         if spec["state"] != "active":
             res.update(status="not active" if spec["state"] == "inactive" else "reference",
                        revision=None)
+            if os.path.exists(local):
+                # A reference is "shown as an interface, not downloaded". A copy left behind
+                # from an earlier active state breaks that promise, so it is reported, never
+                # silently kept and never deleted by the kit.
+                res.update(status="present-not-active", next=NEXT_ACTION["present-not-active"].format(
+                    path=spec["path"], state=spec["state"]))
             results.append(res)
             continue
         local_state, detail, rev = checkout_state(local, spec["branch"])
@@ -351,8 +361,9 @@ def status(parent):
     out = []
     for name, spec in _repos(manifest):
         if spec["state"] != "active":
-            out.append({"name": name, "status": "not active" if spec["state"] == "inactive"
-                        else "reference"})
+            present = os.path.exists(os.path.join(parent, spec["path"]))
+            out.append({"name": name, "status": "present-not-active" if present else
+                        ("not active" if spec["state"] == "inactive" else "reference")})
             continue
         local_state, detail, rev = checkout_state(os.path.join(parent, spec["path"]),
                                                   spec["branch"])
