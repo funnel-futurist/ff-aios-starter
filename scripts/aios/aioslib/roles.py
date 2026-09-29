@@ -61,9 +61,10 @@ def identity(timeout=10):
     return (login or None), "gh api user"
 
 
-WEB_NOTE = ("Claude Code on the web cannot run the GitHub CLI (gh), so it can never tell who you "
-            "are. Do setup, install, upgrade and founder changes in the Claude Code desktop app or "
-            "a terminal. Operator work on the web is fine")
+WEB_NOTE = ("Claude Code on the web is not guaranteed to have a signed-in GitHub CLI (gh), and "
+            "without it the workspace cannot tell who you are. Do setup, install, upgrade and "
+            "founder changes in the Claude Code desktop app or a terminal. Operator work on the "
+            "web is fine")
 
 
 def identity_help(source):

@@ -107,6 +107,20 @@ def cmd_release_verify(args):
     return EXIT_OK
 
 
+def cmd_release_check_tag(args):
+    repo = os.path.abspath(args.repo)
+    problems = release_mod.check_tag(repo, args.tag, args.release_id)
+    _say("tag:      %s" % args.tag)
+    _say("release:  %s" % args.release_id)
+    if problems:
+        _say("verdict:  a checkout of this tag is NOT the approved release")
+        for p in problems:
+            _say("  - %s" % p)
+        return util.EXIT_PACKAGE
+    _say("verdict:  the tag carries the approval and installs the pinned files byte for byte")
+    return EXIT_OK
+
+
 def cmd_install(args):
     repo = os.path.abspath(args.repo)
     manifest = util.read_json(args.release)
@@ -483,6 +497,14 @@ def build_parser():
     rv.add_argument("--repo", default=_repo_root())
     rv.add_argument("--aios-releases", dest="aios_releases")
     rv.set_defaults(func=cmd_release_verify)
+
+    rt = relsub.add_parser("check-tag", help="does a checkout of this tag carry the approved "
+                                              "release, with the pinned files byte for byte?")
+    rt.add_argument("tag")
+    rt.add_argument("--release-id", dest="release_id", required=True,
+                    help="e.g. starter-2.7.0 (the record releases/<id>.json is read at the tag)")
+    rt.add_argument("--repo", default=_repo_root())
+    rt.set_defaults(func=cmd_release_check_tag)
 
     ins = sub.add_parser("install", help="install an approved release into a clean workspace")
     ins.add_argument("--release", required=True)

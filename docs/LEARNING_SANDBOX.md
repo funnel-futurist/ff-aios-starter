@@ -7,7 +7,7 @@
 ## Make it (about 30 minutes, most of it installing tools)
 
 1. **Tools.** Install git, Python 3, Node.js and the GitHub CLI, then run `gh auth login`. Without Node.js two safety checks are skipped silently, and `start` warns you. See [GETTING_STARTED.md](../GETTING_STARTED.md) step 3.
-2. **Where.** Use the Claude Code desktop app or VS Code for this. Claude Code on the web can't run `gh`, so it can't tell who you are (step 4).
+2. **Where.** Use the Claude Code desktop app or VS Code for this. Claude Code on the web isn't guaranteed to have a signed-in `gh`, and without it the workspace can't tell who you are (step 4).
 3. **Repository.** Create an empty private repository on your own GitHub account. If you're taking the AIOS Operator certification, name it the way the certification says: `AIOS_CERT_C0_<FirstName>_Sandbox`.
 4. **Install.** Install the newest approved release into it with the installer, with yourself as `founder` in the organization file (GETTING_STARTED step 6). Put an invented company name in `org_id`.
 5. **Check.** In the sandbox, run `python3 scripts/aios/aios.py start`, then `python3 scripts/aios/aios.py verify --target .`

@@ -314,6 +314,54 @@ class RoleScoping(Sandbox):
             self.assertNotIn("node is not installed", out)
 
 
+class ReleaseTag(Sandbox):
+    """M6: `git clone --branch <tag>` must give the approved record and the pinned bytes.
+
+    The record lives in releases/, which the package excludes, so the approval commit installs
+    the same bytes as the pin; that commit is the one to tag.
+    """
+
+    def record(self, man, message):
+        rid = man["release_id"]
+        harness.write(self.source, "releases/%s.json" % rid, json.dumps(man, indent=2))
+        harness.run_git(self.source, "add", "-A")
+        harness.run_git(self.source, "commit", "-qm", message)
+        return util.git(self.source, ["rev-parse", "HEAD"])
+
+    def test_tag_on_the_approval_commit_passes(self):
+        man = harness.build_manifest(self.source, self.rev, "1.0.0")
+        self.record(man, "draft")
+        approval = self.record(harness.approve(man), "approved")
+        harness.run_git(self.source, "tag", "starter-1.0.0", approval)
+        self.assertEqual(release_mod.check_tag(self.source, "starter-1.0.0", man["release_id"]), [])
+        code, out, _ = self.cli("release", "check-tag", "starter-1.0.0", "--release-id",
+                                man["release_id"], "--repo", self.source)
+        self.assertEqual(code, 0, out)
+        self.assertIn("byte for byte", out)
+
+    def test_tag_on_the_pin_itself_carries_only_a_draft(self):
+        """The 2.6.0 shape: the tag was placed before the approval was recorded."""
+        man = harness.build_manifest(self.source, self.rev, "1.0.0")
+        draft = self.record(man, "draft")
+        self.record(harness.approve(man), "approved")
+        harness.run_git(self.source, "tag", "starter-1.0.0", draft)
+        problems = release_mod.check_tag(self.source, "starter-1.0.0", man["release_id"])
+        self.assertTrue(any("status is 'draft'" in p for p in problems), problems)
+
+    def test_a_tag_whose_package_moved_after_the_pin_fails(self):
+        man = harness.build_manifest(self.source, self.rev, "1.0.0")
+        self.record(harness.approve(man), "approved")
+        moved = harness.bump_source(self.source, {"START_HERE.md": "# changed after approval\n"})
+        harness.run_git(self.source, "tag", "starter-1.0.0", moved)
+        problems = release_mod.check_tag(self.source, "starter-1.0.0", man["release_id"])
+        self.assertTrue(any("differs from the pin at START_HERE.md" in p for p in problems),
+                        problems)
+
+    def test_a_missing_tag_is_named(self):
+        self.assertEqual(release_mod.check_tag(self.source, "starter-9.9.9", "starter-9.9.9"),
+                         ["tag starter-9.9.9 does not exist in %s" % self.source])
+
+
 class UpgradeAndRollback(Sandbox):
     """A4 / N4 / N5 - state survives both directions, and a kill is recoverable."""
 
