@@ -259,6 +259,19 @@ class RoleScoping(Sandbox):
             roles.require_lifecycle(self.policy, self.cfg, "upgrade")
         self.assertEqual(ctx.exception.code, util.EXIT_ROLE)
 
+    def test_n3f_no_gh_names_the_web_limit_instead_of_impossible_advice(self):
+        """M3: on Claude Code on the web gh cannot run, so 'run gh auth login' alone is a dead end."""
+        self.nobody()
+        with self.assertRaises(Refusal) as ctx:
+            roles.require_lifecycle(self.policy, self.cfg, "upgrade")
+        text = " ".join(ctx.exception.details)
+        self.assertIn("cli.github.com", text)
+        self.assertIn("desktop app", text)
+        code, out, err = self.cli("start", "--target", self.target)
+        self.assertEqual(code, util.EXIT_ROLE, out + err)
+        self.assertIn("desktop app", out + err)
+        self.assertIn("gets no role", out + err)
+
     def test_a2b_founder_may_do_both(self):
         self.be("acme-founder")
         login, role = roles.require_lifecycle(self.policy, self.cfg, "upgrade")

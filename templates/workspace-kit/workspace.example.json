@@ -1,6 +1,6 @@
 {
   "schema": "ff-aios-starter/workspace@1",
-  "_comment": "Maps stable names to the repositories this workspace may show. It holds credential REFERENCES (env:NAME), never a token, password or key. Change 'state' to 'active' when a phase is unlocked, then run `aios workspace sync`.",
+  "_comment": "Set \"split\": \"not-split\" on any repository that still holds a private method or another company's material beside this company's own; the kit then refuses to clone it. Maps stable names to the repositories this workspace may show. It holds credential REFERENCES (env:NAME), never a token, password or key. Change 'state' to 'active' when a phase is unlocked, then run `aios workspace sync`.",
   "workspace_name": "Example Company Operating System",
   "company": "Example Company",
   "repos": {
@@ -56,8 +56,8 @@
     }
   },
   "capabilities": [
-    {"name": "Document production", "provider": "Funnel Futurist", "domain": "creation", "status": "interface",
-     "description": "Send an approved brief; receive a formatted document in your own Drive. The production method stays with FF."},
+    {"name": "Document production", "provider": "Funnel Futurist", "domain": "creation", "status": "interface - not available yet",
+     "description": "Planned: send approved Markdown; receive a formatted document in your own Drive, with a receipt. The production method stays with FF. Not callable yet."},
     {"name": "Architecture Health", "provider": "Funnel Futurist", "domain": "aios", "status": "interface",
      "description": "Reads your repositories at a pinned revision and returns findings. It does not change your files."}
   ]

@@ -250,7 +250,7 @@ def cmd_start(args):
     login, source = roles.identity()
     if not login:
         raise Refusal(util.EXIT_ROLE, "cannot establish who you are (%s)" % source,
-                      ["run `gh auth login`"])
+                      roles.identity_help(source))
     role = roles.role_for(config, login)
     if role is None:
         raise Refusal(util.EXIT_ROLE,
@@ -382,6 +382,8 @@ def _print_workspace_report(report):
     for r in report["repos"]:
         rev = (" @ %s" % r["revision"][:12]) if r.get("revision") else ""
         extra = " (cloned)" if r.get("cloned") else (" (moved forward)" if r.get("fast_forwarded") else "")
+        if r.get("moved_to"):
+            extra = " (old copy moved out of the vault to %s)" % r["moved_to"]
         _say("  %-12s %-14s %s%s%s" % (r["name"], r["domain"], r["status"], rev, extra))
         if r.get("next"):
             _say("               next: %s" % r["next"])
@@ -416,7 +418,8 @@ def cmd_workspace_init(args):
 
 
 def cmd_workspace_sync(args):
-    report = workspace.sync(args.parent, clone_filter=args.filter)
+    report = workspace.sync(args.parent, clone_filter=args.filter,
+                            move_retired_copies=args.move_retired)
     _print_workspace_report(report)
     return report["code"]
 
@@ -558,6 +561,9 @@ def build_parser():
     wsy = wssub.add_parser("sync", help="clone newly active repositories and rebuild the maps")
     wsy.add_argument("--parent", required=True)
     wsy.add_argument("--filter")
+    wsy.add_argument("--move-retired", action="store_true",
+                     help="move pristine copies of no-longer-active repositories out of the "
+                          "vault (moved, never deleted)")
     wsy.set_defaults(func=cmd_workspace_sync)
     wst = wssub.add_parser("status", help="each repository's state, without fetching")
     wst.add_argument("--parent", required=True)

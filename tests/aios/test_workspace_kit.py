@@ -51,6 +51,11 @@ def make_remote(base, name, files):
     return work, bare
 
 
+def harness_write(path, text):
+    with open(path, "w", encoding="utf-8") as fh:
+        fh.write(text)
+
+
 def push_change(work, rel, text, message="change"):
     with open(os.path.join(work, rel), "w", encoding="utf-8") as fh:
         fh.write(text)
@@ -336,7 +341,9 @@ class Maps(KitCase):
         self.assertEqual(group["type"], "group")
         self.assertTrue(doc["edges"])
         for edge in doc["edges"]:
-            self.assertIn(edge["label"], workspace.EDGE_LABELS)
+            base = edge["label"][:-len(" (planned)")] if edge["label"].endswith(
+                " (planned)") else edge["label"]
+            self.assertIn(base, workspace.EDGE_LABELS)
         cap = nodes["cap-0"]
         self.assertGreaterEqual(cap["x"], group["x"] + group["width"], "interface sits outside")
         self.assertIn("Interface only", cap["text"])
@@ -406,6 +413,109 @@ class Cli(KitCase):
         self.assertEqual(out.returncode, EXIT_PACKAGE)
         self.assertNotIn(b"user:pw", out.stderr)
         self.assertFalse(os.path.exists(self.parent))
+
+
+class NotSplitAndRetiredCopies(KitCase):
+    """V4.1: unsplit content never enters the vault, and an old copy is moved out, not deleted."""
+
+    def rewrite_manifest(self, change):
+        path = os.path.join(self.parent, workspace.MANIFEST_NAME)
+        with open(path) as fh:
+            m = json.load(fh)
+        change(m)
+        with open(path, "w") as fh:
+            json.dump(m, fh)
+
+    def test_a_not_split_repository_cannot_be_active(self):
+        self.manifest["repos"]["aios"]["split"] = "not-split"
+        problems = workspace.validate(self.manifest)
+        self.assertTrue(any("aios: marked not-split" in p for p in problems), problems)
+        with self.assertRaises(Refusal):
+            self.init()
+        self.assertFalse(os.path.exists(os.path.join(self.parent, "aios")))
+
+    def test_an_unknown_split_value_is_refused(self):
+        self.manifest["repos"]["aios"]["split"] = "maybe"
+        self.assertTrue(any("split 'maybe'" in p for p in workspace.validate(self.manifest)))
+
+    def test_a_not_split_reference_is_labelled_and_its_content_stays_out(self):
+        self.manifest["repos"]["creation"].update(state="reference", split="not-split")
+        self.init()
+        self.assertFalse(os.path.exists(os.path.join(self.parent, "creation")))
+        for rel in ("START-HERE.md", "00-MAPS/Repository Map.md"):
+            self.assertIn("not yet split", self.read(rel))
+        canvas = json.loads(self.read("00-MAPS/Operating System.canvas"))
+        node = [n for n in canvas["nodes"] if n["id"] == "repo-creation"][0]
+        self.assertEqual(node["type"], "text")  # a label, never a file from that repository
+        self.assertIn("not yet split", node["text"])
+        group = canvas["nodes"][0]
+        self.assertEqual(group["id"], "client-boundary")
+        self.assertGreaterEqual(node["x"], group["x"] + group["width"])  # outside the boundary
+        planned = [e["label"] for e in canvas["edges"] if "repo-creation" in
+                   (e["fromNode"], e["toNode"])]
+        self.assertTrue(planned and all(l.endswith("(planned)") for l in planned), planned)
+
+    def test_an_old_copy_is_reported_and_left_until_asked(self):
+        self.init()
+        self.rewrite_manifest(lambda m: m["repos"]["aios"].update(state="reference",
+                                                                  split="not-split"))
+        report = workspace.sync(self.parent, now="2026-09-28T00:00:00Z")
+        row = [r for r in report["repos"] if r["name"] == "aios"][0]
+        self.assertEqual(row["status"], "present-not-active")
+        self.assertIn("--move-retired", row["next"])
+        self.assertEqual(report["code"], EXIT_STATE)
+        self.assertTrue(os.path.isdir(os.path.join(self.parent, "aios", ".git")))
+        self.assertEqual({r["name"]: r["status"] for r in workspace.status(self.parent)}["aios"],
+                         "present-not-active")
+
+    def test_move_retired_moves_a_pristine_copy_out_of_the_vault_intact(self):
+        self.init()
+        head = git(os.path.join(self.parent, "aios"), "rev-parse", "HEAD")
+        self.rewrite_manifest(lambda m: m["repos"]["aios"].update(state="reference",
+                                                                  split="not-split"))
+        report = workspace.sync(self.parent, now="2026-09-28T00:00:00Z",
+                                move_retired_copies=True)
+        row = [r for r in report["repos"] if r["name"] == "aios"][0]
+        dest = row["moved_to"]
+        self.assertFalse(os.path.exists(os.path.join(self.parent, "aios")))
+        self.assertTrue(dest.startswith(self.parent + workspace.RETIRED_SUFFIX + os.sep))
+        self.assertEqual(git(dest, "rev-parse", "HEAD"), head)  # moved, not deleted
+        self.assertEqual(report["code"], EXIT_OK)
+        self.assertNotIn("](aios/", self.read("START-HERE.md"))  # no link into the old copy
+
+    def test_move_retired_leaves_a_copy_with_local_work_in_place(self):
+        self.init()
+        aios = os.path.join(self.parent, "aios")
+        for label, prepare in (
+                ("uncommitted", lambda: harness_write(os.path.join(aios, "draft.md"), "x")),
+                ("unpushed", lambda: (git(aios, "add", "-A"),
+                                      git(aios, "-c", "user.email=a@example.invalid",
+                                          "-c", "user.name=A", "commit", "-q", "-m", "local")))):
+            prepare()
+            self.rewrite_manifest(lambda m: m["repos"]["aios"].update(state="reference"))
+            report = workspace.sync(self.parent, move_retired_copies=True)
+            row = [r for r in report["repos"] if r["name"] == "aios"][0]
+            self.assertNotIn("moved_to", row, label)
+            self.assertIn("was left in this folder", row["next"], label)
+            self.assertTrue(os.path.isdir(os.path.join(aios, ".git")), label)
+        self.assertFalse(os.path.exists(self.parent + workspace.RETIRED_SUFFIX))
+
+    def test_plan_shows_the_old_copy(self):
+        self.init()
+        self.manifest["repos"]["aios"]["state"] = "reference"
+        row = [r for r in workspace.plan(self.manifest, self.parent, check_remote=False)
+               if r["name"] == "aios"][0]
+        self.assertEqual(row["local"], "present")
+        self.assertIn("--move-retired", row["action"])
+
+    def test_cli_move_retired(self):
+        self.init()
+        self.rewrite_manifest(lambda m: m["repos"]["team-ops"].update(state="inactive"))
+        out = subprocess.run([sys.executable, AIOS, "workspace", "sync", "--parent",
+                              self.parent, "--move-retired"], stdout=subprocess.PIPE,
+                             stderr=subprocess.PIPE)
+        self.assertEqual(out.returncode, EXIT_OK, out.stderr.decode())
+        self.assertIn(b"moved out of the vault", out.stdout)
 
 
 if __name__ == "__main__":

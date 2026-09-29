@@ -81,6 +81,7 @@ class SessionHook(_Workspace):
         allowed, reason = self.edit(".claude/settings.json", login=None)
         self.assertFalse(allowed)
         self.assertIn("unidentified", reason)
+        self.assertIn("desktop app", reason)  # M3: says where a founder CAN be identified
         allowed, reason = self.edit(".claude/settings.json", login="a-stranger")
         self.assertFalse(allowed)
         self.assertIn("not in the people map", reason)

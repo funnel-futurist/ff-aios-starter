@@ -10,7 +10,7 @@
 
 Run these from a copy of the Starter, the same way you run upgrades.
 
-1. **Write the manifest.** Copy `templates/workspace-kit/workspace.example.json` somewhere outside any repository, and put your own repository addresses in it. Set each one to `active`, `inactive` (not part of your plan yet) or `reference` (shown as an interface, not downloaded). Never put a password or token in this file. A web address with a token in it is refused.
+1. **Write the manifest.** Copy `templates/workspace-kit/workspace.example.json` somewhere outside any repository, and put your own repository addresses in it. Set each one to `active`, `inactive` (not part of your plan yet) or `reference` (shown as an interface, not downloaded). If a repository still holds a private method or another company's material beside your own work, add `"split": "not-split"`. The kit then refuses to download it and shows it as a labelled reference until it has been split. Never put a password or token in this file. A web address with a token in it is refused.
 2. **See the plan.** Nothing changes during this step.
    ```sh
    python3 scripts/aios/aios.py workspace plan --manifest ~/my-workspace.json --parent ~/Documents/MyCompany-Operating-System
@@ -43,6 +43,7 @@ A folder shown as **inactive** or **reference** isn't missing or broken. If a fo
 - **See what state each repository is in, without downloading anything:** `aios workspace status --parent <folder>`
 - **Refresh:** `aios workspace sync --parent <folder>`. It downloads new repositories, brings clean ones up to date, and rebuilds the maps.
 - **Switch on a new phase:** change its `state` to `active` in `WORKSPACE.json`, then run `sync`. Only repositories you can already read are downloaded. It never creates empty placeholder repositories.
+- **Switch a repository off:** change its `state` to `reference` or `inactive`. Its old copy stays inside the folder, and Obsidian still searches it, until you run `aios workspace sync --parent <folder> --move-retired`. That moves the copy to `<folder>.retired/`, beside the vault. It never deletes it, and it leaves a copy alone if it holds any unsaved, stashed or unpushed work.
 
 ## When something is wrong
 
@@ -53,6 +54,8 @@ A folder shown as **inactive** or **reference** isn't missing or broken. If a fo
 | `other-branch` | You're working on another branch | Switch back when you're ready. Nothing was changed |
 | `not connected` | This computer can't read that repository | Run `gh auth login` as someone with access, or ask an owner for access. Everything else still works |
 | `Repository Map.new.md` appears | You edited a generated map, so your version was kept | Read the new one, then delete whichever you don't want |
+| `present-not-active` | A repository you switched off still has its files here, so search still finds them | Run `sync --move-retired`. A copy with local work is left where it is, and the message says why |
+| `not yet split` on a map | That part holds a private method or another company's material in the same repository | Nothing. It stays a labelled reference until its owner splits it |
 | A warning about a nested vault | A repository has its own `.obsidian` folder | Open the parent folder in Obsidian, not the repository |
 
 ## What this is not

@@ -3,10 +3,10 @@
 > Fastest path once you're in: open this repo in Claude Code and run **`/onboard_wizard`**, it walks you through the rest interactively. This page is the full written reference. If any step is fuzzy, use the unstuck protocol ([docs/UNSTUCK_PROTOCOL.md](docs/UNSTUCK_PROTOCOL.md)) or search YouTube for the exact step (a video from the **last 1-2 months**, the tools change fast).
 
 ## Two things to know before you click anything
-1. **A GitHub account is the real first step.** You cannot click "Use this template" without one. So you make that account first, before anything else.
-2. **Your Claude *subscription* and your *API key* are two different things.** The subscription (at claude.ai) is what lets you chat with Claude. The API key (at console.anthropic.com, same login) is what lets Claude Code act on its own (run skills, edit and commit files). You'll set up both. Most people get confused here, so just know: two dashboards, one Anthropic login.
+1. **A GitHub account is the real first step.** Your AIOS lives in a private GitHub repository, so you make that account first, before anything else.
+2. **Your Claude *subscription* and an *API key* are two different things.** The subscription (at claude.ai) is what you need: it runs Claude and Claude Code. An API key (at console.anthropic.com, same login) is only for scripts or skills that call Anthropic directly, and nothing in this AIOS requires one. Two dashboards, one Anthropic login.
 
-**Heads up (things that quietly block people):** you'll need a payment method for the Claude subscription; admin rights on your computer if you go the install route; a Google account for the Drive step; and each teammate needs their *own* GitHub account before you can add them. Use a real business email you'll keep.
+**Heads up (things that quietly block people):** you'll need a payment method for the Claude subscription; admin rights on your computer to install git, Python 3 and the GitHub CLI; a Google account for the Drive step; and each teammate needs their *own* GitHub account before you can add them. Use a real business email you'll keep.
 
 ---
 
@@ -16,19 +16,27 @@
 
 2. **Create your Anthropic account and subscribe.** Go to claude.ai, sign up, then subscribe (Pro is $20/mo; Max is $100/mo, pick Max if you'll use it heavily or run a team). This gives you the Claude interface.
 
-3. **Use this template to make your own repo.** On the template's GitHub page, click the green **"Use this template"** → Create a new repository. Set it to **Private** (this is your business brain, not public). Name it something like `my-aios`. Click Create. That repo *is* your AIOS.
+3. **Install the three tools the setup needs, then sign in to GitHub from them.** You need **git**, **Python 3** and the **GitHub CLI** (`gh`). Mac: open Terminal and type `git --version` (accept the install prompt if it appears) and `python3 --version` (the same prompt installs it). Install `gh` from https://cli.github.com. Windows: install git from git-scm.com/download/win, Python 3 from python.org (tick "Add python to PATH"), and `gh` from https://cli.github.com. Then run `gh auth login` and follow it. Each of `git --version`, `python3 --version` and `gh --version` should print a number. The workspace uses `gh` to know who you are, so this sign-in is what makes you the founder of your own AIOS.
 
-4. **Pick how you'll run Claude Code.** Three options: **Web** (claude.ai in the browser, easiest, no install), **Desktop** (the Claude app), or **VS Code** (recommended, you see all your files next to the chat and have full control). Choose before the next step, because the next steps differ by path.
+4. **Run the setup in the Claude Code desktop app or VS Code, not the web version.** Claude Code on the web can't run `gh`, so it can never tell who you are, and it treats even a founder as unidentified. Do the setup, installs, upgrades and founder changes on your computer. Day-to-day operator work on the web is fine later.
 
-5. **(Desktop / VS Code only) Install git.** Git keeps your repo synced between GitHub and your computer. Mac: open Terminal, type `git --version`, accept the install prompt if it appears. Windows: download from git-scm.com/download/win and run it with all defaults. Then `git --version` should print a number. (Web path: skip 5-7.)
+5. **Create an empty private repository on GitHub.** github.com → New repository → name it something like `my-aios` → set it to **Private** → leave "Add a README" unticked → Create. It stays empty until the next step fills it. That repo *is* your AIOS. (Taking the AIOS Operator certification? Use the sandbox name the certification gives you. See [docs/LEARNING_SANDBOX.md](docs/LEARNING_SANDBOX.md).)
 
-6. **(Desktop / VS Code only) Clone your repo onto your computer.** On your repo, click the green **Code** button, copy the HTTPS URL. Open Terminal (Mac) or Command Prompt / PowerShell (Windows), type `git clone <paste-the-url>` and press Enter. The folder it creates *is* your AIOS on your machine.
+6. **Install the approved release into it.** The installer copies an exact, approved version and checks every file it wrote. In Terminal:
+   ```sh
+   git clone https://github.com/funnel-futurist/ff-aios-starter.git
+   git clone https://github.com/<you>/my-aios.git
+   cd ff-aios-starter
+   grep -l '"status": "approved"' releases/*.json    # the approved releases; use the newest
+   ```
+   (On Windows, open each file in the `releases` folder and use the newest one that says `"status": "approved"`.)
+   Write your organization file (who you are and your role) as shown in [docs/INSTALL_AND_UPGRADE.md](docs/INSTALL_AND_UPGRADE.md), then run `python3 scripts/aios/aios.py install --release releases/starter-X.Y.Z.json --target ../my-aios --config my-org.json`. Run it from this normal copy of the Starter, not from a checked-out release tag: the approval is recorded on the main branch, so a tag checkout shows the release as a draft and the installer refuses it. Then, in `my-aios`: `git add -A`, `git commit -m "Install AIOS"`, `git push`. (Already made a copy with "Use this template"? That copies whatever was on the main branch that day. See "Already have a workspace from Use this template?" in the install guide.)
 
-7. **Open Claude Code in your AIOS folder.** VS Code: File → Open Folder → pick the cloned folder. You should see `CLAUDE.md`, `GETTING_STARTED.md`, and the `01`-`09` folders in the sidebar.
+7. **Open Claude Code in your AIOS folder and check it.** VS Code: File → Open Folder → pick `my-aios`. You should see `CLAUDE.md`, `GETTING_STARTED.md`, and the `01`-`09` folders in the sidebar. Run `python3 scripts/aios/aios.py start`. It should print your GitHub name, your role (founder) and the release you installed.
 
-8. **Get your Anthropic API key (this is the separate one).** Go to console.anthropic.com (same login), API Keys → Create key. Name it specifically, like `my-aios-claude-code`, so you can revoke just that one later. **Copy it now, you can't see it again.** Then set a spend limit on the key (start at $20-$50/mo) so a runaway script can't surprise you.
+8. **(Optional) Get an Anthropic API key, only if a skill asks for one.** Claude Code runs on your subscription, and every key in this AIOS is optional: the installer lists each as "not configured (optional)". If you do add one: Go to console.anthropic.com (same login), API Keys → Create key. Name it specifically, like `my-aios-claude-code`, so you can revoke just that one later. **Copy it now, you can't see it again.** Then set a spend limit on the key (start at $20-$50/mo) so a runaway script can't surprise you.
 
-9. **Create your `.env` file and paste the key in.** In your AIOS folder, make a file named exactly `.env`. The repo is already set to never upload this file to GitHub. Add one line: `ANTHROPIC_API_KEY=your-key-here`. Save. This is the only place your key lives. Never put it in any other file or a chat message. Every future key (Google, etc.) goes here too.
+9. **(Only if you made a key in step 8) Create your `.env` file and paste the key in.** In your AIOS folder, make a file named exactly `.env`. The repo is already set to never upload this file to GitHub. Add one line: `ANTHROPIC_API_KEY=your-key-here`. Save. This is the only place your key lives. Never put it in any other file or a chat message. Every future key (Google, etc.) goes here too.
 
 10. **Run `/onboard_wizard`.** In Claude Code, type `/onboard_wizard` and press Enter. It asks who you are (founder / operator / VA), captures your vision, mission, and values, confirms your folder structure, and personalizes your AIOS to your real business. Answer each question; wait for it to say done.
 
@@ -45,11 +53,11 @@
 ---
 
 ## You're set up when all of these are true
-Subscription active · your private repo created · Claude Code running (web or local) · API key in `.env` · `/onboard_wizard` run · team invited to the repo · secure (2FA on, named keys with spend limits) · unstuck protocol bookmarked.
+Subscription active · git, Python 3 and `gh` installed and signed in · your private repo installed from an approved release (`start` shows it) · Claude Code running on your computer · `/onboard_wizard` run · team invited to the repo · secure (2FA on, named keys with spend limits) · unstuck protocol bookmarked.
 
 **Prove it's actually working:** run `/context_load`, then `/f6_completeness_check`, then ask *"what do you understand about my business?"* If Claude answers with specifics from your own docs, your brain is wired right. A generic answer means Drive, your `01_Foundations/`, or your key isn't connected yet, fix that before you rely on it.
 
-Caveman version: **account + subscription + repo + running + key secured + team on it + safety net + proof it works.**
+Caveman version: **account + subscription + tools + installed repo + running + team on it + safety net + proof it works.**
 
 ---
 
