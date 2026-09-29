@@ -1,6 +1,6 @@
 # P22 STATE - current at every material change
 
-last_updated: 2026-09-26, V2 direction applied: Workspace Kit (PR #19) + Febi pilot revision 2 (writer: CHAT P22, Claude Opus 5.5)
+last_updated: 2026-09-29, final V4 + V4.1 dispatch: PR #21 (kit not-split rule + onboarding matches installer), pilot record ff-delegation PR #8 (writer: CHAT P22, Claude Opus 5.5)
 branch: exec/p22-rc-2.6.0-20260922 (off main at 0af7e9e); exec/p22-install-20260922 merged as PR #12
 starting_repo_sha: c4387053c956e45a3a190c78d3331214a3b09fff (main, confirmed unmoved at preflight)
 starting_master_revision: 71e063f83b202fbf914e3e4bbc2b4ca9fbc42656 (delegation repo, exec/operating-cutover-20260921)
@@ -113,3 +113,13 @@ Full runbooks for all five are in the receipt, section 11.
 
 `P22-002` (client portability) is eligible: internal validation passed. `P22-GOV-001` is the
 governance half, split out so the install work is not held behind a naming decision.
+
+
+## 2026-09-29 - final V4 + V4.1 dispatch
+
+- Receipt: `P22-V4-2026-09-29.md` (this folder).
+- PR #21 (`exec/p22-v4-clean-vault-20260928`, open, checks pass): carries P01's #20; not-split rule; `sync --move-retired`; GETTING_STARTED/README/LEARNING_SANDBOX match the installer; M3/M5 messages. 152 tests.
+- FF canary: only Command OS active; four unsplit repositories are references, copies moved to `FF-Operating-System.retired/`.
+- Pilot record: ff-delegation `task-management/active-projects/P22-febi-starter-pilot.md` (PR #8, stacked on #7). The Google Doc is marked history.
+- Releases: 2.6.0 is the only approved one. 2.6.1 is still a draft; a release carrying #21 is not cut.
+- Next: cut a release candidate once #21 merges; ClickUp items after the pilot dates are agreed.
