@@ -274,6 +274,29 @@ class InitAndSync(KitCase):
             nodes = {n["id"]: n for n in json.load(fh)["nodes"]}
         self.assertEqual(nodes["repo-revops"]["type"], "file")
 
+    def test_a_copy_left_behind_after_switching_to_reference_is_reported_not_kept_silently(self):
+        """Client mode: 'reference' means not downloaded. A clone left from an earlier active
+        state must be surfaced (the vault still shows it), and the kit must not delete it."""
+        self.init()
+        path = os.path.join(self.parent, "WORKSPACE.json")
+        with open(path) as fh:
+            manifest = json.load(fh)
+        manifest["repos"]["aios"]["state"] = "reference"
+        with open(path, "w") as fh:
+            json.dump(manifest, fh)
+        report = workspace.sync(self.parent)
+        row = [r for r in report["repos"] if r["name"] == "aios"][0]
+        self.assertEqual(row["status"], "present-not-active")
+        self.assertIn("Move aios out of the workspace", row["next"])
+        self.assertEqual(report["code"], workspace.EXIT_STATE)
+        self.assertTrue(os.path.isdir(os.path.join(self.parent, "aios", ".git")))  # never deleted
+        st = {r["name"]: r["status"] for r in workspace.status(self.parent)}
+        self.assertEqual(st["aios"], "present-not-active")
+        self.assertEqual(st["command-os"], "reference")  # never cloned: still a plain reference
+        shutil.rmtree(os.path.join(self.parent, "aios"))
+        st = {r["name"]: r["status"] for r in workspace.status(self.parent)}
+        self.assertEqual(st["aios"], "reference")
+
     def test_regenerating_maps_keeps_an_edit_and_the_owners_own_notes(self):
         self.init()
         maps = os.path.join(self.parent, "00-MAPS")
