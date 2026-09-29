@@ -44,7 +44,7 @@ You own the machine. You're also responsible for it. Same coin.
 
 ## Start here (3 steps)
 
-**1. Install it into your own private repository.** Install git, Python 3 and the GitHub CLI, create an empty private repo, and run the installer with the newest approved release. [GETTING_STARTED.md](GETTING_STARTED.md) steps 3 to 7 spell out every click. Please don't use the green "Use this template" button: it copies whatever is on the main branch that day, not an approved release, and the copy doesn't know who its founder is.
+**1. Install it into your own private repository.** Install git, Python 3, Node.js and the GitHub CLI, create an empty private repo, and run the installer with the newest approved release. [GETTING_STARTED.md](GETTING_STARTED.md) steps 3 to 7 spell out every click. Please don't use the green "Use this template" button: it copies whatever is on the main branch that day, not an approved release, and the copy doesn't know who its founder is.
 
 **2. Open it in Claude Code and run `/onboard_wizard`.** This is the only command you need on day one. It walks you through setup, asks about your business, and fills your brain with real context. Don't skip it. An empty brain is a generic brain. And don't aim for complete, aim for started: a rough version today beats a perfect version next month.
 

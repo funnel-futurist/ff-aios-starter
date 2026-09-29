@@ -9,6 +9,7 @@ that returns the wrong reason sends the operator down the wrong path.
 
 import json
 import os
+import shutil
 import subprocess
 import sys
 
@@ -292,6 +293,25 @@ class RoleScoping(Sandbox):
         code, out, _err = self.cli("start", "--target", self.target)
         self.assertEqual(code, 0)
         self.assertIn("UNPINNED", out)
+
+    def test_m5_start_names_a_safety_hook_that_cannot_run(self):
+        """A missing hook program fails open in Claude Code, so start must say so."""
+        self.be("acme-va")
+        settings = os.path.join(self.target, ".claude", "settings.json")
+        os.makedirs(os.path.dirname(settings), exist_ok=True)
+        with open(settings, "w") as fh:
+            json.dump({"hooks": {"PreToolUse": [{"matcher": "Bash", "hooks": [
+                {"type": "command", "command": "node \"$CLAUDE_PROJECT_DIR/guard.js\""}]}]}}, fh)
+        code, out, _err = self.cli("start", "--target", self.target,
+                                   env={"PATH": self.bin + os.pathsep + "/usr/bin:/bin"}
+                                   if not os.path.exists("/usr/bin/node") else None)
+        self.assertEqual(code, 0)
+        if not os.path.exists("/usr/bin/node") and not os.path.exists("/bin/node"):
+            self.assertIn("node is not installed", out)
+            self.assertIn("skips them without saying so", out)
+        code, out, _err = self.cli("start", "--target", self.target)
+        if shutil.which("node"):
+            self.assertNotIn("node is not installed", out)
 
 
 class UpgradeAndRollback(Sandbox):

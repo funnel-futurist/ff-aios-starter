@@ -24,6 +24,7 @@ Python 3.9+, standard library only.
 import argparse
 import json
 import os
+import shutil
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -286,7 +287,31 @@ def cmd_start(args):
         _say("  held two ways: Claude will not edit these for you, and a pull request that")
         _say("  changes them fails its boundary check until a founder approves that commit.")
         _say("  a direct push to main is stopped only if branch protection is on.")
+    for warning in _hook_runtime_warnings(target):
+        _say("")
+        _say("warning:   %s" % warning)
     return EXIT_OK
+
+
+def _hook_runtime_warnings(target):
+    """A Claude Code hook whose program is missing fails without blocking anything, so a safety
+    hook that cannot start is a silent gap. Name it where people look first."""
+    settings = os.path.join(target, ".claude", "settings.json")
+    try:
+        hooks = util.read_json(settings).get("hooks") or {}
+    except (OSError, ValueError):
+        return []
+    needed = set()
+    for entries in hooks.values():
+        for entry in entries or []:
+            for hook in entry.get("hooks") or []:
+                program = (hook.get("command") or "").split(" ", 1)[0]
+                if program in ("node", "python3"):
+                    needed.add(program)
+    return ["%s is not installed, so this workspace's %s safety hooks cannot run and Claude Code "
+            "skips them without saying so. Install %s, then run start again"
+            % (prog, prog, "Node.js from https://nodejs.org" if prog == "node" else "Python 3")
+            for prog in sorted(needed) if shutil.which(prog) is None]
 
 
 def cmd_sanitize(args):

@@ -6,7 +6,7 @@
 1. **A GitHub account is the real first step.** Your AIOS lives in a private GitHub repository, so you make that account first, before anything else.
 2. **Your Claude *subscription* and an *API key* are two different things.** The subscription (at claude.ai) is what you need: it runs Claude and Claude Code. An API key (at console.anthropic.com, same login) is only for scripts or skills that call Anthropic directly, and nothing in this AIOS requires one. Two dashboards, one Anthropic login.
 
-**Heads up (things that quietly block people):** you'll need a payment method for the Claude subscription; admin rights on your computer to install git, Python 3 and the GitHub CLI; a Google account for the Drive step; and each teammate needs their *own* GitHub account before you can add them. Use a real business email you'll keep.
+**Heads up (things that quietly block people):** you'll need a payment method for the Claude subscription; admin rights on your computer to install git, Python 3, Node.js and the GitHub CLI; a Google account for the Drive step; and each teammate needs their *own* GitHub account before you can add them. Use a real business email you'll keep.
 
 ---
 
@@ -16,7 +16,7 @@
 
 2. **Create your Anthropic account and subscribe.** Go to claude.ai, sign up, then subscribe (Pro is $20/mo; Max is $100/mo, pick Max if you'll use it heavily or run a team). This gives you the Claude interface.
 
-3. **Install the three tools the setup needs, then sign in to GitHub from them.** You need **git**, **Python 3** and the **GitHub CLI** (`gh`). Mac: open Terminal and type `git --version` (accept the install prompt if it appears) and `python3 --version` (the same prompt installs it). Install `gh` from https://cli.github.com. Windows: install git from git-scm.com/download/win, Python 3 from python.org (tick "Add python to PATH"), and `gh` from https://cli.github.com. Then run `gh auth login` and follow it. Each of `git --version`, `python3 --version` and `gh --version` should print a number. The workspace uses `gh` to know who you are, so this sign-in is what makes you the founder of your own AIOS.
+3. **Install the four tools the setup needs, then sign in to GitHub.** You need **git**, **Python 3**, **Node.js** and the **GitHub CLI** (`gh`). Node.js runs two of the safety checks (one of them stops risky git commands); without it Claude Code skips them without saying so. Install it from https://nodejs.org (the LTS version). Mac: open Terminal and type `git --version` (accept the install prompt if it appears) and `python3 --version` (the same prompt installs it). Install `gh` from https://cli.github.com. Windows: install git from git-scm.com/download/win, Python 3 from python.org (tick "Add python to PATH"), and `gh` from https://cli.github.com. Then run `gh auth login` and follow it. Each of `git --version`, `python3 --version`, `node --version` and `gh --version` should print a number. The workspace uses `gh` to know who you are, so this sign-in is what makes you the founder of your own AIOS.
 
 4. **Run the setup in the Claude Code desktop app or VS Code, not the web version.** Claude Code on the web can't run `gh`, so it can never tell who you are, and it treats even a founder as unidentified. Do the setup, installs, upgrades and founder changes on your computer. Day-to-day operator work on the web is fine later.
 
@@ -53,7 +53,7 @@
 ---
 
 ## You're set up when all of these are true
-Subscription active · git, Python 3 and `gh` installed and signed in · your private repo installed from an approved release (`start` shows it) · Claude Code running on your computer · `/onboard_wizard` run · team invited to the repo · secure (2FA on, named keys with spend limits) · unstuck protocol bookmarked.
+Subscription active · git, Python 3, Node.js and `gh` installed and signed in · your private repo installed from an approved release (`start` shows it) · Claude Code running on your computer · `/onboard_wizard` run · team invited to the repo · secure (2FA on, named keys with spend limits) · unstuck protocol bookmarked.
 
 **Prove it's actually working:** run `/context_load`, then `/f6_completeness_check`, then ask *"what do you understand about my business?"* If Claude answers with specifics from your own docs, your brain is wired right. A generic answer means Drive, your `01_Foundations/`, or your key isn't connected yet, fix that before you rely on it.
 
