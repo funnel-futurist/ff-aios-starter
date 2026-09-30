@@ -18,7 +18,7 @@
   },
   "created_from": {
     "branch": "exec/p22-v4-clean-vault-20260928",
-    "git_rev": "aa2f46bbae9ff0bffb42fa358d024bf8edc1a8a2"
+    "git_rev": "d3f360de286146da7bfde0817114fd85723eafe1"
   },
   "credentials": [
     {
@@ -509,7 +509,7 @@
       "class": "managed",
       "mode": "100644",
       "path": "docs/INSTALL_AND_UPGRADE.md",
-      "sha256": "c43694a2620a465ff08f27d7e3ee4a484254d3fc1934d13aec9109ac82e30d95"
+      "sha256": "587f98266ca109e38f792d96abbbc20bb4956b82f2af5ae21535ad9ebba4c8ac"
     },
     {
       "class": "managed",
