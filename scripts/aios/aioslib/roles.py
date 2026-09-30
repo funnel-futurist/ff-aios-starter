@@ -61,6 +61,27 @@ def identity(timeout=10):
     return (login or None), "gh api user"
 
 
+WEB_NOTE = ("Claude Code on the web is not guaranteed to have a signed-in GitHub CLI (gh), and "
+            "without it the workspace cannot tell who you are. Do setup, install, upgrade and "
+            "founder changes in the Claude Code desktop app or a terminal. Operator work on the "
+            "web is fine")
+
+
+def identity_help(source):
+    """The next steps for an unidentified person, worded for the cause actually observed.
+
+    The rule does not change: without an identity there is no role. Only the explanation does,
+    because "run gh auth login" is impossible advice where gh cannot run at all.
+    """
+    if source == "gh unavailable":
+        return ["the GitHub CLI (gh) is not installed or cannot run here. Install it from "
+                "https://cli.github.com, then run `gh auth login`",
+                WEB_NOTE,
+                "nothing ran: an unidentified person gets no role (least privilege)"]
+    return ["run `gh auth login` so the workspace can tell who you are",
+            "nothing ran: an unidentified person gets no role (least privilege)"]
+
+
 def role_for(config, login):
     if not login:
         return None
@@ -77,8 +98,7 @@ def require_role(config, allowed, action):
         raise Refusal(
             EXIT_ROLE,
             "cannot establish who is running this (%s)" % source,
-            ["run `gh auth login` so the workspace can tell who you are",
-             "least privilege: an unidentified operator gets no role, so nothing runs"],
+            identity_help(source),
         )
     role = role_for(config, login)
     if role is None:

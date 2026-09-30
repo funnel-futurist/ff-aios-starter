@@ -2,7 +2,7 @@
 
 **This repo is yours.**
 
-Not rented. Not a login you lose when a subscription lapses. Not a tool some company can change or take away on a Tuesday. You clicked "Use this template," and now you own the machine.
+Not rented. Not a login you lose when a subscription lapses. Not a tool some company can change or take away on a Tuesday. It's installed into your own private repository, and you own the machine.
 
 This is your business's second brain. It runs on Claude Code. It holds your context, your decisions, your systems, your voice. And every day you use it, it gets sharper, because you're the one shaping it. The version you start today is the dumbest it will ever be. Tomorrow it knows more. That's the compound, and it's working for you.
 
@@ -44,7 +44,7 @@ You own the machine. You're also responsible for it. Same coin.
 
 ## Start here (3 steps)
 
-**1. Use this template.** Top of this page: the green "Use this template" button. Make it a private repo. It's yours now.
+**1. Install it into your own private repository.** Install git, Python 3, Node.js and the GitHub CLI, create an empty private repo, and run the installer with the newest approved release. [GETTING_STARTED.md](GETTING_STARTED.md) steps 3 to 7 spell out every click. Please don't use the green "Use this template" button: it copies whatever is on the main branch that day, not an approved release, and the copy doesn't know who its founder is.
 
 **2. Open it in Claude Code and run `/onboard_wizard`.** This is the only command you need on day one. It walks you through setup, asks about your business, and fills your brain with real context. Don't skip it. An empty brain is a generic brain. And don't aim for complete, aim for started: a rough version today beats a perfect version next month.
 

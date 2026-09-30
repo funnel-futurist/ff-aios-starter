@@ -24,6 +24,7 @@ Python 3.9+, standard library only.
 import argparse
 import json
 import os
+import shutil
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -103,6 +104,20 @@ def cmd_release_verify(args):
             _say("  - %s" % p)
         return util.EXIT_PACKAGE
     _say("verdict:  installable (pinned, intact, approved)")
+    return EXIT_OK
+
+
+def cmd_release_check_tag(args):
+    repo = os.path.abspath(args.repo)
+    problems = release_mod.check_tag(repo, args.tag, args.release_id)
+    _say("tag:      %s" % args.tag)
+    _say("release:  %s" % args.release_id)
+    if problems:
+        _say("verdict:  a checkout of this tag is NOT the approved release")
+        for p in problems:
+            _say("  - %s" % p)
+        return util.EXIT_PACKAGE
+    _say("verdict:  the tag carries the approval and installs the pinned files byte for byte")
     return EXIT_OK
 
 
@@ -250,7 +265,7 @@ def cmd_start(args):
     login, source = roles.identity()
     if not login:
         raise Refusal(util.EXIT_ROLE, "cannot establish who you are (%s)" % source,
-                      ["run `gh auth login`"])
+                      roles.identity_help(source))
     role = roles.role_for(config, login)
     if role is None:
         raise Refusal(util.EXIT_ROLE,
@@ -286,7 +301,31 @@ def cmd_start(args):
         _say("  held two ways: Claude will not edit these for you, and a pull request that")
         _say("  changes them fails its boundary check until a founder approves that commit.")
         _say("  a direct push to main is stopped only if branch protection is on.")
+    for warning in _hook_runtime_warnings(target):
+        _say("")
+        _say("warning:   %s" % warning)
     return EXIT_OK
+
+
+def _hook_runtime_warnings(target):
+    """A Claude Code hook whose program is missing fails without blocking anything, so a safety
+    hook that cannot start is a silent gap. Name it where people look first."""
+    settings = os.path.join(target, ".claude", "settings.json")
+    try:
+        hooks = util.read_json(settings).get("hooks") or {}
+    except (OSError, ValueError):
+        return []
+    needed = set()
+    for entries in hooks.values():
+        for entry in entries or []:
+            for hook in entry.get("hooks") or []:
+                program = (hook.get("command") or "").split(" ", 1)[0]
+                if program in ("node", "python3"):
+                    needed.add(program)
+    return ["%s is not installed, so this workspace's %s safety hooks cannot run and Claude Code "
+            "skips them without saying so. Install %s, then run start again"
+            % (prog, prog, "Node.js from https://nodejs.org" if prog == "node" else "Python 3")
+            for prog in sorted(needed) if shutil.which(prog) is None]
 
 
 def cmd_sanitize(args):
@@ -382,6 +421,8 @@ def _print_workspace_report(report):
     for r in report["repos"]:
         rev = (" @ %s" % r["revision"][:12]) if r.get("revision") else ""
         extra = " (cloned)" if r.get("cloned") else (" (moved forward)" if r.get("fast_forwarded") else "")
+        if r.get("moved_to"):
+            extra = " (old copy moved out of the vault to %s)" % r["moved_to"]
         _say("  %-12s %-14s %s%s%s" % (r["name"], r["domain"], r["status"], rev, extra))
         if r.get("next"):
             _say("               next: %s" % r["next"])
@@ -416,7 +457,8 @@ def cmd_workspace_init(args):
 
 
 def cmd_workspace_sync(args):
-    report = workspace.sync(args.parent, clone_filter=args.filter)
+    report = workspace.sync(args.parent, clone_filter=args.filter,
+                            move_retired_copies=args.move_retired)
     _print_workspace_report(report)
     return report["code"]
 
@@ -455,6 +497,14 @@ def build_parser():
     rv.add_argument("--repo", default=_repo_root())
     rv.add_argument("--aios-releases", dest="aios_releases")
     rv.set_defaults(func=cmd_release_verify)
+
+    rt = relsub.add_parser("check-tag", help="does a checkout of this tag carry the approved "
+                                              "release, with the pinned files byte for byte?")
+    rt.add_argument("tag")
+    rt.add_argument("--release-id", dest="release_id", required=True,
+                    help="e.g. starter-2.7.0 (the record releases/<id>.json is read at the tag)")
+    rt.add_argument("--repo", default=_repo_root())
+    rt.set_defaults(func=cmd_release_check_tag)
 
     ins = sub.add_parser("install", help="install an approved release into a clean workspace")
     ins.add_argument("--release", required=True)
@@ -558,6 +608,9 @@ def build_parser():
     wsy = wssub.add_parser("sync", help="clone newly active repositories and rebuild the maps")
     wsy.add_argument("--parent", required=True)
     wsy.add_argument("--filter")
+    wsy.add_argument("--move-retired", action="store_true",
+                     help="move pristine copies of no-longer-active repositories out of the "
+                          "vault (moved, never deleted)")
     wsy.set_defaults(func=cmd_workspace_sync)
     wst = wssub.add_parser("status", help="each repository's state, without fetching")
     wst.add_argument("--parent", required=True)

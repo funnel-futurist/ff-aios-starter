@@ -9,6 +9,7 @@ that returns the wrong reason sends the operator down the wrong path.
 
 import json
 import os
+import shutil
 import subprocess
 import sys
 
@@ -259,6 +260,19 @@ class RoleScoping(Sandbox):
             roles.require_lifecycle(self.policy, self.cfg, "upgrade")
         self.assertEqual(ctx.exception.code, util.EXIT_ROLE)
 
+    def test_n3f_no_gh_names_the_web_limit_instead_of_impossible_advice(self):
+        """M3: on Claude Code on the web gh cannot run, so 'run gh auth login' alone is a dead end."""
+        self.nobody()
+        with self.assertRaises(Refusal) as ctx:
+            roles.require_lifecycle(self.policy, self.cfg, "upgrade")
+        text = " ".join(ctx.exception.details)
+        self.assertIn("cli.github.com", text)
+        self.assertIn("desktop app", text)
+        code, out, err = self.cli("start", "--target", self.target)
+        self.assertEqual(code, util.EXIT_ROLE, out + err)
+        self.assertIn("desktop app", out + err)
+        self.assertIn("gets no role", out + err)
+
     def test_a2b_founder_may_do_both(self):
         self.be("acme-founder")
         login, role = roles.require_lifecycle(self.policy, self.cfg, "upgrade")
@@ -279,6 +293,73 @@ class RoleScoping(Sandbox):
         code, out, _err = self.cli("start", "--target", self.target)
         self.assertEqual(code, 0)
         self.assertIn("UNPINNED", out)
+
+    def test_m5_start_names_a_safety_hook_that_cannot_run(self):
+        """A missing hook program fails open in Claude Code, so start must say so."""
+        self.be("acme-va")
+        settings = os.path.join(self.target, ".claude", "settings.json")
+        os.makedirs(os.path.dirname(settings), exist_ok=True)
+        with open(settings, "w") as fh:
+            json.dump({"hooks": {"PreToolUse": [{"matcher": "Bash", "hooks": [
+                {"type": "command", "command": "node \"$CLAUDE_PROJECT_DIR/guard.js\""}]}]}}, fh)
+        code, out, _err = self.cli("start", "--target", self.target,
+                                   env={"PATH": self.bin + os.pathsep + "/usr/bin:/bin"}
+                                   if not os.path.exists("/usr/bin/node") else None)
+        self.assertEqual(code, 0)
+        if not os.path.exists("/usr/bin/node") and not os.path.exists("/bin/node"):
+            self.assertIn("node is not installed", out)
+            self.assertIn("skips them without saying so", out)
+        code, out, _err = self.cli("start", "--target", self.target)
+        if shutil.which("node"):
+            self.assertNotIn("node is not installed", out)
+
+
+class ReleaseTag(Sandbox):
+    """M6: `git clone --branch <tag>` must give the approved record and the pinned bytes.
+
+    The record lives in releases/, which the package excludes, so the approval commit installs
+    the same bytes as the pin; that commit is the one to tag.
+    """
+
+    def record(self, man, message):
+        rid = man["release_id"]
+        harness.write(self.source, "releases/%s.json" % rid, json.dumps(man, indent=2))
+        harness.run_git(self.source, "add", "-A")
+        harness.run_git(self.source, "commit", "-qm", message)
+        return util.git(self.source, ["rev-parse", "HEAD"])
+
+    def test_tag_on_the_approval_commit_passes(self):
+        man = harness.build_manifest(self.source, self.rev, "1.0.0")
+        self.record(man, "draft")
+        approval = self.record(harness.approve(man), "approved")
+        harness.run_git(self.source, "tag", "starter-1.0.0", approval)
+        self.assertEqual(release_mod.check_tag(self.source, "starter-1.0.0", man["release_id"]), [])
+        code, out, _ = self.cli("release", "check-tag", "starter-1.0.0", "--release-id",
+                                man["release_id"], "--repo", self.source)
+        self.assertEqual(code, 0, out)
+        self.assertIn("byte for byte", out)
+
+    def test_tag_on_the_pin_itself_carries_only_a_draft(self):
+        """The 2.6.0 shape: the tag was placed before the approval was recorded."""
+        man = harness.build_manifest(self.source, self.rev, "1.0.0")
+        draft = self.record(man, "draft")
+        self.record(harness.approve(man), "approved")
+        harness.run_git(self.source, "tag", "starter-1.0.0", draft)
+        problems = release_mod.check_tag(self.source, "starter-1.0.0", man["release_id"])
+        self.assertTrue(any("status is 'draft'" in p for p in problems), problems)
+
+    def test_a_tag_whose_package_moved_after_the_pin_fails(self):
+        man = harness.build_manifest(self.source, self.rev, "1.0.0")
+        self.record(harness.approve(man), "approved")
+        moved = harness.bump_source(self.source, {"START_HERE.md": "# changed after approval\n"})
+        harness.run_git(self.source, "tag", "starter-1.0.0", moved)
+        problems = release_mod.check_tag(self.source, "starter-1.0.0", man["release_id"])
+        self.assertTrue(any("differs from the pin at START_HERE.md" in p for p in problems),
+                        problems)
+
+    def test_a_missing_tag_is_named(self):
+        self.assertEqual(release_mod.check_tag(self.source, "starter-9.9.9", "starter-9.9.9"),
+                         ["tag starter-9.9.9 does not exist in %s" % self.source])
 
 
 class UpgradeAndRollback(Sandbox):

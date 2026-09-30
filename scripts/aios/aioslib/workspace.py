@@ -22,6 +22,12 @@ What it promises, stated so nobody has to discover it:
   is written beside it as `<name>.new.md` instead.
 * Hiding a file in Obsidian is not access control. The kit keeps private material out by
   never cloning it; the manifest refuses a URL that carries a credential.
+* A repository marked `split: not-split` holds a private method, or another company's
+  material, in the same repository as this company's own work. It can only be shown as a
+  reference until the split is real: the manifest refuses it as `active`.
+* A copy of a repository that is no longer active stays searchable while it sits inside the
+  vault. The kit reports it and, only when asked with `--move-retired`, moves a pristine copy
+  out of the vault. It is moved, never deleted, and a copy with any local work stays put.
 """
 
 import datetime
@@ -42,6 +48,8 @@ MANIFEST_NAME = "WORKSPACE.json"
 MAPS_DIR = "00-MAPS"
 START_HERE = "START-HERE.md"
 STATES = ("active", "inactive", "reference")
+SPLITS = ("clean", "not-split")
+RETIRED_SUFFIX = ".retired"
 DOMAINS = ("aios", "creation", "team-ops", "command-os", "revops", "attention", "other")
 # Where each domain sits on the Operating System canvas: AIOS on top as company context, the
 # operating domains in the middle, Command OS below as visibility.
@@ -91,6 +99,14 @@ def validate(manifest):
         if spec.get("state") not in STATES:
             problems.append("%s: state %r is not one of %s" % (name, spec.get("state"),
                                                               ", ".join(STATES)))
+        split = spec.get("split", "clean")
+        if split not in SPLITS:
+            problems.append("%s: split %r is not one of %s" % (name, split, ", ".join(SPLITS)))
+        elif split == "not-split" and spec.get("state") == "active":
+            problems.append("%s: marked not-split, so it holds a private method or another "
+                            "company's material beside this company's own work. Set its state "
+                            "to reference until the split is real; it must not be cloned into "
+                            "this vault" % name)
         if spec.get("domain") not in DOMAINS:
             problems.append("%s: domain %r is not one of %s" % (name, spec.get("domain"),
                                                                ", ".join(DOMAINS)))
@@ -213,8 +229,9 @@ NEXT_ACTION = {
     "ahead": "{path} has commits that are not on GitHub yet. Push them when they are ready.",
     "present-not-active": "{path} is marked {state} in WORKSPACE.json, but a full copy is still in "
                           "this folder, so the vault still shows its contents. Move {path} out of "
-                          "the workspace (or delete it if it has nothing unsaved), then run "
-                          "`aios workspace status` again. Nothing was changed.",
+                          "the workspace: `aios workspace sync --parent <folder> --move-retired` "
+                          "moves a copy that holds nothing unsaved to <folder>.retired/ (it never "
+                          "deletes). Then run `aios workspace status` again. Nothing was changed.",
     "unavailable": "This computer cannot read {url}. Sign in with `gh auth login` as someone "
                    "who has access, or ask an owner to grant it. The rest of the workspace "
                    "still works.",
@@ -233,7 +250,11 @@ def plan(manifest, parent, check_remote=True):
         row = {"name": name, "domain": spec["domain"], "state": spec["state"],
                "path": spec["path"], "branch": spec["branch"], "url": spec["url"]}
         if spec["state"] != "active":
-            row.update(local="-", action="show as %s; nothing is cloned" % spec["state"])
+            action = "show as %s; nothing is cloned" % spec["state"]
+            if os.path.exists(local):
+                action += ("; an old copy is still inside the vault (sync --move-retired "
+                           "moves a pristine copy out)")
+            row.update(local="present" if os.path.exists(local) else "-", action=action)
         else:
             local_state, detail, rev = checkout_state(local, spec["branch"])
             row.update(local=local_state, detail=detail, revision=rev)
@@ -290,7 +311,39 @@ def init(manifest, parent, clone_filter=None, now=None):
     return report
 
 
-def sync(parent, clone_filter=None, now=None):
+def pristine(path, branch):
+    """(True, "") when a checkout holds nothing that exists only on this computer."""
+    state, detail, _rev = checkout_state(path, branch)
+    if state not in ("clean", "behind", "other-branch", "detached"):
+        return False, detail
+    if util.worktree_dirty(path):
+        return False, "has uncommitted changes"
+    code, stash, _ = _git(path, "stash", "list")
+    if code != 0 or stash:
+        return False, "has stashed changes"
+    code, unpushed, _ = _git(path, "log", "--branches", "--not", "--remotes", "--oneline")
+    if code != 0 or unpushed:
+        return False, "has commits that are not on any remote"
+    return True, ""
+
+
+def move_retired(parent, spec, now=None):
+    """Move a pristine checkout out of the vault. Returns (moved_to or None, reason)."""
+    local = os.path.join(parent, spec["path"])
+    ok, reason = pristine(local, spec["branch"])
+    if not ok:
+        return None, reason
+    stamp = _now(now).replace(":", "").replace("-", "")
+    dest_root = parent.rstrip(os.sep) + RETIRED_SUFFIX
+    dest = os.path.join(dest_root, "%s-%s" % (spec["path"], stamp))
+    if os.path.exists(dest):
+        return None, "%s already exists" % dest
+    os.makedirs(dest_root, exist_ok=True)
+    shutil.move(local, dest)
+    return dest, ""
+
+
+def sync(parent, clone_filter=None, now=None, move_retired_copies=False):
     """Clone newly active repositories, move clean ones forward, leave everything else alone."""
     parent = os.path.abspath(parent)
     manifest = load(parent)
@@ -298,16 +351,28 @@ def sync(parent, clone_filter=None, now=None):
     for name, spec in _repos(manifest):
         local = os.path.join(parent, spec["path"])
         res = {"name": name, "domain": spec["domain"], "state": spec["state"],
-               "path": spec["path"], "branch": spec["branch"]}
+               "path": spec["path"], "branch": spec["branch"],
+               "split": spec.get("split", "clean")}
         if spec["state"] != "active":
             res.update(status="not active" if spec["state"] == "inactive" else "reference",
                        revision=None)
             if os.path.exists(local):
                 # A reference is "shown as an interface, not downloaded". A copy left behind
-                # from an earlier active state breaks that promise, so it is reported, never
-                # silently kept and never deleted by the kit.
-                res.update(status="present-not-active", next=NEXT_ACTION["present-not-active"].format(
-                    path=spec["path"], state=spec["state"]))
+                # from an earlier active state breaks that promise, so it is reported, and moved
+                # out only when asked and only when it holds nothing unique. Never deleted.
+                moved, reason = (move_retired(parent, spec, now=now) if move_retired_copies
+                                 else (None, None))
+                if moved:
+                    res["moved_to"] = moved
+                elif reason:
+                    res.update(status="present-not-active", next=(
+                        "%s is marked %s, but its copy was left in this folder because it %s. "
+                        "Save or push that work, then run sync --move-retired again. Nothing "
+                        "was changed." % (spec["path"], spec["state"], reason)))
+                else:
+                    res.update(status="present-not-active",
+                               next=NEXT_ACTION["present-not-active"].format(
+                                   path=spec["path"], state=spec["state"]))
             results.append(res)
             continue
         local_state, detail, rev = checkout_state(local, spec["branch"])
@@ -437,6 +502,11 @@ def _start_page(parent, spec):
 
 
 def _label(res):
+    if res["status"] == "reference" and res.get("split") == "not-split":
+        return ("reference - not yet split: its private method or other companies' material "
+                "shares one repository, so its content is not in this vault")
+    if res["status"] == "present-not-active":
+        return ("%s - but an old copy is still in this folder; move it out" % res["state"])
     return {"not active": "inactive - not part of this plan yet",
             "reference": "reference - shown as an interface, not cloned",
             "not connected": "not connected - this computer cannot read it",
@@ -505,8 +575,14 @@ def write_maps(parent, manifest, results, now=None):
     return {k: {"file": v[0], "kept_your_edit": v[1]} for k, v in written.items()}
 
 
+def _live(res):
+    return bool(res.get("revision"))
+
+
 def relationships(manifest, results):
+    """(from, to, label) edges. An edge touching a part that is not set up says '(planned)'."""
     present = {r["domain"]: r["name"] for r in results}
+    live = {r["name"]: _live(r) for r in results}
     edges = []
     for r in results:
         if r["domain"] in ("aios", "command-os"):
@@ -524,7 +600,8 @@ def relationships(manifest, results):
         if target:
             edges.append((target, cap["name"], "capability call"))
             edges.append((cap["name"], target, "client-specific output"))
-    return edges
+    return [(a, b, label if live.get(a, True) and live.get(b, True) else label + " (planned)")
+            for a, b, label in edges]
 
 
 def canvas(parent, manifest, results):
@@ -533,9 +610,14 @@ def canvas(parent, manifest, results):
     specs = dict(_repos(manifest))
     width, height, gap = 300, 120, 60
     row_members = {}
+    outside = [r for r in results if r.get("split") == "not-split"]
     for r in results:
+        if r in outside:
+            continue
         row_members.setdefault(ROWS.get(r["domain"], 1), []).append(r)
-    widest = max(len(v) for v in row_members.values())
+    if not row_members:
+        row_members = {0: []}
+    widest = max(1, max(len(v) for v in row_members.values()))
     group_w = widest * (width + gap) + gap
     ids = {}
     for row, members in sorted(row_members.items()):
@@ -563,10 +645,21 @@ def canvas(parent, manifest, results):
     for i, cap in enumerate(caps):
         node_id = "cap-%d" % i
         ids[cap["name"]] = node_id
+        status = cap.get("status") or "interface"
         nodes.append({"id": node_id, "type": "text", "x": group_w + 2 * gap,
                       "y": gap + i * (height + gap), "width": width, "height": height,
-                      "color": "5", "text": "**%s**\n\nInterface only - provided by %s"
-                      % (cap["name"], cap.get("provider", "a provider"))})
+                      "color": "5", "text": "**%s**\n\nInterface only - provided by %s%s"
+                      % (cap["name"], cap.get("provider", "a provider"),
+                         "" if status == "interface" else " (%s)" % status)})
+    # Parts that are not split yet are provided from outside: they never sit inside the
+    # company's boundary, and they are a label, never a file from that repository.
+    for i, r in enumerate(outside):
+        node_id = "repo-" + r["name"]
+        ids[r["name"]] = node_id
+        nodes.append({"id": node_id, "type": "text", "x": group_w + 2 * gap + width + gap,
+                      "y": gap + i * (height + gap), "width": width, "height": height,
+                      "color": "3", "text": "**%s**\n\n%s" % (
+                          specs[r["name"]].get("title") or r["name"], _label(r))})
     for n, (a, b, label) in enumerate(relationships(manifest, results)):
         if a in ids and b in ids:
             edges.append({"id": "edge-%d" % n, "fromNode": ids[a], "toNode": ids[b],

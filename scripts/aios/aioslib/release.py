@@ -217,6 +217,48 @@ def check_intact(man, repo):
     return problems
 
 
+def check_tag(repo, tag, release_id):
+    """Every reason `git clone --branch <tag>` would not give a learner this approved release.
+
+    The release record lives under `releases/`, which the package excludes, so the commit that
+    records an approval installs exactly the same package bytes as the pinned commit. The tag
+    therefore belongs on the approval commit: then a tag checkout carries `status: approved`
+    and the installer accepts it. This check proves both halves - the record at the tag is
+    approved and pinned, and the package files at the tag are byte-identical to the pin -
+    so a tag can never quietly point at a different tree from the one a founder approved.
+    """
+    problems = []
+    tagged = util.git(repo, ["rev-parse", "--verify", "--quiet", tag + "^{commit}"], check=False)
+    if not tagged:
+        return ["tag %s does not exist in %s" % (tag, repo)]
+    record_path = "releases/%s.json" % release_id
+    raw = util.git(repo, ["show", "%s:%s" % (tagged, record_path)], check=False)
+    if not raw:
+        return ["the tag's commit %s has no %s" % (tagged[:12], record_path)]
+    try:
+        import json
+        man = json.loads(raw)
+    except ValueError:
+        return ["%s at the tag is not valid JSON" % record_path]
+    problems += ["at the tag: " + p for p in check_approved(man) + check_pinned(man)]
+    pin = (man.get("created_from") or {}).get("git_rev", "")
+    if pin and util.rev_exists(repo, pin):
+        proc_ok = util.git(repo, ["merge-base", pin, tagged], check=False) == pin
+        if not proc_ok:
+            problems.append("the pinned commit %s is not an ancestor of the tag's commit %s"
+                            % (pin[:12], tagged[:12]))
+        spec = load_spec(repo, tagged)
+        at_tag = {p: (c, m, h) for p, c, m, h in select_files(repo, tagged, spec)}
+        declared = {e["path"]: (e.get("class"), e.get("mode"), e.get("sha256"))
+                    for e in man.get("files") or []}
+        for path in sorted(set(at_tag) | set(declared)):
+            if at_tag.get(path) != declared.get(path):
+                problems.append("the package at the tag differs from the pin at %s" % path)
+    elif pin:
+        problems.append("pinned commit %s is not present in %s" % (pin[:12], repo))
+    return problems
+
+
 def consumable(man, repo, aios_release_lookup=None):
     """Every reason this release may not be installed. Empty list means it may be."""
     problems = []

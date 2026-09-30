@@ -150,7 +150,8 @@ def check_edit(root, tool_name, tool_input, identify=None):
     return False, (
         "%s belongs to the founder lane, and %s may not change it. Ask a founder to make "
         "this change, or to review a pull request that proposes it. If you are a founder and "
-        "see this, run `gh auth login` so the workspace can tell who you are." % (rel, who))
+        "see this, run `gh auth login` so the workspace can tell who you are.%s" % (
+            rel, who, "" if login else " " + roles.WEB_NOTE + "."))
 
 
 def hook_pre_edit(stdin_text, root=None):

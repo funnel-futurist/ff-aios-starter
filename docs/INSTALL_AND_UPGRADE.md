@@ -44,6 +44,30 @@ with uncommitted work.
 `start` and `verify` are safe to run any time and change nothing. `upgrade` and `rollback` are
 founder-only.
 
+## Getting an exact release
+
+Every release is a record, `releases/starter-X.Y.Z.json`, plus a tag, `starter-X.Y.Z`. The
+record lives in `releases/`, which the package never ships, so the commit that records a
+founder's approval installs exactly the same files as the commit it pins. **That approval
+commit is the one tagged.** A checkout of the tag then carries the approved record, and the
+installer accepts it.
+
+```bash
+git clone https://github.com/funnel-futurist/ff-aios-starter.git
+cd ff-aios-starter
+python3 scripts/aios/aios.py release check-tag starter-X.Y.Z --release-id starter-X.Y.Z
+git checkout starter-X.Y.Z        # only once check-tag says the tag is the approved release
+```
+
+`check-tag` proves both halves: the record at the tag is approved and pinned, and every
+package file at the tag is byte-identical to the pin. If it refuses, don't install from the
+tag.
+
+**starter-2.6.0 is the known exception.** Its tag was placed on the pinned commit before the
+approval was recorded, so the record inside the tag is an earlier draft and `check-tag`
+refuses it. Published tags are never moved. Install 2.6.0 from the normal copy instead: the
+installer still materialises only the pinned 2.6.0 files and re-hashes them on disk.
+
 ## Installing a new workspace
 
 ```bash
@@ -146,6 +170,21 @@ bash scripts/team/verify-branch-protection.sh
 A `CODEOWNERS` file full of `[REPO_OWNER]` placeholders enforces **nothing** - GitHub matches
 no one - and neither does a perfectly filled one if branch protection is off.
 
+## What protects you, and when it doesn't
+
+A safeguard that did not run is not a safeguard. Claude Code treats a hook that fails to start
+(for example, because its program is missing) as a non-blocking error and carries on, and there
+is no setting that makes a failed hook block. So each protection below holds only under its
+condition.
+
+| Protection | Holds when | When it does not hold |
+|---|---|---|
+| Founder-lane edits refused in the session | Python 3 is installed and `gh` is signed in (an unidentified person gets operator limits) | Python 3 missing on that computer: the hook can't start and Claude Code skips it. Nothing in the session can warn, because the warning needs Python too |
+| Risky git commands stop and ask you first (force-push, `reset --hard` and similar). They are not blocked: you can still say yes | Node.js is installed | Node.js missing: the hook is skipped, so there is no extra question. `start` warns, and the warning is not protection |
+| Pull request that touches the founder lane shows red | GitHub Actions runs (server-side, independent of the laptop) | Always runs; it can only **block** a merge with branch protection on |
+| Branch protection | The repository belongs to a paid plan, or is public | A private repository on a personal free account can't have it. GitHub answers "Upgrade to GitHub Pro or make this repository public" |
+| Installed files match the release | `verify --repo` against the source | Without `--repo`, `verify` only checks the local record, which a local editor could also change |
+
 ## Two questions `verify` can answer
 
 Without `--repo` it asks *"does this workspace still match what was installed?"*, using the record
@@ -155,6 +194,17 @@ change a managed file **and** its recorded hash, and the check would agree with 
 With `--repo` it also re-derives every hash from the pinned commit in the source repository, which
 catches exactly that. The output always says which of the two it ran. Use `--repo` when the answer
 matters to somebody other than you.
+
+## For maintainers: approving a release
+
+1. Cut the draft: `python3 scripts/aios/aios.py release build --version X.Y.Z --rev <commit on main>`.
+   The builder can only write `draft`.
+2. The founder approves that exact commit, in their own words. Record it in
+   `releases/starter-X.Y.Z.json` (`status: approved`, `approval.approved_by`, `approved_at`,
+   `basis`) and merge that change to `main`.
+3. Tag **the commit that recorded the approval** with an annotated tag, then prove it:
+   `python3 scripts/aios/aios.py release check-tag starter-X.Y.Z --release-id starter-X.Y.Z`.
+   Push the tag only once that passes. Never move a tag that is already published.
 
 ## Exit codes
 
