@@ -180,7 +180,7 @@ condition.
 | Protection | Holds when | When it does not hold |
 |---|---|---|
 | Founder-lane edits refused in the session | Python 3 is installed and `gh` is signed in (an unidentified person gets operator limits) | Python 3 missing on that computer: the hook can't start and Claude Code skips it. Nothing in the session can warn, because the warning needs Python too |
-| Risky git commands blocked (force-push, reset and similar) | Node.js is installed | Node.js missing: the hook is skipped. `start` warns, and the warning is not protection |
+| Risky git commands stop and ask you first (force-push, `reset --hard` and similar). They are not blocked: you can still say yes | Node.js is installed | Node.js missing: the hook is skipped, so there is no extra question. `start` warns, and the warning is not protection |
 | Pull request that touches the founder lane shows red | GitHub Actions runs (server-side, independent of the laptop) | Always runs; it can only **block** a merge with branch protection on |
 | Branch protection | The repository belongs to a paid plan, or is public | A private repository on a personal free account can't have it. GitHub answers "Upgrade to GitHub Pro or make this repository public" |
 | Installed files match the release | `verify --repo` against the source | Without `--repo`, `verify` only checks the local record, which a local editor could also change |
