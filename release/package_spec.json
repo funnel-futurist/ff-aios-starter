@@ -10,22 +10,22 @@
     ".githooks/**",
     "**/__pycache__/**",
     "*.pyc",
-    "*.pyo"
+    "*.pyo",
+    "templates/setup/**"
   ],
   "seed": [
     "CLAUDE.md",
     "README.md",
     ".gitignore",
     ".aios/local-operator.example.json",
-    "01_Foundations/**",
-    "02_Deliverables/**",
-    "03_Quality_Control/**",
-    "04_Customer_Journey/**",
-    "05_Assets/**",
-    "06_Communication/**",
-    "08_Automations/**",
-    "09_Archive/**",
-    "11_Projects/**"
+    "estate.yaml",
+    "00_AIOS/**",
+    "01_Creation/**",
+    "02_Team_Ops/**",
+    "03_RevOps/**",
+    "04_Attention/**",
+    "05_Jobs/**",
+    "99_Archive/**"
   ],
   "render": [
     {
@@ -33,5 +33,103 @@
       "out": ".github/CODEOWNERS",
       "why": "CODEOWNERS must name owners who actually have access to THIS repository, so it is rendered per workspace, never copied."
     }
-  ]
+  ],
+  "layout": {
+    "version": "3",
+    "_comment": "Starter 3.0 instance layout (estate plan section 3.2, ruled C1). On upgrade from layout 2, every file the release does not manage that sits under a 2.x folder moves to its 3.0 destination (longest matching 'from' wins; each 2.x top folder has a catch-all), then nothing may remain under a 2.x folder. Moves are recorded so rollback reverses them.",
+    "retired_roots": [
+      "01_Foundations",
+      "02_Deliverables",
+      "03_Quality_Control",
+      "04_Customer_Journey",
+      "05_Assets",
+      "06_Communication",
+      "07_Setup",
+      "08_Automations",
+      "09_Archive",
+      "11_Projects"
+    ],
+    "moves": [
+      {
+        "from": "01_Foundations/",
+        "to": "00_AIOS/company/"
+      },
+      {
+        "from": "02_Deliverables/_review_queue/",
+        "to": "00_AIOS/review_queue/"
+      },
+      {
+        "from": "02_Deliverables/copy/",
+        "to": "01_Creation/outputs/"
+      },
+      {
+        "from": "02_Deliverables/funnels/",
+        "to": "03_RevOps/funnels/"
+      },
+      {
+        "from": "02_Deliverables/audits/",
+        "to": "03_RevOps/audits/"
+      },
+      {
+        "from": "02_Deliverables/reports/",
+        "to": "03_RevOps/reports/"
+      },
+      {
+        "from": "02_Deliverables/ads/",
+        "to": "04_Attention/campaigns/ads/"
+      },
+      {
+        "from": "02_Deliverables/emails/",
+        "to": "04_Attention/campaigns/emails/"
+      },
+      {
+        "from": "02_Deliverables/webinars/",
+        "to": "04_Attention/campaigns/webinars/"
+      },
+      {
+        "from": "02_Deliverables/",
+        "to": "01_Creation/outputs/"
+      },
+      {
+        "from": "03_Quality_Control/",
+        "to": "00_AIOS/review_queue/"
+      },
+      {
+        "from": "04_Customer_Journey/",
+        "to": "03_RevOps/customer_journey/"
+      },
+      {
+        "from": "05_Assets/brand_guide/",
+        "to": "01_Creation/brand/"
+      },
+      {
+        "from": "05_Assets/",
+        "to": "01_Creation/asset_library/"
+      },
+      {
+        "from": "06_Communication/decisions_log.md",
+        "to": "00_AIOS/decisions_log.md"
+      },
+      {
+        "from": "06_Communication/",
+        "to": "02_Team_Ops/routines/"
+      },
+      {
+        "from": "07_Setup/",
+        "to": "99_Archive/07_Setup/"
+      },
+      {
+        "from": "08_Automations/",
+        "to": "03_RevOps/automations/"
+      },
+      {
+        "from": "09_Archive/",
+        "to": "99_Archive/"
+      },
+      {
+        "from": "11_Projects/",
+        "to": "02_Team_Ops/projects/"
+      }
+    ]
+  }
 }

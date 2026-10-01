@@ -10,12 +10,12 @@ Run this at the start of every Claude Code session to orient yourself.
 ## Steps
 
 1. Read `CLAUDE.md` for workspace rules and operating context.
-2. Read all documents in `01_Foundations/`, scan each subfolder for completed F6 docs (ignore empty `_workspace.md` templates).
-3. Read `04_Customer_Journey/engagement_timeline.md`, current phase, schedule, standing meetings.
-4. Read `04_Customer_Journey/task_tracker.md`, what's active, blocked, and up next.
-5. Read the most recent entry in `06_Communication/daily_handoff.md`, last VA update.
-6. Check `02_Deliverables/_review_queue/` for any files awaiting review.
-7. Read `06_Communication/decisions_log.md`, last 5 entries for recent context.
+2. Read all documents in `00_AIOS/company/`, scan each subfolder for completed F6 docs (ignore empty `_workspace.md` templates).
+3. Read `03_RevOps/customer_journey/engagement_timeline.md`, current phase, schedule, standing meetings.
+4. Read `03_RevOps/customer_journey/task_tracker.md`, what's active, blocked, and up next.
+5. Read the most recent entry in `02_Team_Ops/routines/daily_handoff.md`, last VA update.
+6. Check `00_AIOS/review_queue/` for any files awaiting review.
+7. Read `00_AIOS/decisions_log.md`, last 5 entries for recent context.
 
 ## Output
 

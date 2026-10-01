@@ -1,0 +1,1008 @@
+{
+  "approval": {
+    "approved_at": null,
+    "approved_by": null
+  },
+  "compatibility": {
+    "breaking": [
+      "folder layout 3: files move on upgrade (see layout.moves)"
+    ],
+    "min_upgrade_from": "2.6.0"
+  },
+  "consumes": {
+    "aios_release": null
+  },
+  "counts": {
+    "files": 139,
+    "managed": 82,
+    "seed": 57,
+    "skills": 20
+  },
+  "created_from": {
+    "branch": "exec/p22-starter-3.0-20261001",
+    "git_rev": "0a8f2297a2ad4a31f22062013c525305799c94dc"
+  },
+  "credentials": [
+    {
+      "name": "ANTHROPIC_API_KEY",
+      "purpose": "Only needed for API billing or the CI reviewer. A Claude subscription needs no key here.",
+      "required": false
+    },
+    {
+      "name": "OPENAI_API_KEY",
+      "purpose": "Only if you use embeddings or Whisper transcription.",
+      "required": false
+    },
+    {
+      "name": "GOOGLE_CLIENT_ID",
+      "purpose": "Only if you connect Google Workspace via API.",
+      "required": false
+    },
+    {
+      "name": "GOOGLE_CLIENT_SECRET",
+      "purpose": "Only if you connect Google Workspace via API.",
+      "required": false
+    }
+  ],
+  "files": [
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".aios/.gitignore",
+      "sha256": "78893d8fbac13421639a98e79c18935efedccb7e74454a92d28e04eb0f28f04e"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": ".aios/local-operator.example.json",
+      "sha256": "07df5a30f9f77ec34b4d2c549954d47b56b4da95d267a182f64442d214bb4258"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".aios/roles.json",
+      "sha256": "f943d4fe1a8e29cd732ea41bbd0f4171fae16201f5914a782844e2259b4090d7"
+    },
+    {
+      "class": "managed",
+      "mode": "100755",
+      "path": ".claude/hooks/git-staleness-check.js",
+      "sha256": "380cebfef94ec6d60124b4189732e30a1a59a226526588ea7dc1b6a33484602c"
+    },
+    {
+      "class": "managed",
+      "mode": "100755",
+      "path": ".claude/hooks/guard-dangerous-git.js",
+      "sha256": "878f7ed6b7f59a8ec162268323c98ab9f23fd4df6c302370d74cb9bdd9da860a"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/settings.json",
+      "sha256": "b1be4c9460125f1a0aed6870b023b2db1cce9ccedb103e9757cbe08bbb9664c0"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/README.md",
+      "sha256": "6c2854b6d5874654ca16448749711bc6575fcac8489ea1c896965cee78a176c3"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/changelog/SKILL.md",
+      "sha256": "b8799e50c96efb9bf822ba931671e2322b0a27f12b1cddd080c5134eb336a3b8"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/context_load/SKILL.md",
+      "sha256": "2e3d4ac297b1919f65fbb0b802061bcb66a316f33fef4962c39fb48bf6684ad8"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/dashboard/SKILL.md",
+      "sha256": "9d80fc0eeaab7989db8df372031ddea58664f0e8af425579d81cb86759fab218"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/f6_completeness_check/SKILL.md",
+      "sha256": "680207052652634a0550693cc8f34796b64ae1eaf5342517ebd99489ec896edb"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/file_audit/SKILL.md",
+      "sha256": "f61c1d83a08e16d0dba064896a945e43931ffb5c15f9af8f72c845ed1e538537"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/financial_teardown/SKILL.md",
+      "sha256": "737a859e1ccab7373f91da9b8fe5abb7844c51423daf71d2c71d0213e5d10fa6"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/grill_me/SKILL.md",
+      "sha256": "414c9c0ccd64b8fb033582a4592cf5667a1067ce1dd1140ca8d598aa5f085bf5"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/humanize/SKILL.md",
+      "sha256": "da0fedc903660b777904755468db543afa0c5296a6aea91febb977b59c87f6bb"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/onboard_wizard/SKILL.md",
+      "sha256": "68041ae8390f21a26f6e62c177dec2f855c251c8bde8c48d663eadfa1710633b"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/pr_review/SKILL.md",
+      "sha256": "b2ed39d837b03794f0ea496265e94d6cce9a04db7ea127e456edd448aeac5224"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/project_management/SKILL.md",
+      "sha256": "9b4ac4c185ba8f4e9e6e97fc5d596ff22ae6c63afdb8f214f3d98c1aaba1f20f"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/qc_review/SKILL.md",
+      "sha256": "3f2fe8e907f466c4569cd5f9ab3597c1f4395ee47fa7fa4150c525ca53dcb5fa"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/resolve-conflict/SKILL.md",
+      "sha256": "db72946f6024ef79fee3931363eaf073898e1573977c87e2bf1c0e26c5ac77d3"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/review-queue/SKILL.md",
+      "sha256": "683a4a8d32d04926370ce334b7e30077da76d40d73310b7043192b403d4c28f7"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/security_check/SKILL.md",
+      "sha256": "241d286a3ba660e1a5dd576fb6f4f61bb48b3363aa0369ee2e581f51ba481c5c"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/start-my-day/SKILL.md",
+      "sha256": "59ffad8f7191ef42d38b4774c06757a592d35f6e9be900e9b2c87e7bf2eda3a5"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/start/SKILL.md",
+      "sha256": "595122419fd1a8e96f285d353ea4ca0cdabf67ec8a486cfc7189a6df908cd95a"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/upskill/SKILL.md",
+      "sha256": "79689085b7a3d3910a579d0c14d339c7d0199ea3b64b781f31463cd7b8d6267f"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/workspace_health/SKILL.md",
+      "sha256": "88e7bb786327217e83cdee45eb817e75032a09d3acc4a7104e4378af45a61718"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".claude/skills/wrap-up/SKILL.md",
+      "sha256": "d136c4d11ea8763e6771f540eb0b775387494b9121b66de474450a103478be7d"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".env.example",
+      "sha256": "5fa90cdde04b3aad3ceec7aa4328faf9cd7ba150a57eb76087ad6050dbe37798"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".github/pull_request_template.md",
+      "sha256": "6603c27e95439367d7d1fdfb4032bfbafba42abc7ec1ac6cc1c9f070a7cafeee"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".github/workflows/install-contract.yml",
+      "sha256": "2f013456834a28cd67cde894e2779ab88e845e1da386374ff3b70b1cc4c48ccc"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".github/workflows/pr-review.yml",
+      "sha256": "a570001d19096ed855baa494d1f0bb36869a47702a95f40780de747613df07ca"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".github/workflows/verify-protection.yml",
+      "sha256": "167bf902e501ccae60db50ad53d6f5108e16dabab6edd22d953f2a893301e4ee"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": ".gitignore",
+      "sha256": "c4d81682464c4ee7746dc36275252122cd8abab79f51bde342dce3fefa4c1f26"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".template_version.json",
+      "sha256": "cae97517a74ef32dd730aad8802a3ff6e3f26e0d986566e80aa9f44db86d8657"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "00_AIOS/company/avatar_analysis/_workspace.md",
+      "sha256": "5918cc17690d6580f433dac5ab609405e874f06a91118e09b616264226e2f94f"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "00_AIOS/company/market_analysis/_workspace.md",
+      "sha256": "6cfedd52dde9bc567447e02823cc0c9decef369a3e4b8eec11d613491d33febf"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "00_AIOS/company/offer_economics/_workspace.md",
+      "sha256": "b74035fdf6888fa11411cc312324720281d025dbaa43a29d35501aa0e1504cf8"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "00_AIOS/company/offer_optimization/_workspace.md",
+      "sha256": "066a4a0d5dafb1049c65a2649981ae9a1c1663f1344f29a2872e5edf80949c06"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "00_AIOS/company/pitch_and_messaging/_workspace.md",
+      "sha256": "41cf227f6a646d0f2ee931fb646e3a658ec40b383d1be44fecba1069919c81bd"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "00_AIOS/company/profile_snapshot/_workspace.md",
+      "sha256": "c45472daa650e6c92b5163c23030c5d23d1dfdbcd1e4ff2188380375238acf74"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "00_AIOS/decisions_log.md",
+      "sha256": "6674ffbfb6d5734a9e3975dba62077a6b654c1c0e6b6de93c6fb79ae7bdeb7c2"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "00_AIOS/review_queue/.gitkeep",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "00_AIOS/review_queue/qc_approval_rubric.md",
+      "sha256": "05957c0bf2190846d8d78223b6d0164a848a4a5c6303f59027812ff082611831"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "00_AIOS/review_queue/qc_preferences.md",
+      "sha256": "430ad12f1fefee9ae0c21b90f1b5a4c9fe9029158751af60e0bb9e75a64c507e"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "00_AIOS/review_queue/qc_revision_log.md",
+      "sha256": "c0d4b44653fcd11b7c754f97e7fa347a6baa203cae92ef05e3e0e5e269723ff1"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "00_AIOS/routing.md",
+      "sha256": "7c388f7e2b5f3777240ef4dcf462504aa5c7161e4ea376a2fb28bfbcb1b05e6d"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "00_AIOS/systems/connections.md",
+      "sha256": "43c3ea292d28b779a343cd4bad46434877145d38f88856924b0e926d085368c9"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "01_Creation/asset_library/README.md",
+      "sha256": "488f2b1e2e9c5a4d68aa1d1d0e23c6a0a2286251408953eb1ed3ab6bf535a134"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "01_Creation/brand/README.md",
+      "sha256": "15cc43767310aaba12be4294df4a4725f1dcdd614bde19c478030f9c709710ca"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "01_Creation/outputs/.gitkeep",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "01_Creation/preferences/README.md",
+      "sha256": "2fdd6acbd0023830e35f7aa94b0a5b67859317ebc421eac74d7d4321751609e7"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "02_Team_Ops/evidence/.gitkeep",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "02_Team_Ops/onboarding/.gitkeep",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "02_Team_Ops/operating_manual/README.md",
+      "sha256": "4a14eca92418d75a4fbf8b578847165cc4a52bfd81464839728066859027ec24"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "02_Team_Ops/org_chart.md",
+      "sha256": "296080ef6d2c1c421f2153579aeeb865ba2fb50ea3bdfb271da269f64e355d37"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "02_Team_Ops/people/.gitkeep",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "02_Team_Ops/policies/.gitkeep",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "02_Team_Ops/projects/README.md",
+      "sha256": "6aae42f1f728cb70407c2f5bfee01bf306204149d334dd5c9a16c84076c13bf2"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "02_Team_Ops/projects/_template/PROJECT.md",
+      "sha256": "17557f7d886db00273ad2e0f9e6f742d37b7ae6ccbf3ffb7851910408653721e"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "02_Team_Ops/roles/.gitkeep",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "02_Team_Ops/routines/daily_handoff.md",
+      "sha256": "e8ce90285248134d7b86c9fbbe711a0b85a337cd9c5b648ba5efd8da8be71cbc"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "02_Team_Ops/routines/feedback_log.md",
+      "sha256": "5f551b2a0a00710096601cb9643514d9fbf4f47e221c41122785211e848b84b7"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "02_Team_Ops/routines/meeting_notes/.gitkeep",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "02_Team_Ops/routines/unstuck_protocol.md",
+      "sha256": "f04a7abff584ec7f6a4f45b2c9e168742c83bddf8741e16e69ee811c8375c11d"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "03_RevOps/audits/.gitkeep",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "03_RevOps/automations/_about.md",
+      "sha256": "c6cac3f06b70c7f2d6f6479276af71531f5feef052e7c39785837726c75a8df6"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "03_RevOps/crm/.gitkeep",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "03_RevOps/customer_journey/engagement_timeline.md",
+      "sha256": "ca5fba4fed173a4260bd36212d348f2a87b638a8af3c492e77fc8c163be460b6"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "03_RevOps/customer_journey/journey_map.md",
+      "sha256": "986953f6aa460719a4a6d08222eb92df468d4ddc9a9249684313abdf0e8d6e46"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "03_RevOps/customer_journey/success_metrics.md",
+      "sha256": "2eb3df94c5922446fd978e266ede4db567bce63af5b723dd28bc367bd03771ba"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "03_RevOps/customer_journey/support_touchpoints.md",
+      "sha256": "576f8a9f63c73b608e7f2c026098edd504d5d872cf3f04323d498264124985b6"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "03_RevOps/customer_journey/task_tracker.md",
+      "sha256": "3f9a0775e37caddb491eaf26ac4d37463d0c6cd90d458bbcde45ce08ae769a81"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "03_RevOps/funnels/.gitkeep",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "03_RevOps/records/README.md",
+      "sha256": "2d361abc38f6588605e28206753f40702a06f27e1894ae5791a4d0423c764929"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "03_RevOps/reports/.gitkeep",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "03_RevOps/sales/.gitkeep",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "03_RevOps/site/README.md",
+      "sha256": "e9ae70fd5837cb14dd37f04358c64d5e2b177c85fc929c65fde3b896ba8aa029"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "04_Attention/accounts/.gitkeep",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "04_Attention/campaigns/ads/.gitkeep",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "04_Attention/campaigns/emails/.gitkeep",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "04_Attention/campaigns/webinars/.gitkeep",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "04_Attention/content/.gitkeep",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "04_Attention/performance/.gitkeep",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "04_Attention/publishing/.gitkeep",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "05_Jobs/README.md",
+      "sha256": "50dadc23bdfda5af792c93b7189dfd9cf79f635118464453048c948ae9e12fb8"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "99_Archive/_about.md",
+      "sha256": "505d7ef0ec22ef16ff2eee937b6eae867a7808ff56ab84563c344e47b9413a8a"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "CLAUDE.md",
+      "sha256": "0e63393b1d74c98d4bab34278745958f45eee3efe3088d47dba6548d8296fe06"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": "CONTRIBUTING.md",
+      "sha256": "04d1692928e67fef072194efd8359bc6f5840dadc45681c28a0a20de748e71d8"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": "GETTING_STARTED.md",
+      "sha256": "63f64cd93c3735054a0a7f10c78752c21d9b6e23d523d3f94a5f115347dc4c41"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": "LICENSE",
+      "sha256": "d8956ce548a99f7c59373b7f94c242420301c8abd16751e4be8c97436d83ef35"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "README.md",
+      "sha256": "7f578f4b0060ef37b8ef4f37710e2271a14e8a81d6ba2ecfe9f39aec98c9e59c"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": "REPO_CONTEXT.md",
+      "sha256": "417ff105197b8689a33b64dd4863604f5f5c2a6c9f9a5084b01970c3361d4396"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": "SECURITY.md",
+      "sha256": "354d684113f231c92c5081ab548d49deeeb3c75f815bca3a56ef32620958a514"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": "SETUP.md",
+      "sha256": "ae40471f67e227c3afe8e3e82d0b62f27618f9736682f1d8cc6f178fe74f43cc"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": "START_HERE.md",
+      "sha256": "3d45959f6c3f4c44bffd9cc7132b048c649c4bc8cddfe320be35670024d1d5ba"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": "THIRD_PARTY_NOTICES.md",
+      "sha256": "7f5988178e8f50b962e862f323627c6cc33b6e03c4d29841df5ad1cb615d360e"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": "docs/INSTALL_AND_UPGRADE.md",
+      "sha256": "2d7001893f15829b1822b8f528c91d71c5ee887bf402cf6d38c510e536885087"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": "docs/LEARNING_SANDBOX.md",
+      "sha256": "3219b338a880e1f689562fac0a1f3b117db7404643c1ef8fd909a680dae54fc0"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": "docs/PR_REVIEWER_SETUP.md",
+      "sha256": "aef4ba904812e49d31e389d2c4d9eb25f80a6dd215651c55eb90d602e9d70638"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": "docs/SKILL_VALIDATION.md",
+      "sha256": "f9ed97b068ebe5dff75b57393b45b49f1da1627a009dd61842a6405d02427249"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": "docs/UNSTUCK_PROTOCOL.md",
+      "sha256": "cdf8fb7537652df95b2ef627f45b9fd807d85f3d40e4e5f6191a7e1d759e73b7"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": "docs/WORKSPACE_KIT.md",
+      "sha256": "7c28c58148e5b156672f0fbcaf27a4cff4e720d68ce1de8431ffef5443c1dab1"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": "docs/decisions/0001-instance-layout-3-0.md",
+      "sha256": "56fa26d2269d272e3b245efde687c0c7a6e5a36456842ed86b461eb66258e9d8"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": "docs/evidence/skill-validation.md",
+      "sha256": "77a6707fd654be529c5e99cd1df93456789aeb81a18a186e620c14eda72af188"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": "docs/human_steps/README.md",
+      "sha256": "289f7e57546f502cde2721646a2124fc617406cc7ee92a53a6c9b24585ed6d00"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": "docs/human_steps/connect_vercel_to_a_repo.md",
+      "sha256": "22a22115de7e34113aea54946dce42a61f104db1dd98b3f7bf7fd31e0f51d2fb"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": "docs/human_steps/create_a_supabase_token.md",
+      "sha256": "d5006adecaccb42e371f754ccaf3e36492367e7c33139a79a8c447b96758f368"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": "docs/human_steps/download_a_supabase_backup.md",
+      "sha256": "513d6ccdeb9b71c27a4220e7b9647f76d40c4ba0836358a80de0b7501e553cd4"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": "docs/human_steps/remove_an_org_member.md",
+      "sha256": "ba94facf8b4727b1ec5ae100f3fab86186452d1033f524d8bdc71936177996f0"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": "docs/human_steps/run_a_terminal_command_from_claude.md",
+      "sha256": "3649eee9c4a8030aac5d1910ae9d57b32167f34e3b43a73ace62d8a235a1665e"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": "docs/human_steps/turn_on_github_2fa.md",
+      "sha256": "611159b5b6c0d2f414bebe99b9134e5a49d3fbc5754248a4cf85489d7c6eef46"
+    },
+    {
+      "class": "seed",
+      "mode": "100644",
+      "path": "estate.yaml",
+      "sha256": "c709e4d27798dbb1b2ca0ade21cdfc80edcf5b714c1ad439537f2c0f3931ad49"
+    },
+    {
+      "class": "managed",
+      "mode": "100755",
+      "path": "scripts/aios/aios.py",
+      "sha256": "2d8423d8ff4a2eb72327287f85b8e7ccb42ae0e14a66898b00ac3595d1a09dde"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": "scripts/aios/aioslib/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": "scripts/aios/aioslib/boundary.py",
+      "sha256": "058054cc0512a149d489a3e47bffb4787d96f3c45ed7089518c4ab774f813b4d"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": "scripts/aios/aioslib/governance.py",
+      "sha256": "158904e3709ac853de7f635c9f415dcf9da65886753f5da9830583b282a0ac64"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": "scripts/aios/aioslib/install.py",
+      "sha256": "0705fbf8f147b7a35a22e8935a9a8b1e4fcbdf46f5c2831dc676d1ae2282d4e0"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": "scripts/aios/aioslib/layout.py",
+      "sha256": "81bc76bc264f5b199d1dbc0b0c45339b510aeb03d33d974fed5ef04e557e0027"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": "scripts/aios/aioslib/orgconfig.py",
+      "sha256": "06f52e233964e4ffa047bb97d0156c73d00aca7a650d9f345a208f26f5f611d8"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": "scripts/aios/aioslib/release.py",
+      "sha256": "bc3de3e17bc7d52825f635715cce08eeda19f862fa264fc2680f9034473cc90b"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": "scripts/aios/aioslib/roles.py",
+      "sha256": "6529d9440a727c65ab3d9f8e3cbc0acd06a0c6aa7e6dc7565ebaaae06a39633d"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": "scripts/aios/aioslib/sanitize.py",
+      "sha256": "781f97b62b2697397c2185fa8b8b28b6adc1d2ad602110c37da0c8767b10a4a6"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": "scripts/aios/aioslib/util.py",
+      "sha256": "8c975f02c45a1c19fccc920af9a55c5d17c6a27f8e7c4f304c5a3a0f30cf620a"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": "scripts/aios/aioslib/workspace.py",
+      "sha256": "6dd938fd20bb32179010e2e5df459639ff7386a9975e8872fa0bf29b3fd5ceac"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": "scripts/pr_review/static_checks.mjs",
+      "sha256": "84372592c3b7c52dc011669e95e2e6d0653953205b48db90c8c44b900d161793"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": "scripts/pr_review/static_checks.test.mjs",
+      "sha256": "6ab05d3dd42c9820750acc5096f1f09cd0a7abf75961e8470fd1c5ffd68a3d00"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": "scripts/pr_review/symlink_audit.mjs",
+      "sha256": "de8c7066dc59ca1dc1e84ab7c4d3530d61d675e616cf1705253715f8386b1d5b"
+    },
+    {
+      "class": "managed",
+      "mode": "100755",
+      "path": "scripts/team/git-safety-check.sh",
+      "sha256": "b54cfe644245219e52844da75346f846f21d7085960c00530abf0bd4895c84b6"
+    },
+    {
+      "class": "managed",
+      "mode": "100755",
+      "path": "scripts/team/guard-dangerous-git.test.js",
+      "sha256": "dffe4b519505e6597441b99dd9f29e3f88e138eea695c9b76a330ab2a0c003b0"
+    },
+    {
+      "class": "managed",
+      "mode": "100755",
+      "path": "scripts/team/verify-branch-protection.sh",
+      "sha256": "302fa17053a8b3546f927e09dbc428ef14845b22efe7a0636aa0bedb67f7886f"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": "scripts/verify_skill_push.py",
+      "sha256": "70a3f0dd5bdef998fcd1dc82017cdef1e9573eb43b93dea62b2bbb3a792b7ac8"
+    },
+    {
+      "class": "managed",
+      "mode": "100755",
+      "path": "scripts/verify_skills.py",
+      "sha256": "b76dddb84a7bd04138bbcc0f24b9af39a7694e50764d4c1d602e177aa91c6267"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": "taxonomy_rules.md",
+      "sha256": "81a307f5909ec6b2fed5734bf47a5ae0f5f059c1ffc5b3c779d9622a27da3e42"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": "templates/governance/CODEOWNERS.template",
+      "sha256": "3cb630451c31dc87dab180f0870630120c8909a8358df936d7fcb3d278b64c72"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": "templates/workspace-kit/obsidian/app.json",
+      "sha256": "e1217aa6b720848332ed31b7d827b9346a11326105d0bbcd124350e6d94ab6ad"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": "templates/workspace-kit/obsidian/appearance.json",
+      "sha256": "0d20de9c9c20cc46662f8d883df975b7ddcb323d853efd8055365a7f7519101a"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": "templates/workspace-kit/obsidian/core-plugins.json",
+      "sha256": "37af672a5858ecb615819575f7521e9bb9f5015a825569a212c6c21c9e311483"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": "templates/workspace-kit/obsidian/graph.json",
+      "sha256": "67718013ee4441eb83d7a78572f367b8a6ca2b13c2b364b489cb04afd94f1f50"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": "templates/workspace-kit/workspace.example.json",
+      "sha256": "3fd91a2ff1535732e5dfee3f690d8b19647cc225f84e11af10a369a25f51de64"
+    }
+  ],
+  "layout": {
+    "_comment": "Starter 3.0 instance layout (estate plan section 3.2, ruled C1). On upgrade from layout 2, every file the release does not manage that sits under a 2.x folder moves to its 3.0 destination (longest matching 'from' wins; each 2.x top folder has a catch-all), then nothing may remain under a 2.x folder. Moves are recorded so rollback reverses them.",
+    "moves": [
+      {
+        "from": "01_Foundations/",
+        "to": "00_AIOS/company/"
+      },
+      {
+        "from": "02_Deliverables/_review_queue/",
+        "to": "00_AIOS/review_queue/"
+      },
+      {
+        "from": "02_Deliverables/copy/",
+        "to": "01_Creation/outputs/"
+      },
+      {
+        "from": "02_Deliverables/funnels/",
+        "to": "03_RevOps/funnels/"
+      },
+      {
+        "from": "02_Deliverables/audits/",
+        "to": "03_RevOps/audits/"
+      },
+      {
+        "from": "02_Deliverables/reports/",
+        "to": "03_RevOps/reports/"
+      },
+      {
+        "from": "02_Deliverables/ads/",
+        "to": "04_Attention/campaigns/ads/"
+      },
+      {
+        "from": "02_Deliverables/emails/",
+        "to": "04_Attention/campaigns/emails/"
+      },
+      {
+        "from": "02_Deliverables/webinars/",
+        "to": "04_Attention/campaigns/webinars/"
+      },
+      {
+        "from": "02_Deliverables/",
+        "to": "01_Creation/outputs/"
+      },
+      {
+        "from": "03_Quality_Control/",
+        "to": "00_AIOS/review_queue/"
+      },
+      {
+        "from": "04_Customer_Journey/",
+        "to": "03_RevOps/customer_journey/"
+      },
+      {
+        "from": "05_Assets/brand_guide/",
+        "to": "01_Creation/brand/"
+      },
+      {
+        "from": "05_Assets/",
+        "to": "01_Creation/asset_library/"
+      },
+      {
+        "from": "06_Communication/decisions_log.md",
+        "to": "00_AIOS/decisions_log.md"
+      },
+      {
+        "from": "06_Communication/",
+        "to": "02_Team_Ops/routines/"
+      },
+      {
+        "from": "07_Setup/",
+        "to": "99_Archive/07_Setup/"
+      },
+      {
+        "from": "08_Automations/",
+        "to": "03_RevOps/automations/"
+      },
+      {
+        "from": "09_Archive/",
+        "to": "99_Archive/"
+      },
+      {
+        "from": "11_Projects/",
+        "to": "02_Team_Ops/projects/"
+      }
+    ],
+    "retired_roots": [
+      "01_Foundations",
+      "02_Deliverables",
+      "03_Quality_Control",
+      "04_Customer_Journey",
+      "05_Assets",
+      "06_Communication",
+      "07_Setup",
+      "08_Automations",
+      "09_Archive",
+      "11_Projects"
+    ],
+    "version": "3"
+  },
+  "package": "ff-aios-starter",
+  "release_id": "starter-3.0.0",
+  "schema": "ff-aios-starter/release@1",
+  "skills": [
+    "changelog",
+    "context_load",
+    "dashboard",
+    "f6_completeness_check",
+    "file_audit",
+    "financial_teardown",
+    "grill_me",
+    "humanize",
+    "onboard_wizard",
+    "pr_review",
+    "project_management",
+    "qc_review",
+    "resolve-conflict",
+    "review-queue",
+    "security_check",
+    "start",
+    "start-my-day",
+    "upskill",
+    "workspace_health",
+    "wrap-up"
+  ],
+  "status": "draft",
+  "version": "3.0.0"
+}

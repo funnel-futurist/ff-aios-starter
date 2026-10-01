@@ -1,6 +1,6 @@
 # P22 STATE - current at every material change
 
-last_updated: 2026-09-29, V4.2 packet WP13: starter-2.7.0 DRAFT candidate at d3f360d with brief and 9-scenario rehearsal; check-tag (M6) (writer: CHAT P22, Claude Opus 5.5)
+last_updated: 2026-10-01, estate W2: Starter 3.0 draft PR (layout, 2.x->3.0 upgrade, SETUP.md per kind, six E1 cards), 3.0.0 DRAFT at 0a8f229; 2.7.0 still unapproved (writer: CHAT P22, Claude Opus 5.5)
 branch: exec/p22-rc-2.6.0-20260922 (off main at 0af7e9e); exec/p22-install-20260922 merged as PR #12
 starting_repo_sha: c4387053c956e45a3a190c78d3331214a3b09fff (main, confirmed unmoved at preflight)
 starting_master_revision: 71e063f83b202fbf914e3e4bbc2b4ca9fbc42656 (delegation repo, exec/operating-cutover-20260921)
@@ -128,3 +128,8 @@ governance half, split out so the install work is not held behind a naming decis
 
 - Receipt: `P22-V42-2026-09-29.md`. Candidate `starter-2.7.0` DRAFT at `d3f360d`; brief `releases/starter-2.7.0.BRIEF.md`.
 - Waiting for: "Approve starter 2.7.0 at d3f360d" (founder), then a merge-commit merge of #21 (human), then the tag on the approval commit (P22, after check-tag).
+
+## 2026-10-01 - estate W2, Starter 3.0
+
+- Receipt: `P22-W2-2026-10-01.md`. Branch `exec/p22-starter-3.0-20261001`, draft PR. Candidate `starter-3.0.0` DRAFT at `0a8f229`.
+- 2.7.0: merged (#21, `d0bbb00`), still draft, no tag. Waiting for "Approve starter 2.7.0 at d3f360d".

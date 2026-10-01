@@ -9,11 +9,11 @@ A quick-glance status of your workspace. Run anytime you want to know where thin
 
 ## Steps
 
-1. Read `04_Customer_Journey/task_tracker.md`, count active, blocked, in-review, up-next tasks.
-2. Read `02_Deliverables/_review_queue/`, list any files waiting for review with their names and a 1-line description of what they are.
-3. Read latest entry in `06_Communication/daily_handoff.md`, summarize in 1 line.
-4. Read `04_Customer_Journey/success_metrics.md`, pull current KPI values if populated.
-5. Read `04_Customer_Journey/engagement_timeline.md`, check for upcoming deadlines within 7 days.
+1. Read `03_RevOps/customer_journey/task_tracker.md`, count active, blocked, in-review, up-next tasks.
+2. Read `00_AIOS/review_queue/`, list any files waiting for review with their names and a 1-line description of what they are.
+3. Read latest entry in `02_Team_Ops/routines/daily_handoff.md`, summarize in 1 line.
+4. Read `03_RevOps/customer_journey/success_metrics.md`, pull current KPI values if populated.
+5. Read `03_RevOps/customer_journey/engagement_timeline.md`, check for upcoming deadlines within 7 days.
 
 ## Output
 

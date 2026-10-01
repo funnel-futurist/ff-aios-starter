@@ -8,7 +8,7 @@ description: Refresh your AIOS's skills so you stay current without bloating. Re
 You help the operator keep their AIOS sharp. Two failure modes you fight: **falling behind** (the tools change monthly and they're still on an old setup) and **bloat** (skills and files pile up, the brain gets slower and dumber, the garden grows weeds). Your job is to fix both in one pass. Be honest and decisive; recommend cuts, not just adds.
 
 ## Step 1: Map what they actually do
-Ask, or read from `01_Foundations/` and `vision_mission_values.md`: **which departments are they running right now?** (e.g. acquisition, fulfillment/customer success, operations, finance, content.) For each, what are the recurring jobs? You're sizing the surface area their skills should cover.
+Ask, or read from `00_AIOS/company/` and `vision_mission_values.md`: **which departments are they running right now?** (e.g. acquisition, fulfillment/customer success, operations, finance, content.) For each, what are the recurring jobs? You're sizing the surface area their skills should cover.
 
 ## Step 2: Audit what they have (grill for bloat)
 List the skills in `.claude/skills/`. For each, ask plainly: **"When did you last use this? Does it still earn its place?"** Flag:
@@ -28,7 +28,7 @@ Map findings to their departments: "for content you now do X, this capability wo
 Give a clear, short table per department: what to add (and why it's worth it), what to update, what to retire. **Gate every ADD with can-vs-should:** does it serve a job they actually do, or is it shiny? If shiny, cut it. Note anything that's use-at-your-own-risk, adopting the good ones early is how they get ahead, but they choose.
 
 ## Step 5: Act on the approved changes
-With their go-ahead: add the new skills (only from sources they trust, never run an untrusted skill), update the stale ones, archive the dead ones to `09_Archive/`. Commit with a clear message so the change is reversible.
+With their go-ahead: add the new skills (only from sources they trust, never run an untrusted skill), update the stale ones, archive the dead ones to `99_Archive/`. Commit with a clear message so the change is reversible.
 
 ## The frame
 Stay current AND stay lean. Elimination > addition. The point isn't more skills, it's the *right* skills for the work you actually do, kept sharp as the tools evolve.

@@ -16,7 +16,9 @@ Edit this `CLAUDE.md` freely as your business and workflow evolve, it's your bra
 - **Lean beats bloated.** Add the high-impact core; look the specifics up as you go.
 
 ## Your workspace
-`01_Foundations/` (your Foundational 6: market, avatar, offer, economics, pitch, profile) · `02_Deliverables/` · `03_Quality_Control/` · `04_Customer_Journey/` · `05_Assets/` · `06_Communication/` · `07_Setup/` · `08_Automations/` · `09_Archive/`. Add folders as you grow. File naming: lowercase, underscores, no spaces (`taxonomy_rules.md`).
+Seven domain folders, the same in every company's instance (`00_AIOS/routing.md` says which one takes which request):
+`00_AIOS/` who we are (`company/` holds your Foundational 6), routing, decisions and the review queue · `01_Creation/` brand, the one asset library, preferences, finished outputs · `02_Team_Ops/` people, roles, projects, onboarding, routines · `03_RevOps/` site, funnels, CRM, automations, sales, customer journey, audits, reports, records · `04_Attention/` content, campaigns, publishing, accounts, performance · `05_Jobs/` recurring jobs · `99_Archive/`.
+Setup is in `SETUP.md`. File naming: lowercase, underscores, no spaces (`taxonomy_rules.md`).
 
 ## Your skills
 Type `/` to see them. What each one does: `.claude/skills/README.md`. Run `/start` any time to see the moves for your role.
