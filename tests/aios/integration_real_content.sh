@@ -196,7 +196,7 @@ mk_gh acme-va
 hook_event Edit .aios/config.json | run_hook > "$WORK/hook_operator.json" 2>&1
 grep -q '"permissionDecision": "deny"' "$WORK/hook_operator.json" \
   && ok "operator's edit to the people map is refused" || bad "operator edited the people map"
-hook_event Write 02_Deliverables/draft.md | run_hook > "$WORK/hook_operator_ok.json" 2>&1
+hook_event Write 01_Creation/outputs/draft.md | run_hook > "$WORK/hook_operator_ok.json" 2>&1
 [ ! -s "$WORK/hook_operator_ok.json" ] && ok "operator's ordinary work is untouched" \
   || bad "the hook got in the way of ordinary work"
 mk_gh acme-founder
@@ -216,9 +216,9 @@ grep -q 'document-skills@anthropic-agent-skills' "$TARGET/.claude/settings.json"
 step "the operator does real work (this is the state that must survive)"
 mk_gh acme-founder
 printf '# Your AIOS\n\nMY OWN CONSTITUTION, edited by the founder.\n' > "$TARGET/CLAUDE.md"
-mkdir -p "$TARGET/02_Deliverables/copy"
-printf 'my real deliverable\n' > "$TARGET/02_Deliverables/copy/launch_email.md"
-printf '# my market\nreal notes\n' > "$TARGET/01_Foundations/market_analysis/_workspace.md"
+mkdir -p "$TARGET/01_Creation/outputs"
+printf 'my real deliverable\n' > "$TARGET/01_Creation/outputs/launch_email.md"
+printf '# my market\nreal notes\n' > "$TARGET/00_AIOS/company/market_analysis/_workspace.md"
 mkdir -p "$TARGET/.claude/skills/my_own_skill"
 printf '# mine\n' > "$TARGET/.claude/skills/my_own_skill/SKILL.md"
 STATE_BEFORE=$(cd "$TARGET" && find . -path ./.git -prune -o -path ./.aios/backups -prune -o -type f -print \
@@ -321,7 +321,7 @@ grep -q "shipped in 9.1.0" "$TARGET/START_HERE.md" && bad "rollback left new con
   || ok "file added by 9.1.0 removed again"
 grep -q "MY OWN CONSTITUTION" "$TARGET/CLAUDE.md" && ok "seed survived the round trip" \
   || bad "SEED LOST IN ROLLBACK"
-[ -f "$TARGET/02_Deliverables/copy/launch_email.md" ] && ok "operator's own work survived" \
+[ -f "$TARGET/01_Creation/outputs/launch_email.md" ] && ok "operator's own work survived" \
   || bad "OPERATOR WORK LOST"
 [ -f "$TARGET/.claude/skills/my_own_skill/SKILL.md" ] && ok "operator's own skill survived" \
   || bad "OPERATOR SKILL LOST"
@@ -373,7 +373,8 @@ step "N6: a package carrying a literal secret fails sanitization"
 # is exactly what happened the first time. The value written at RUNTIME is a full fake key,
 # so the sanitizer still has something real to catch.
 _p1="sk-ant"; _p2="-api03-$(printf 'A%.0s' $(seq 1 40))"
-printf 'KEY = "%s%s"\n' "$_p1" "$_p2" > "$SRC/06_Communication/leak.md"
+mkdir -p "$SRC/02_Team_Ops/routines"
+printf 'KEY = "%s%s"\n' "$_p1" "$_p2" > "$SRC/02_Team_Ops/routines/leak.md"
 git -C "$SRC" add -A >/dev/null 2>&1; git -C "$SRC" commit -qm "leak" >/dev/null 2>&1
 REV3="$(git -C "$SRC" rev-parse HEAD)"
 aios sanitize --repo "$SRC" --rev "$REV3" --mode scan >/dev/null 2>&1

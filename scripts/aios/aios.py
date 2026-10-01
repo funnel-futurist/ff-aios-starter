@@ -14,6 +14,7 @@
     boundary          does this pull request touch the founder lane without a founder?
     hook              Claude Code hooks (pre-edit: hold the founder lane in the session)
     workspace         Obsidian Workspace Kit: one vault over separate authorized repositories
+    instance          the instance (workspace-kind) contract checks, read-only
 
 Exit codes are part of the contract: 0 ok, 1 error, 2 package, 3 role, 4 credential,
 5 state, 6 verify, 7 sanitize, 8 governance.
@@ -239,7 +240,24 @@ def cmd_upgrade(args):
          % (target, before["release"]["version"], record["release"]["version"]))
     _say("  by:       %s (%s)" % (login, role))
     _say("  managed:  %d files, verified by readback" % len(record["managed"]))
-    _say("  state:    untouched (seed and unmanaged files were not written)")
+    migration = record.get("layout_migration")
+    if migration:
+        _say("  layout:   %s -> %s: %d file(s) moved to their new folders, nothing left in the "
+             "old ones" % (migration["from"], migration["to"], len(migration["moves"])))
+        _say("            new starter files: %d" % len(migration.get("created_seeds") or []))
+        stale = migration.get("stale_references") or []
+        if stale:
+            _say("  check:    %d of your own file(s) still name an old folder. They were not "
+                 "edited; update the paths when you're ready:" % len(stale))
+            for p in stale[:15]:
+                _say("              %s" % p)
+        for old, new in migration.get("moved_deployables") or []:
+            _say("  hosting:  %s looks like a deployed site and is now %s. If Vercel (or another "
+                 "host) builds it, change its Root Directory to %s. Card: "
+                 "docs/human_steps/connect_vercel_to_a_repo.md" % (old, new, new))
+        _say("  next:     commit the change (git add -A, then git commit): git shows it as moves")
+    else:
+        _say("  state:    untouched (seed and unmanaged files were not written)")
     _say("  rollback: available (%s)" % record["previous"]["backup"])
     return EXIT_OK
 
@@ -282,6 +300,9 @@ def cmd_start(args):
         problems, summary = install_mod.verify(target, record)
         _say("release:   %s (%s)%s"
              % (summary["release_id"], summary["version"], "" if not problems else "  DRIFTED"))
+        _say("layout:    %s" % ("3.0 domain folders (00_AIOS ... 05_Jobs, 99_Archive)"
+                                if record.get("layout") == "3" else
+                                "2.x numbered folders (01_Foundations ... 11_Projects)"))
         for p in problems[:5]:
             _say("  - %s" % p)
     except Refusal:
@@ -433,6 +454,18 @@ def _print_workspace_report(report):
     if kept:
         _say("kept your edits; fresh copies written as: %s" % ", ".join(kept))
     _say("open %s in Obsidian, then START-HERE.md" % report["parent"])
+
+
+def cmd_instance_check(args):
+    from aioslib import layout as layout_mod
+    target = os.path.abspath(args.target)
+    results = layout_mod.instance_checks(target)
+    for control, status, detail in results:
+        _say("  %-5s %-9s %s" % (status, control, detail))
+    failed = [r for r in results if r[1] == "FAIL"]
+    _say("verdict:  %s" % ("meets the instance contract's file checks" if not failed
+                          else "%d check(s) failed" % len(failed)))
+    return util.EXIT_VERIFY if failed else EXIT_OK
 
 
 def cmd_workspace_plan(args):
@@ -592,6 +625,12 @@ def build_parser():
     hksub = hk.add_subparsers(dest="subcommand")
     hp = hksub.add_parser("pre-edit", help="PreToolUse: hold the founder lane in the session")
     hp.set_defaults(func=cmd_hook_pre_edit)
+
+    ic = sub.add_parser("instance", help="the instance (workspace-kind) contract checks")
+    icsub = ic.add_subparsers(dest="instance_command")
+    icc = icsub.add_parser("check", help="read-only: baseline files, layout 3.0, no 2.x folders")
+    icc.add_argument("--target", default=".")
+    icc.set_defaults(func=cmd_instance_check)
 
     ws = sub.add_parser("workspace", help="Obsidian Workspace Kit over separate repositories")
     wssub = ws.add_subparsers(dest="workspace_command")

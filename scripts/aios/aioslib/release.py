@@ -106,7 +106,13 @@ def build(repo, rev, version, spec=None, branch=None, credentials=None, min_upgr
         "created_from": {"git_rev": rev, "branch": branch or ""},
         "status": "draft",
         "approval": {"approved_by": None, "approved_at": None},
-        "compatibility": {"min_upgrade_from": min_upgrade_from, "breaking": []},
+        "compatibility": {"min_upgrade_from": min_upgrade_from,
+                          "breaking": (["folder layout %s: files move on upgrade (see layout.moves)"
+                                        % spec["layout"].get("version")]
+                                       if spec.get("layout") else [])},
+        # The folder moves an upgrade applies. Part of the pinned release, so the founder
+        # approves the exact moves with it.
+        "layout": spec.get("layout"),
         # P01 owns AIOS releases. When this is set it must name an APPROVED aios-X.Y.Z;
         # today nothing is approved, so it stays null and consume() enforces that.
         "consumes": {"aios_release": aios_release},

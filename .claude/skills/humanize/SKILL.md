@@ -19,7 +19,7 @@ This skill activates when:
 
 ### Step 1: Load Voice Context
 
-Read `03_Quality_Control/qc_preferences.md` for brand voice rules. If F6 docs exist in `01_Foundations/`, read the Complete Profile for voice DNA. The rewrite should sound like the client, not like generic clean text.
+Read `00_AIOS/review_queue/qc_preferences.md` for brand voice rules. If F6 docs exist in `00_AIOS/company/`, read the Complete Profile for voice DNA. The rewrite should sound like the client, not like generic clean text.
 
 ### Step 2: Scan for AI Patterns
 

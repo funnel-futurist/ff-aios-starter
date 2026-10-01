@@ -18,15 +18,15 @@ This skill activates when:
 ### Step 1: Load Taxonomy Rules
 Read `taxonomy_rules.md` at the repo root. This defines the naming conventions, folder structure, and prefix rules that all files must follow.
 
-### Step 2: Scan All 7 Folders
-Walk every file in these canonical folders:
-- `01_Foundations/` (6 subfolders: market_analysis, avatar_analysis, offer_optimization, offer_economics, pitch_and_messaging, profile_snapshot)
-- `02_Deliverables/` (subfolders: _review_queue, copy, funnels, ads, emails, reports, webinars, audits)
-- `03_Quality_Control/`
-- `04_Customer_Journey/`
-- `05_Assets/`
-- `06_Communication/`
-- `07_Setup/`
+### Step 2: Scan the domain folders
+Walk every file in the Starter 3.0 domain folders:
+- `00_AIOS/` (`company/` with 6 subfolders: market_analysis, avatar_analysis, offer_optimization, offer_economics, pitch_and_messaging, profile_snapshot; `systems/`; `review_queue/`; `routing.md`; `decisions_log.md`)
+- `01_Creation/` (`brand/`, `asset_library/`, `preferences/`, `outputs/`)
+- `02_Team_Ops/` (`people/`, `roles/`, `projects/`, `onboarding/`, `policies/`, `operating_manual/`, `routines/`, `evidence/`)
+- `03_RevOps/` (`site/`, `funnels/`, `crm/`, `automations/`, `sales/`, `customer_journey/`, `audits/`, `reports/`, `records/`)
+- `04_Attention/` (`content/`, `campaigns/`, `publishing/`, `accounts/`, `performance/`)
+- `05_Jobs/`
+- `99_Archive/`
 
 ### Step 3: Check Naming Violations
 For every file found, check:
@@ -37,12 +37,13 @@ For every file found, check:
 
 ### Step 4: Check for Structural Drift
 Flag any files that:
-- Exist outside the 7 canonical folders (excluding standard root files: CLAUDE.md, README.md, GETTING_STARTED.md, taxonomy_rules.md, .env.example, .template_version.json, .gitignore)
-- Are in the wrong folder for their type (e.g., a deliverable in 01_Foundations)
+- Exist outside the domain folders (excluding the standard root files: START_HERE.md, README.md, CLAUDE.md, SETUP.md, REPO_CONTEXT.md, estate.yaml, GETTING_STARTED.md, taxonomy_rules.md, .env.example, .template_version.json, .gitignore, and the machinery folders `.aios/`, `.claude/`, `.github/`, `docs/`, `scripts/`, `templates/`)
+- Are in the wrong folder for their type (e.g., a finished deliverable in `00_AIOS/company/`)
+- Still sit in a Starter 2.x folder (`01_Foundations/` ... `11_Projects/`): run the 3.0 upgrade, which moves them
 - Are folders that don't match the canonical subfolder list
 
 ### Step 5: Check for Empty / Template-Only F6 Docs
-For each of the 6 `01_Foundations/` subfolders:
+For each of the 6 `00_AIOS/company/` subfolders:
 - Check if any real content files exist (not counting .gitkeep or _workspace.md templates)
 - Report which F6 docs have real content vs. are still empty/template-only
 
@@ -58,8 +59,8 @@ For each of the 6 `01_Foundations/` subfolders:
 ### Structure
 | Folder | Status | Notes |
 |---|---|---|
-| 01_Foundations | PASS/FLAG/FAIL | details |
-| 02_Deliverables | PASS/FLAG/FAIL | details |
+| 00_AIOS | PASS/FLAG/FAIL | details |
+| 01_Creation | PASS/FLAG/FAIL | details |
 | ... | ... | ... |
 
 ### Naming

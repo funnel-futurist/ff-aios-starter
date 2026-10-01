@@ -17,14 +17,14 @@ This skill activates when:
 ## EXECUTION PROTOCOL
 
 ### Step 1: Scan Each F6 Folder
-Read the contents of each subfolder in `01_Foundations/`:
+Read the contents of each subfolder in `00_AIOS/company/`:
 
-1. **Market Analysis**, `01_Foundations/market_analysis/`
-2. **Avatar Analysis**, `01_Foundations/avatar_analysis/`
-3. **Offer Optimization**, `01_Foundations/offer_optimization/`
-4. **Offer Economics**, `01_Foundations/offer_economics/`
-5. **Pitch & Messaging**, `01_Foundations/pitch_and_messaging/`
-6. **Profile Snapshot**, `01_Foundations/profile_snapshot/`
+1. **Market Analysis**, `00_AIOS/company/market_analysis/`
+2. **Avatar Analysis**, `00_AIOS/company/avatar_analysis/`
+3. **Offer Optimization**, `00_AIOS/company/offer_optimization/`
+4. **Offer Economics**, `00_AIOS/company/offer_economics/`
+5. **Pitch & Messaging**, `00_AIOS/company/pitch_and_messaging/`
+6. **Profile Snapshot**, `00_AIOS/company/profile_snapshot/`
 
 ### Step 2: Evaluate Each Document
 For each folder, check every file (ignoring `.gitkeep` and `_workspace.md`):
@@ -44,12 +44,12 @@ For each folder, check every file (ignoring `.gitkeep` and `_workspace.md`):
 
 | # | Document | Folder | Status | Notes |
 |---|---|---|---|---|
-| 1 | Market Analysis | 01_Foundations/market_analysis/ | Complete / Partial / Template Only | [brief note, e.g., "Full analysis locked" or "Missing competitor section"] |
-| 2 | Avatar Analysis | 01_Foundations/avatar_analysis/ | Complete / Partial / Template Only | [brief note] |
-| 3 | Offer Optimization | 01_Foundations/offer_optimization/ | Complete / Partial / Template Only | [brief note] |
-| 4 | Offer Economics | 01_Foundations/offer_economics/ | Complete / Partial / Template Only | [brief note] |
-| 5 | Pitch & Messaging | 01_Foundations/pitch_and_messaging/ | Complete / Partial / Template Only | [brief note] |
-| 6 | Profile Snapshot | 01_Foundations/profile_snapshot/ | Complete / Partial / Template Only | [brief note] |
+| 1 | Market Analysis | 00_AIOS/company/market_analysis/ | Complete / Partial / Template Only | [brief note, e.g., "Full analysis locked" or "Missing competitor section"] |
+| 2 | Avatar Analysis | 00_AIOS/company/avatar_analysis/ | Complete / Partial / Template Only | [brief note] |
+| 3 | Offer Optimization | 00_AIOS/company/offer_optimization/ | Complete / Partial / Template Only | [brief note] |
+| 4 | Offer Economics | 00_AIOS/company/offer_economics/ | Complete / Partial / Template Only | [brief note] |
+| 5 | Pitch & Messaging | 00_AIOS/company/pitch_and_messaging/ | Complete / Partial / Template Only | [brief note] |
+| 6 | Profile Snapshot | 00_AIOS/company/profile_snapshot/ | Complete / Partial / Template Only | [brief note] |
 
 **Ready for production work:** [Yes, all 6 locked / No, X docs still needed]
 **Blocking skills:** [list any skills that cannot run until missing docs are complete]

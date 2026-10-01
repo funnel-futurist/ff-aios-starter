@@ -23,7 +23,7 @@ been tested against a clean exception is not recovery.
 import os
 import shutil
 
-from . import governance, orgconfig, release as release_mod, roles, util
+from . import governance, layout as layout_mod, orgconfig, release as release_mod, roles, util
 from .util import (EXIT_PACKAGE, EXIT_STATE, EXIT_VERIFY, Refusal, sha256_bytes, sha256_file)
 
 INSTALL_SCHEMA = "ff-aios-starter/install@1"
@@ -360,6 +360,7 @@ def install(target, manifest, source_repo, config, aios_lookup=None, render_gove
         "managed": sorted(managed, key=lambda e: e["path"]),
         "seeded": sorted(seeded, key=lambda e: e["path"]),
         "rendered": rendered,
+        "layout": layout_mod.version_of(manifest.get("layout")),
         "previous": None,
     }
     util.write_json(install_record_path(target), record)
@@ -430,6 +431,14 @@ def _upgrade_locked(target, manifest, source_repo, aios_lookup=None):
             sorted(collisions)[:20] + ["move or delete them, then upgrade again"],
         )
 
+    # The folder layout move (2.x -> 3.0). Planned before anything changes, so a conflict
+    # refuses the upgrade with the workspace untouched.
+    new_layout = manifest.get("layout") or {}
+    old_layout_version = record.get("layout") or "2"
+    moves = []
+    if new_layout.get("moves") and layout_mod.version_of(new_layout) != old_layout_version:
+        moves = layout_mod.plan_moves(target, new_layout, set(old_managed))
+
     txn_id = "%s-%s-to-%s" % (util.now_iso().replace(":", "").replace("-", ""),
                               current_version, manifest["version"])
     backup_root = _backup(target, record, txn_id)
@@ -446,12 +455,17 @@ def _upgrade_locked(target, manifest, source_repo, aios_lookup=None):
         # install record still describes the old release, so recovery cannot infer them.
         "seed_adds": sorted({p for p, e in files.items()
                              if e["class"] == "seed" and p not in old_seeded
-                             and not os.path.lexists(os.path.join(target, p))}),
+                             and not os.path.lexists(os.path.join(target, p))
+                             and p not in {d for _s, d in moves}}),
+        # Folder moves, recorded before the first one runs, so recovery can reverse them.
+        "moves": [list(m) for m in moves],
     })
 
     new_managed, new_seeded, created_seeds = [], [], []
     written = 0
     try:
+        layout_mod.apply_moves(target, moves)
+        util.fault("upgrade.after_moves")
         util.fault("upgrade.before_write")
         for path, mode, data in util.read_tree(source_repo, manifest["created_from"]["git_rev"]):
             entry = files.get(path)
@@ -492,6 +506,11 @@ def _upgrade_locked(target, manifest, source_repo, aios_lookup=None):
             if os.path.isfile(full):
                 os.remove(full)
         _prune_empty_dirs(target)
+        if moves or new_layout.get("retired_roots"):
+            left = layout_mod.leftovers(target, new_layout)
+            if left:
+                raise Refusal(EXIT_STATE, "the 3.0 folder move left %d file(s) behind in 2.x "
+                              "folders" % len(left), sorted(left)[:20])
         util.fault("upgrade.before_record")
 
         new_record = dict(record)
@@ -509,6 +528,24 @@ def _upgrade_locked(target, manifest, source_repo, aios_lookup=None):
         new_record["credentials"] = [{"name": c["name"], "ref": c["ref"],
                                       "required": c["required"], "resolved": c["resolved"]}
                                      for c in creds]
+        new_record["layout"] = layout_mod.version_of(new_layout) if new_layout else \
+            old_layout_version
+        if moves:
+            managed_now = {e["path"] for e in new_managed}
+            new_record["layout_migration"] = {
+                "from": old_layout_version, "to": new_record["layout"],
+                "moves": [list(m) for m in moves],
+                # 3.0 starter files this upgrade created. A rollback removes the ones still
+                # unedited, so going back to 2.x doesn't leave an empty 3.0 skeleton behind.
+                "created_seeds": [{"path": p, "sha256": sha256_file(os.path.join(target, p))}
+                                  for p in sorted(created_seeds)],
+                # Reported, never rewritten: the person's own files that still name a 2.x folder.
+                "moved_deployables": [list(d) for d in layout_mod.moved_deployables(moves)],
+                "stale_references": layout_mod.stale_references(
+                    target, new_layout, skip_paths=managed_now | {INSTALL_PATH}),
+            }
+        else:
+            new_record.pop("layout_migration", None)
         new_record["upgraded_at"] = util.now_iso()
         new_record["status"] = "installed"
         new_record["previous"] = {
@@ -532,6 +569,8 @@ def _upgrade_locked(target, manifest, source_repo, aios_lookup=None):
         removable = sorted((new_managed_paths - set(old_managed)) | set(created_seeds))
         _restore(target, backup_root, record, remove_paths=removable,
                  expected=set(old_managed) | new_managed_paths | set(created_seeds))
+        layout_mod.reverse_moves(target, moves)
+        _prune_empty_dirs(target)
         problems, _ = verify(target, record)
         if os.path.isfile(journal_path(target)):
             os.remove(journal_path(target))
@@ -595,6 +634,8 @@ def _rollback_locked(target):
         remove = sorted((current_paths | journal_adds) - prior_paths)
         _restore(target, backup_root, prior, remove,
                  expected=current_paths | journal_adds)
+        layout_mod.reverse_moves(target, [tuple(m) for m in journal.get("moves") or []])
+        _prune_empty_dirs(target)
         os.remove(journal_path(target))
         problems, summary = verify(target, prior)
         if problems:
@@ -617,7 +658,13 @@ def _rollback_locked(target):
     current_paths = {e["path"] for e in current.get("managed") or []}
     prior_paths = {e["path"] for e in prior.get("managed") or []}
     remove = sorted(current_paths - prior_paths)
-    _restore(target, backup_root, prior, remove, expected=current_paths)
+    migration = current.get("layout_migration") or {}
+    created = [e["path"] for e in migration.get("created_seeds") or []
+               if os.path.isfile(os.path.join(target, e["path"]))
+               and sha256_file(os.path.join(target, e["path"])) == e["sha256"]]
+    _restore(target, backup_root, prior, remove + created, expected=current_paths | set(created))
+    layout_mod.reverse_moves(target, [tuple(m) for m in migration.get("moves") or []])
+    _prune_empty_dirs(target)
     problems, summary = verify(target, prior)
     if problems:
         raise Refusal(EXIT_VERIFY, "rollback did not restore a verifiable workspace", problems)
