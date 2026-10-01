@@ -401,7 +401,7 @@ class LayoutUpgrade(Sandbox):
         rev3 = harness.bump_source(src, {
             "release/package_spec.json": json.dumps(spec, indent=2),
             "00_AIOS/routing.md": "# routing\n",
-            "00_AIOS/decisions_log.md": "# decisions\n3.0 text\n",
+            "00_AIOS/decisions_log.md": "# decisions\n3.0 text (was 06_Communication/)\n",
         }, message="3.0 layout")
         self.v3 = harness.approve(harness.build_manifest(src, rev3, "3.0.0"))
 
@@ -501,6 +501,8 @@ class LayoutUpgrade(Sandbox):
         record = install_mod.upgrade(self.target, self.v3, self.source)
         refreshed = {r["path"] for r in record["layout_migration"]["refreshed_seeds"]}
         self.assertEqual(refreshed, {"00_AIOS/decisions_log.md"})
+        # release text that names an old folder on purpose is not reported as the person's
+        self.assertNotIn("00_AIOS/decisions_log.md", record["layout_migration"]["stale_references"])
         with open(os.path.join(self.target, "00_AIOS", "decisions_log.md")) as fh:
             self.assertIn("3.0 text", fh.read())
         # the person's edited file was moved, never given new text

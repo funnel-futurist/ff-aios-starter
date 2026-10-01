@@ -580,8 +580,11 @@ def _upgrade_locked(target, manifest, source_repo, aios_lookup=None):
                 "refreshed_seeds": refresh,
                 # Reported, never rewritten: the person's own files that still name a 2.x folder.
                 "moved_deployables": [list(d) for d in layout_mod.moved_deployables(moves)],
+                # Files whose text came from the release in this upgrade are skipped: they can
+                # mention an old folder on purpose ("your old 11_Projects/ moved here").
                 "stale_references": layout_mod.stale_references(
-                    target, new_layout, skip_paths=managed_now | {INSTALL_PATH}),
+                    target, new_layout, skip_paths=managed_now | {INSTALL_PATH}
+                    | set(created_seeds) | {r["path"] for r in refresh}),
             }
         else:
             new_record.pop("layout_migration", None)
