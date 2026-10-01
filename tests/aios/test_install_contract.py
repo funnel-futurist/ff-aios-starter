@@ -401,6 +401,7 @@ class LayoutUpgrade(Sandbox):
         rev3 = harness.bump_source(src, {
             "release/package_spec.json": json.dumps(spec, indent=2),
             "00_AIOS/routing.md": "# routing\n",
+            "00_AIOS/decisions_log.md": "# decisions\n3.0 text\n",
         }, message="3.0 layout")
         self.v3 = harness.approve(harness.build_manifest(src, rev3, "3.0.0"))
 
@@ -470,12 +471,53 @@ class LayoutUpgrade(Sandbox):
         self.assertIn("recovered", how)
         self.assertEqual(install_mod.state_fingerprint(self.target), self.state_before)
 
+    def test_l10_a_hard_kill_after_moves_and_refreshes_is_recovered_exactly(self):
+        code = subprocess.call(
+            [sys.executable, "-c",
+             "import sys; sys.path.insert(0, %r);"
+             "from aioslib import install as i, util;"
+             "i.upgrade(%r, util.read_json(%r), %r)" % (harness.AIOS_DIR, self.target,
+                                                        self.write_json("v3.json", self.v3),
+                                                        self.source)],
+            env=dict(os.environ, AIOS_FAULT="crash:upgrade.before_record"),
+            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        self.assertEqual(code, 137)
+        self.assertTrue(install_mod.load_journal(self.target)["refreshed"])
+        with open(os.path.join(self.target, "00_AIOS", "decisions_log.md")) as fh:
+            self.assertIn("3.0 text", fh.read())  # the kill really landed after the refresh
+        install_mod.rollback(self.target)
+        self.assertEqual(install_mod.state_fingerprint(self.target), self.state_before)
+
     def test_l6_rollback_keeps_a_new_starter_file_the_person_edited(self):
         install_mod.upgrade(self.target, self.v3, self.source)
         harness.write(self.target, "00_AIOS/routing.md", "# routing\nMY EDIT\n")
         install_mod.rollback(self.target)
         with open(os.path.join(self.target, "00_AIOS", "routing.md")) as fh:
             self.assertIn("MY EDIT", fh.read())
+
+    def test_l8_unedited_starter_files_get_the_new_text_and_rollback_restores_it(self):
+        with open(os.path.join(self.target, "06_Communication", "decisions_log.md"), "rb") as fh:
+            before = fh.read()
+        record = install_mod.upgrade(self.target, self.v3, self.source)
+        refreshed = {r["path"] for r in record["layout_migration"]["refreshed_seeds"]}
+        self.assertEqual(refreshed, {"00_AIOS/decisions_log.md"})
+        with open(os.path.join(self.target, "00_AIOS", "decisions_log.md")) as fh:
+            self.assertIn("3.0 text", fh.read())
+        # the person's edited file was moved, never given new text
+        with open(os.path.join(self.target, "00_AIOS", "company", "market_analysis",
+                               "_workspace.md")) as fh:
+            self.assertEqual(fh.read(), "MY MARKET\n")
+        install_mod.rollback(self.target)
+        with open(os.path.join(self.target, "06_Communication", "decisions_log.md"), "rb") as fh:
+            self.assertEqual(fh.read(), before)
+        self.assertEqual(install_mod.state_fingerprint(self.target), self.state_before)
+
+    def test_l9_a_starter_file_edited_after_the_upgrade_keeps_the_edit_on_rollback(self):
+        install_mod.upgrade(self.target, self.v3, self.source)
+        harness.write(self.target, "00_AIOS/decisions_log.md", "# decisions\nMY DECISION\n")
+        install_mod.rollback(self.target)
+        with open(os.path.join(self.target, "06_Communication", "decisions_log.md")) as fh:
+            self.assertIn("MY DECISION", fh.read())
 
     def test_l7_a_fresh_3_0_install_has_only_the_new_layout(self):
         fresh = os.path.join(self.tmp, "fresh")

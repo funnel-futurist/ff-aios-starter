@@ -271,6 +271,20 @@ def _restore(target, backup_root, record_to_restore, remove_paths, expected=None
     _prune_empty_dirs(target)
 
 
+def _unrefresh(target, backup_root, refreshed):
+    """Put the old text back into refreshed starter files that still hold the new text.
+    A file edited after the upgrade is the person's now and is left as it is."""
+    for r in refreshed:
+        dest = os.path.join(target, r["path"])
+        old = os.path.join(backup_root, "refreshed", r["path"])
+        if os.path.isfile(dest) and os.path.isfile(old) and sha256_file(dest) == r["new_sha"]:
+            shutil.copy2(old, dest)
+
+
+def backup_root_for(target, record):
+    return os.path.join(target, (record.get("previous") or {}).get("backup") or "")
+
+
 def _prune_empty_dirs(target):
     for root, dirs, files in os.walk(target, topdown=False):
         if os.path.abspath(root) == os.path.abspath(target):
@@ -438,10 +452,27 @@ def _upgrade_locked(target, manifest, source_repo, aios_lookup=None):
     moves = []
     if new_layout.get("moves") and layout_mod.version_of(new_layout) != old_layout_version:
         moves = layout_mod.plan_moves(target, new_layout, set(old_managed))
+    # Starter files the person never edited (still byte-identical to what the old release
+    # wrote) get the new release's text at their new home, so they don't keep pointing at
+    # 2.x folders. Anything they edited is theirs and is never touched.
+    old_seed_sha = {e["path"]: e.get("sha256") for e in record.get("seeded") or []}
+    refresh = []
+    for src, dst in moves:
+        entry = files.get(dst)
+        was = old_seed_sha.get(src)
+        if entry and entry["class"] == "seed" and was and entry["sha256"] != was \
+                and os.path.isfile(os.path.join(target, src)) \
+                and sha256_file(os.path.join(target, src)) == was:
+            refresh.append({"path": dst, "from": src, "old_sha": was, "new_sha": entry["sha256"]})
+    refresh_by_path = {r["path"]: r for r in refresh}
 
     txn_id = "%s-%s-to-%s" % (util.now_iso().replace(":", "").replace("-", ""),
                               current_version, manifest["version"])
     backup_root = _backup(target, record, txn_id)
+    for r in refresh:  # keep the old text, so every rollback path can put it back
+        dst = os.path.join(backup_root, "refreshed", r["path"])
+        util.ensure_parent(dst)
+        shutil.copy2(os.path.join(target, r["from"]), dst)
     util.write_json(journal_path(target), {
         "op": "upgrade", "txn": txn_id, "from_version": current_version,
         "to_version": manifest["version"], "backup": os.path.relpath(backup_root, target),
@@ -459,6 +490,8 @@ def _upgrade_locked(target, manifest, source_repo, aios_lookup=None):
                              and p not in {d for _s, d in moves}}),
         # Folder moves, recorded before the first one runs, so recovery can reverse them.
         "moves": [list(m) for m in moves],
+        # Unedited starter files given the new text; their old text is in the backup.
+        "refreshed": refresh,
     })
 
     new_managed, new_seeded, created_seeds = [], [], []
@@ -476,6 +509,11 @@ def _upgrade_locked(target, manifest, source_repo, aios_lookup=None):
                               "content at the pin does not match the manifest: %s" % path)
             if entry["class"] == "seed":
                 dest = os.path.join(target, path)
+                r = refresh_by_path.get(path)
+                if r and os.path.isfile(dest) and sha256_file(dest) == r["old_sha"]:
+                    sha = util.write_file(target, path, data, entry.get("mode", "100644"))
+                    new_seeded.append({"path": path, "sha256": sha})
+                    continue
                 if os.path.lexists(dest):
                     new_seeded.append({"path": path, "sha256": sha256_file(dest)
                                        if os.path.isfile(dest) else ""})
@@ -539,6 +577,7 @@ def _upgrade_locked(target, manifest, source_repo, aios_lookup=None):
                 # unedited, so going back to 2.x doesn't leave an empty 3.0 skeleton behind.
                 "created_seeds": [{"path": p, "sha256": sha256_file(os.path.join(target, p))}
                                   for p in sorted(created_seeds)],
+                "refreshed_seeds": refresh,
                 # Reported, never rewritten: the person's own files that still name a 2.x folder.
                 "moved_deployables": [list(d) for d in layout_mod.moved_deployables(moves)],
                 "stale_references": layout_mod.stale_references(
@@ -569,6 +608,7 @@ def _upgrade_locked(target, manifest, source_repo, aios_lookup=None):
         removable = sorted((new_managed_paths - set(old_managed)) | set(created_seeds))
         _restore(target, backup_root, record, remove_paths=removable,
                  expected=set(old_managed) | new_managed_paths | set(created_seeds))
+        _unrefresh(target, backup_root, refresh)
         layout_mod.reverse_moves(target, moves)
         _prune_empty_dirs(target)
         problems, _ = verify(target, record)
@@ -634,6 +674,7 @@ def _rollback_locked(target):
         remove = sorted((current_paths | journal_adds) - prior_paths)
         _restore(target, backup_root, prior, remove,
                  expected=current_paths | journal_adds)
+        _unrefresh(target, backup_root, journal.get("refreshed") or [])
         layout_mod.reverse_moves(target, [tuple(m) for m in journal.get("moves") or []])
         _prune_empty_dirs(target)
         os.remove(journal_path(target))
@@ -663,6 +704,7 @@ def _rollback_locked(target):
                if os.path.isfile(os.path.join(target, e["path"]))
                and sha256_file(os.path.join(target, e["path"])) == e["sha256"]]
     _restore(target, backup_root, prior, remove + created, expected=current_paths | set(created))
+    _unrefresh(target, backup_root_for(target, current), migration.get("refreshed_seeds") or [])
     layout_mod.reverse_moves(target, [tuple(m) for m in migration.get("moves") or []])
     _prune_empty_dirs(target)
     problems, summary = verify(target, prior)

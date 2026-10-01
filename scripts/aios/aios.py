@@ -244,7 +244,9 @@ def cmd_upgrade(args):
     if migration:
         _say("  layout:   %s -> %s: %d file(s) moved to their new folders, nothing left in the "
              "old ones" % (migration["from"], migration["to"], len(migration["moves"])))
-        _say("            new starter files: %d" % len(migration.get("created_seeds") or []))
+        _say("            new starter files: %d; unedited starter files given the 3.0 text: %d"
+             % (len(migration.get("created_seeds") or []),
+                len(migration.get("refreshed_seeds") or [])))
         stale = migration.get("stale_references") or []
         if stale:
             _say("  check:    %d of your own file(s) still name an old folder. They were not "
