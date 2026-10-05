@@ -12,14 +12,14 @@
 4. **Install.** Install the newest approved release into it with the installer, with yourself as `founder` in the organization file (GETTING_STARTED step 6). Put an invented company name in `org_id`.
 5. **Check.** In the sandbox, run `python3 scripts/aios/aios.py start`, then `python3 scripts/aios/aios.py verify --target .`
 
-**It worked when** `start` prints your GitHub name, the role `founder` and the release, and `verify` says `matches the installed release`. The sandbox then has the `01`-`09` folders, `CLAUDE.md` and the skills. It has no `releases/`, `tests/` or `evidence/` folders: those belong to the Starter's own repository, not to yours.
+**It worked when** `start` prints your GitHub name, the role `founder` and the release, and `verify` says `matches the installed release`. The sandbox then has the domain folders `00_AIOS` to `05_Jobs` and `99_Archive`, `CLAUDE.md`, `SETUP.md` and the skills. It has no `releases/`, `tests/` or `evidence/` folders: those belong to the Starter's own repository, not to yours.
 
 ## What's in it, and what isn't yet
 
 | Part | In your sandbox | Not in it |
 |---|---|---|
 | AIOS | The approved Starter release, owned by you | Funnel Futurist's own AIOS |
-| Design | Your brand guide and assets in `05_Assets/`, and Anthropic's document skills if you install them during onboarding. Those skills are Anthropic's, not Funnel Futurist's | FF's protected Design method. FF's document production is planned as a service you can request; it isn't callable yet |
+| Design | Your brand guide and assets in `01_Creation/`, and Anthropic's document skills if you install them during onboarding. Those skills are Anthropic's, not Funnel Futurist's | FF's protected Design method. FF's document production is planned as a service you can request; it isn't callable yet |
 | Obsidian map (optional) | A vault over your own repositories, made with the Workspace Kit once your release includes it ([WORKSPACE_KIT.md](WORKSPACE_KIT.md)) | Any Funnel Futurist repository |
 | Branch protection | On a personal free GitHub account, a private repository can't have branch protection. GitHub answers "Upgrade to GitHub Pro or make this repository public". The founder-only pull-request check still runs and shows red, but it can't block a merge | Hard blocking, unless the account is on a paid plan or the repository belongs to an organization on a paid plan |
 
