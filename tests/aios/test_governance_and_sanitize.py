@@ -379,7 +379,7 @@ class ProtectionVerifierTellsTheTruth(Sandbox):
     exists to kill, introduced by the fix for it.
     """
 
-    def _run_with_stub_gh(self, protected):
+    def _run_with_stub_gh(self, protected, protection_error="Not Found"):
         """Run the real script with a stub `gh` that reports a given protection state."""
         import subprocess
         gh = os.path.join(self.bin, "gh")
@@ -388,11 +388,11 @@ class ProtectionVerifierTellsTheTruth(Sandbox):
             fh.write(
                 "#!/bin/sh\n"
                 "case \"$*\" in\n"
-                "  *'branches/main/protection'*) echo 'Not Found' >&2; exit 1;;\n"
+                "  *'branches/main/protection'*) echo '%s' >&2; exit 1;;\n"
                 "  *'branches/main'*) echo %s;;\n"
                 "  *'contents/.github/CODEOWNERS'*) echo CODEOWNERS;;\n"
                 "  *) echo ''; ;;\n"
-                "esac\n" % ("true" if protected else "false"))
+                "esac\n" % (protection_error, "true" if protected else "false"))
         os.chmod(gh, 0o755)
         env = dict(os.environ, PATH=self.bin + os.pathsep + os.environ["PATH"])
         return subprocess.run(
@@ -407,6 +407,29 @@ class ProtectionVerifierTellsTheTruth(Sandbox):
         self.assertNotIn("all protections in place", out,
                          "the verifier reported green over the finding it had just printed")
         self.assertEqual(proc.returncode, 1, out)
+
+    def test_githubs_own_answer_for_an_unprotected_branch_fails_the_script(self):
+        # GitHub says "Branch not protected (HTTP 404)", not "Not Found". The script missed that wording, fell
+        # into its "couldn't read protection" branch and exited 0 over a main it had just called unprotected.
+        proc = self._run_with_stub_gh(protected=False, protection_error="gh: Branch not protected (HTTP 404)")
+        out = proc.stdout.decode()
+        self.assertIn("NOT protected", out)
+        self.assertNotIn("all protections in place", out)
+        self.assertEqual(proc.returncode, 1, out)
+
+    def test_an_unreadable_detail_does_not_hide_an_unprotected_branch(self):
+        for error in ("gh: Resource not accessible by integration (HTTP 403)", "gh: something else (HTTP 502)"):
+            proc = self._run_with_stub_gh(protected=False, protection_error=error)
+            out = proc.stdout.decode()
+            self.assertNotIn("INCONCLUSIVE", out, error)
+            self.assertEqual(proc.returncode, 1, out)
+
+    def test_a_protected_branch_whose_detail_needs_admin_stays_inconclusive(self):
+        proc = self._run_with_stub_gh(protected=True,
+                                      protection_error="gh: Resource not accessible by integration (HTTP 403)")
+        out = proc.stdout.decode()
+        self.assertIn("INCONCLUSIVE", out)
+        self.assertEqual(proc.returncode, 0, out)
 
     def test_the_failure_counter_is_initialised_before_any_check(self):
         """Structural guard: an increment above the initialisation is silently discarded."""
