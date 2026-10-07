@@ -30,3 +30,5 @@ Type `/` to see them. What each one does: `.claude/skills/README.md`. Run `/star
 - **Documents:** Word, PDF, PowerPoint and Excel come from Anthropic's `document-skills` plugin, which `/onboard_wizard` installs. They are Anthropic's, not copied here (`THIRD_PARTY_NOTICES.md`).
 
 Add your own (see `docs/UNSTUCK_PROTOCOL.md` and the skills folder for how). Never run skills from sources you don't trust.
+
+@.aios/operator_core/OPERATOR_CORE.md

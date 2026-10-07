@@ -131,7 +131,11 @@ local changes to the system layer - that is information, not a failure.
 5. Replaces managed files. Adds new seed files only where they do not already exist.
    **Seed files are never upgraded:** `CLAUDE.md` and the foundation folders are written once and
    are yours from then on, so an improvement to them reaches an existing workspace only through
-   the release notes.
+   the release notes. **One exception, declared in the release:** a *seed line*, one line a
+   release adds once to a seed file that predates it. From 2.7.2 that is the operator core's
+   import in `CLAUDE.md` (`@.aios/operator_core/OPERATOR_CORE.md`). It is added once, never
+   twice, never into a `CLAUDE.md` you deleted, and never again after you remove it; a rollback
+   takes it back; `--dry-run` shows it; `verify` reports whether it is still there.
 6. Re-hashes everything and compares it to the new manifest.
 
 If any step fails, it puts the workspace back and verifies that it did. If the machine dies
