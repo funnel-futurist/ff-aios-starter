@@ -126,6 +126,9 @@ local changes to the system layer - that is information, not a failure.
 3. Refuses if the new release ships a path that already exists as your own file.
 4. Snapshots every managed file and writes a journal **before** changing anything.
 5. Replaces managed files. Adds new seed files only where they do not already exist.
+   **Seed files are never upgraded:** `CLAUDE.md` and the foundation folders are written once and
+   are yours from then on, so an improvement to them reaches an existing workspace only through
+   the release notes.
 6. Re-hashes everything and compares it to the new manifest.
 
 If any step fails, it puts the workspace back and verifies that it did. If the machine dies

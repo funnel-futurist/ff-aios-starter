@@ -10,7 +10,7 @@
 
 - You need a Claude subscription (Pro $20/mo or Team ~$30/user/mo).
 - Download Claude Desktop from [claude.ai/download](https://claude.ai/download), or open it in the browser at claude.ai.
-- Your operator or VA should have already cloned this repo to your computer. If not, see GETTING_STARTED.md for the full path. Your repo was created from the ff-aios-starter template: either you clicked "Use this template" and own it directly, or your agency created the repo and invited you to it.
+- Your operator or VA should have already cloned this repo to your computer. If not, see GETTING_STARTED.md for the full path. Your repo has an approved ff-aios-starter release installed into it by the installer ([GETTING_STARTED.md](../GETTING_STARTED.md) steps 5 and 6): either you installed it and own it directly, or your agency did and invited you to it. Not "Use this template", which copies the main branch as it is that day.
 
 ---
 
