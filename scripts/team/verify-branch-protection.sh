@@ -36,16 +36,25 @@ PROT=$(gh api "repos/$REPO/branches/main/protection" 2>/tmp/_prot_err)
 CODE=$?
 ERR=$(cat /tmp/_prot_err 2>/dev/null); rm -f /tmp/_prot_err
 if [ $CODE -ne 0 ]; then
-  if echo "$ERR" | grep -qi "Not Found"; then
+  # GitHub answers an unprotected branch with "Branch not protected (HTTP 404)", not "Not Found". Missing that
+  # sent a confirmed-unprotected main to the "couldn't read" branch below, which exited 0.
+  if echo "$ERR" | grep -qiE "Not Found|not protected|HTTP 404"; then
     if [ "$PROTECTED" != "false" ]; then
       echo "  ✗ FAIL: main has NO branch protection (direct pushes to main are NOT blocked)"
       fails=$((fails+1))
     fi
-  elif echo "$ERR" | grep -qiE "403|admin"; then
-    echo "  ⚠ NOTE: can't read protection (needs an admin token). Re-run as an admin to verify."
-    echo "─────────────────────────────────────────────"; echo "INCONCLUSIVE (no admin access) — not a failure."; exit 0
   else
-    echo "  ⚠ NOTE: couldn't read protection ($(echo "$ERR" | head -1 | cut -c1-80))"; exit 0
+    if echo "$ERR" | grep -qiE "403|admin"; then
+      echo "  ⚠ NOTE: can't read protection (needs an admin token). Re-run as an admin to verify."
+    else
+      echo "  ⚠ NOTE: couldn't read protection ($(echo "$ERR" | head -1 | cut -c1-80))"
+    fi
+    # An unreadable detail is no reason to go green over a failure already confirmed without admin.
+    if [ "$fails" -gt 0 ]; then
+      echo "─────────────────────────────────────────────"
+      echo "RESULT: $fails check(s) FAILED - main is not protected (confirmed without admin)."; exit 1
+    fi
+    echo "─────────────────────────────────────────────"; echo "INCONCLUSIVE (no admin access) - not a failure."; exit 0
   fi
 else
   echo "$PROT" | python3 -c "
