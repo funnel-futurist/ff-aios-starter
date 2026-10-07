@@ -1,6 +1,6 @@
-<!-- aios-operator-core v1.1.0 -->
+<!-- aios-operator-core v1.1.1 -->
 <!-- Client edition. It differs from the source in sections 8 and 9 only; .aios/operator_core/manifest.json says how. Managed by the Starter: don't edit this file, an upgrade replaces it. -->
-# AIOS Operator Core v1.1.0
+# AIOS Operator Core v1.1.1
 
 The common way any AIOS session explains work, asks humans for things, routes work, and records what it did. It is guidance, not security enforcement. Business methods (copy, RevOps, design) live in their own domain repos. If this file and a repo's own instructions disagree on one of these topics, say so and follow the stricter one, with one exception: when the owner has explicitly replaced an older workflow, the replacement wins, even if the old one asked for more approvals. A superseded instruction doesn't bring an approval loop back. A platform permission that still denies an action is different: it is never superseded by an instruction, and you never route around it.
 
@@ -29,16 +29,16 @@ Use it whenever a person must do or decide something. Keep it short and link the
 A person's click authorizes; it doesn't prove the change is correct. Tests and technical review establish quality. Routine work inside an approved job (a normal data save, an unchanged rebased PR) never goes back through a release approval.
 
 ### Example: weak vs complete
-Weak: "AIOS needs code owners. Please create the release-owners team."
+Weak: "We need code owners. Please create the release team."
 Complete:
-- **Outcome:** only changes the founders authorized reach the shared client package.
-- **Problem and evidence:** an unreviewed draft reached the Starter's main branch on 10-05, and clients copy main. The ownership file names a team that GitHub can't see, so it shows "Unknown owner" on every line and enforces nothing.
-- **If we do nothing:** any account with write access can change what clients install, unnoticed.
-- **Fix:** make the existing team visible, put both founders in it, and point the ownership file at it. Branch protection then requires one founder's approval on shared release files only.
-- **Simpler alternative:** name the two founders individually. It works today, but every change of people means editing every repository.
-- **Downside and recovery:** release PRs wait for one founder; routine data saves and job runs don't. Removing the rule undoes it in one settings page.
-- **Why you:** only an organization owner can change a team; the agents' app can't.
-- **Steps and success:** the team settings link and three steps; success is the ownership check showing no errors.
+- **Outcome:** only changes the owners authorized reach the shared package other people install.
+- **Problem and evidence:** an unreviewed change reached the package's main branch, which is what installs copy (link the record where it happened). The ownership file names a group the platform can't resolve, so it enforces nothing.
+- **If we do nothing:** anyone with write access can change what others install, unnoticed.
+- **Fix:** make the owners' group resolvable, put the owners in it, and point the ownership file at it. Branch protection then requires one owner's approval on release files only.
+- **Simpler alternative:** name the owners individually. It works, but every change of people means editing every repository.
+- **Downside and recovery:** release changes wait for one owner; routine data saves and job runs don't. Removing the rule undoes it in one settings page.
+- **Why you:** only an account owner can change the group; automation identities can't.
+- **Steps and success:** the settings link and three steps; success is the ownership check showing no errors.
 
 ## 3. Route every task into one of four lanes
 | Lane | Treatment |
