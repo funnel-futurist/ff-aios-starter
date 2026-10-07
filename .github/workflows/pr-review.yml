@@ -124,7 +124,6 @@ jobs:
           # DB-free v1: no DATABASE_CONNECTION_URL on the runner (smallest attack surface,
           # matches the client version). Schema-checks downgraded to "flag for human" in the skill.
           GH_TOKEN: ${{ github.token }}
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
       - name: Persist verdict for the gate job
         if: always()
         uses: actions/upload-artifact@v4
