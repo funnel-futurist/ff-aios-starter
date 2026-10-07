@@ -103,8 +103,6 @@ jobs:
           fetch-depth: 0
           ref: ${{ github.event.pull_request.head.ref }}
       - name: Claude review (pr_review skill)
-        id: claude_review
-        continue-on-error: true   # the review counts if verdict.json is valid (see 'Require a valid verdict'); timeout-minutes is the runaway guard
         if: env.HAS_CLAUDE_CREDENTIAL == 'yes'
         uses: anthropics/claude-code-action@v1
         with:
@@ -119,6 +117,7 @@ jobs:
           prompt: "/pr_review ${{ github.repository }} ${{ github.event.pull_request.number }}"
           claude_args: |
             --model claude-sonnet-4-6
+            --max-turns 20
             --allowedTools Bash,Read,Glob,Grep,Write,Edit
             --append-system-prompt "You are running headless in GitHub Actions CI as the always-on PR reviewer. Follow the pr_review skill CI mode exactly: review with intent; AUTO-FIX safe mechanical issues and push them to the PR branch (honor the [pr-autofix] loop guard — never re-fix your own fix commit); APPROVE good work; request-changes only on genuine blockers; and ALWAYS write ./verdict.json per the skill schema. Never auto-fix secrets or destructive changes."
         env:
@@ -134,11 +133,6 @@ jobs:
           path: verdict.json
           retention-days: 3
           if-no-files-found: ignore
-      - name: Require a valid verdict (a finished review passes even if the action reported an error)
-        if: always()
-        run: |
-          node -e 'const fs=require("fs"); let v; try { v=JSON.parse(fs.readFileSync("verdict.json","utf8")); } catch (e) { process.exit(1); } const q=v && v.quality_score; process.exit(typeof q==="number" && q>=1 && q<=10 ? 0 : 1);' \
-            || { echo "::error::No valid verdict.json - the AI review did not finish"; exit 1; }
 
   # ── 3. Deterministic gate — sets pr-gate status + enables native auto-merge ───
   gate:

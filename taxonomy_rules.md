@@ -39,24 +39,14 @@ Example: `offer_stack.md` → `offer_stack_v2.md`
 
 | Content Type | Folder |
 |---|---|
-| Who we are: strategy, research, positioning, offers, pricing, avatar | `00_AIOS/company/` |
-| Which domain takes which request | `00_AIOS/routing.md` |
-| Company decisions | `00_AIOS/decisions_log.md` |
-| Waiting for review, QC rubric, QC preferences, revision notes | `00_AIOS/review_queue/` |
-| Tools and connected capabilities | `00_AIOS/systems/` |
-| Brand guide | `01_Creation/brand/` |
-| Logos, photos, videos, testimonials (one record each) | `01_Creation/asset_library/` |
-| How you like work made | `01_Creation/preferences/` |
-| Finished documents, decks, copy, training | `01_Creation/outputs/` |
-| People, roles, org chart | `02_Team_Ops/people/`, `roles/`, `org_chart.md` |
-| Projects (one folder each, `PROJECT.md` first) | `02_Team_Ops/projects/` |
-| Daily handoff, standups, meeting notes, feedback, unstuck protocol | `02_Team_Ops/routines/` |
-| Website, funnels, CRM, automations, sales | `03_RevOps/site/`, `funnels/`, `crm/`, `automations/`, `sales/` |
-| Timeline, milestones, KPIs, the customer journey | `03_RevOps/customer_journey/` |
-| Audits and reports | `03_RevOps/audits/`, `reports/` |
-| Payments, onboarding, support, client-success records | `03_RevOps/records/` |
-| Content, ads, emails, webinars, publishing | `04_Attention/` (`campaigns/` holds ads, emails, webinars) |
-| Recurring jobs | `05_Jobs/` |
-| Completed, retired, or superseded work | `99_Archive/` |
-
-A website that becomes a deployable app gets its own repository, registered first; until then it lives in `03_RevOps/site/`. Setup lives in `SETUP.md` and the step-by-step cards in `docs/human_steps/`.
+| Strategy, research, positioning | `01_Foundations/` |
+| Finished deliverables (copy, ads, emails, funnels, reports) | `02_Deliverables/` |
+| Your brand preferences, revision notes | `03_Quality_Control/` |
+| Timeline, milestones, KPIs | `04_Customer_Journey/` |
+| Logos, fonts, colors, existing content | `05_Assets/` |
+| Decisions, feedback, meeting notes | `06_Communication/` |
+| Setup walkthroughs, onboarding, how-to | `07_Setup/` |
+| Scheduled + triggered automations, runbooks | `08_Automations/` |
+| Completed, retired, or superseded work | `09_Archive/` |
+| Department workspaces, sales / content / ops (optional, for teams) | `10_Departments/` |
+| Deployable sites, apps, internal tools, one folder each; Vercel Root Directory points at the subfolder (optional) | `11_Projects/` |

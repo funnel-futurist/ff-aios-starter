@@ -23,10 +23,7 @@ That's it. Open the repo in Claude Code → type **`/start-my-day`** when you be
 
 ## What happens automatically (you do nothing)
 - When you open the repo, you get a friendly nudge **if** you're on `main` or behind the latest — telling you to run `/start-my-day`.
-- Genuinely dangerous git commands (that could delete unsaved work) pause and ask you first. That check needs Node.js; `/start` warns you if it's missing, and a warning isn't protection.
-
-## Where things go
-Seven domain folders, the same in every company's instance: `00_AIOS` (who you are, routing, decisions, the review queue), `01_Creation`, `02_Team_Ops`, `03_RevOps`, `04_Attention`, `05_Jobs`, `99_Archive`. `00_AIOS/routing.md` says which one takes which request. Setting this workspace up, or adding a tool to it: **[SETUP.md](SETUP.md)**.
+- Genuinely dangerous commands (that could delete unsaved work) are blocked or paused for you.
 
 ## If you get stuck or confused
 - Tell Claude: *"treat me like a caveman, explain like I'm 5, give me every click."*

@@ -1,6 +1,6 @@
 ---
 name: changelog
-description: Generate a plain English changelog from recent git commits. Saves to 02_Team_Ops/routines/changelog.md.
+description: Generate a plain English changelog from recent git commits. Saves to 06_Communication/changelog.md.
 ---
 
 # Changelog Generator
@@ -20,19 +20,19 @@ Run `git log --oneline -20` (or since the last changelog entry date if one exist
 
 ### Step 2: Group by Category
 Organize commits into:
-- **Strategy Docs**, F6 updates, new docs in 00_AIOS/company/
-- **Deliverables**, New work in 01_Creation/outputs/
+- **Strategy Docs**, F6 updates, new docs in 01_Foundations/
+- **Deliverables**, New work in 02_Deliverables/
 - **Workspace Updates**, Template changes, new skills, config updates
 - **Communication**, Meeting notes, decisions, feedback logged
 - **Other**, Anything that doesn't fit above
 
 ### Step 3: Write in Plain English
 For each item:
-- BAD: "feat: add doc_2_avatar_analysis.md to 00_AIOS/company/avatar_analysis/"
+- BAD: "feat: add doc_2_avatar_analysis.md to 01_Foundations/avatar_analysis/"
 - GOOD: "Your Avatar Analysis document was added, Claude now knows your ideal client profile"
 
 ### Step 4: Append to Changelog
-Add the entry to `02_Team_Ops/routines/changelog.md` (create the file if it doesn't exist).
+Add the entry to `06_Communication/changelog.md` (create the file if it doesn't exist).
 
 ## OUTPUT FORMAT
 

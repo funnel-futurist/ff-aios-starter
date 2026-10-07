@@ -37,7 +37,7 @@ Briefly grill them: What's the business? Who's it for? The mission? 1-3 core val
 ## Step 5: Do you understand the structure? (the check)
 Quick check: can they explain the folder layout, where global vs client material lives, and how to find things? If not, walk it once. (Skipping this causes problems later.)
 
-**Then prove the brain is actually wired** (don't skip, this is how they know it worked): run `/context_load`, then `/f6_completeness_check`, then ask *"what do you understand about my business?"* If Claude answers with specifics from their own foundational docs, it's working. A generic answer means something isn't connected yet (Google Drive, an empty `00_AIOS/company/`, or the key), fix that before moving on.
+**Then prove the brain is actually wired** (don't skip, this is how they know it worked): run `/context_load`, then `/f6_completeness_check`, then ask *"what do you understand about my business?"* If Claude answers with specifics from their own foundational docs, it's working. A generic answer means something isn't connected yet (Google Drive, an empty `01_Foundations/`, or the key), fix that before moving on.
 
 ## Step 6: Your toolkit (the moves you can run)
 Now show them what's on hand, so they finish onboarding knowing their capabilities, not just their setup. Tell them: **type `/` in Claude Code to see every skill live**, and the full list (what each does + how to trigger it) lives in `.claude/skills/README.md`. Name the daily drivers so they are not overwhelmed:
