@@ -1,8 +1,8 @@
-<!-- aios-operator-core v1.0.0 -->
+<!-- aios-operator-core v1.1.0 -->
 <!-- Client edition. It differs from the source in sections 8 and 9 only; .aios/operator_core/manifest.json says how. Managed by the Starter: don't edit this file, an upgrade replaces it. -->
-# AIOS Operator Core v1.0.0
+# AIOS Operator Core v1.1.0
 
-The common way any AIOS session explains work, asks humans for things, routes work, and records what it did. It is guidance, not security enforcement. Business methods (copy, RevOps, design) live in their own domain repos. If this file and a repo's own instructions disagree on one of these topics, say so and follow the stricter one.
+The common way any AIOS session explains work, asks humans for things, routes work, and records what it did. It is guidance, not security enforcement. Business methods (copy, RevOps, design) live in their own domain repos. If this file and a repo's own instructions disagree on one of these topics, say so and follow the stricter one, with one exception: when the owner has explicitly replaced an older workflow, the replacement wins, even if the old one asked for more approvals. A superseded instruction doesn't bring an approval loop back. A platform permission that still denies an action is different: it is never superseded by an instruction, and you never route around it.
 
 ## 1. Explain work
 - Lead with the result. Then what changed, then what is still open. Skip the tour of how you got there.
@@ -12,18 +12,33 @@ The common way any AIOS session explains work, asks humans for things, routes wo
 - Prose standard: follow the writing standard in section 9. Do not copy it into other files.
 
 ## 2. Human action card
-Use it whenever a person must do or decide something. Keep it short; link the depth.
+Use it whenever a person must do or decide something. Keep it short and link the depth. The card follows one causal chain, so the reader can see why the ask exists and what happens either way:
 - **Title:** the business outcome first, technical ID second.
-- **Purpose:** the problem and the result this creates.
+- **Wanted outcome:** the result this creates, in the reader's terms.
+- **The problem and its evidence:** what was observed or what requirement changed, and where it shows. "X needs Y" isn't a problem; say what goes wrong without it, and point to where it already went wrong.
+- **If we do nothing:** the realistic consequence, with no invented urgency.
+- **The chosen fix, and why:** what will change and why it solves the problem.
+- **The simpler alternative:** the cheaper option you considered, and why it doesn't do the job (or recommend it if it does).
 - **Benefit:** near-term and business benefit.
-- **Consequence + recovery:** the realistic downside and how to undo it.
-- **Why now:** what it blocks or what the deadline really is. No deadline unless one is real.
-- **Why you:** what was already tried and the exact authority only this person holds.
-- **Recommendation:** what to do and why, plus one real alternative if there is one.
-- **Exact place and steps:** direct link, which device or app (Terminal, GitHub, SQL editor), numbered steps.
-- **Success:** what they will see when it worked.
-- **State:** "already approved, just needs your hands" or "new decision." Name the next owner after.
+- **Downside and recovery:** what could go wrong, and how to undo it.
+- **Why this person:** what was already tried, and the exact authority or account only this person holds. If a tool or an already-authorized identity can do it, it isn't a human card.
+- **Exact place, steps and success:** a direct link, which app or device, numbered steps, and what they will see when it worked.
+- **State:** "already approved, just needs your hands" or "new decision". Name the next owner after.
 - **Evidence:** where completion gets recorded.
+
+A person's click authorizes; it doesn't prove the change is correct. Tests and technical review establish quality. Routine work inside an approved job (a normal data save, an unchanged rebased PR) never goes back through a release approval.
+
+### Example: weak vs complete
+Weak: "AIOS needs code owners. Please create the release-owners team."
+Complete:
+- **Outcome:** only changes the founders authorized reach the shared client package.
+- **Problem and evidence:** an unreviewed draft reached the Starter's main branch on 10-05, and clients copy main. The ownership file names a team that GitHub can't see, so it shows "Unknown owner" on every line and enforces nothing.
+- **If we do nothing:** any account with write access can change what clients install, unnoticed.
+- **Fix:** make the existing team visible, put both founders in it, and point the ownership file at it. Branch protection then requires one founder's approval on shared release files only.
+- **Simpler alternative:** name the two founders individually. It works today, but every change of people means editing every repository.
+- **Downside and recovery:** release PRs wait for one founder; routine data saves and job runs don't. Removing the rule undoes it in one settings page.
+- **Why you:** only an organization owner can change a team; the agents' app can't.
+- **Steps and success:** the team settings link and three steps; success is the ownership check showing no errors.
 
 ## 3. Route every task into one of four lanes
 | Lane | Treatment |
@@ -60,7 +75,7 @@ An upload is not integration. Do not delete the original because a summary exist
 - Update the current file for ongoing status on the same outcome and audience. Do not create a new "final" per session.
 - New file only for an independently owned outcome, a different audience, immutable evidence or a separately versioned release.
 - Do not rename load-bearing paths for tidiness. Moves need a link migration and a receipt.
-- Rule changes are releases: capture, change the one source, test, publish a version, update consumers, verify. "Available," "installed," "loaded in this session" and "behavior verified" are four different states.
+- Rule changes are releases: capture, change the one source, test, publish a version, update consumers, verify. "Available," "installed," "loaded in this session" and "behavior verified" are four different states. Merging an import closes the install; a session already running keeps the instructions it started with, so check a fresh session before claiming the behavior changed.
 - Client upgrades replace the managed core and never touch the client's own files or data, apart from the one import line a release declares for `CLAUDE.md`: added once, never twice, and taken back by a rollback.
 
 ## 9. Writing standard (referenced, not copied)
