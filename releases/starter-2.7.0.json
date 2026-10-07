@@ -1,7 +1,8 @@
 {
   "approval": {
-    "approved_at": null,
-    "approved_by": null
+    "approved_at": "2026-10-06T22:50:00Z",
+    "approved_by": "phoenix-ship-it",
+    "basis": "Phoenix, 2026-10-06 at about 22:50Z, answered the line \"Approve starter 2.7.0 at c5dce56\": yes / no with \"Approved starter two point seven, yes\". Recorded by Chat Zero in ff-delegation exec/operating-cutover-20260921 at 59ba051, BOWTIE_QC_REVIEW_ROUTING_2026-10-06.md section 9. The approval binds to c5dce563f028125bef056af622b72dbded08f86c only: the 2.7.0 candidate d3f360d plus the version label (.template_version.json says 2.7.0). Provenance of 2.6.0's 186 copied Anthropic files is in section 3 of the same record; this release holds none of them."
   },
   "compatibility": {
     "breaking": [],
@@ -17,8 +18,8 @@
     "skills": 20
   },
   "created_from": {
-    "branch": "exec/p22-v4-clean-vault-20260928",
-    "git_rev": "aa2f46bbae9ff0bffb42fa358d024bf8edc1a8a2"
+    "branch": "exec/lane01-starter-2.7.0-version-20261006",
+    "git_rev": "c5dce563f028125bef056af622b72dbded08f86c"
   },
   "credentials": [
     {
@@ -245,7 +246,7 @@
       "class": "managed",
       "mode": "100644",
       "path": ".template_version.json",
-      "sha256": "cae97517a74ef32dd730aad8802a3ff6e3f26e0d986566e80aa9f44db86d8657"
+      "sha256": "e9af85124fa1973b02e6fea21bfec4eb156447f28ea6c16a9988ecc10afe107b"
     },
     {
       "class": "seed",
@@ -509,7 +510,7 @@
       "class": "managed",
       "mode": "100644",
       "path": "docs/INSTALL_AND_UPGRADE.md",
-      "sha256": "c43694a2620a465ff08f27d7e3ee4a484254d3fc1934d13aec9109ac82e30d95"
+      "sha256": "587f98266ca109e38f792d96abbbc20bb4956b82f2af5ae21535ad9ebba4c8ac"
     },
     {
       "class": "managed",
@@ -729,6 +730,6 @@
     "workspace_health",
     "wrap-up"
   ],
-  "status": "draft",
+  "status": "approved",
   "version": "2.7.0"
 }
