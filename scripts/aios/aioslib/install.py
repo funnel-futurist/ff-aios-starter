@@ -363,6 +363,11 @@ def install(target, manifest, source_repo, config, aios_lookup=None, render_gove
         "rendered": rendered,
         "previous": None,
     }
+    if manifest.get("seed_lines"):
+        # A fresh install seeds the file from the release, which the build proved carries the line.
+        _kept, missing, settled = _seed_line_plan(target, {}, manifest)
+        record["seed_lines"] = settled + [{k: v for k, v in e.items() if k != "appended"}
+                                          for e in (dict(m, state="missing") for m in missing)]
     util.write_json(install_record_path(target), record)
 
     require_verified(target, record, "freshly installed workspace")
@@ -396,6 +401,8 @@ def upgrade_plan(target, manifest, source_repo, aios_lookup=None):
                          if p in old_managed and old_managed[p].get("sha256") == e["sha256"]),
         "new_seeds": sorted(p for p, e in files.items() if e["class"] == "seed" and p not in old_seeded
                             and not os.path.lexists(os.path.join(target, p))),
+        "seed_lines": [{"path": e["path"], "line": e["line"]}
+                       for e in _seed_line_plan(target, record, manifest)[1]],
     }
 
 
@@ -436,6 +443,63 @@ def drift_recipe(target, record, source_repo, problems):
         out.append("to keep it: move your change into a file the release doesn't manage (your own file, "
                    "or a seed file such as CLAUDE.md), revert this one, commit, and upgrade again")
     return out
+
+
+def _seed_line_plan(target, record, manifest):
+    """The declared seed lines this release adds, and the state of the ones it doesn't.
+
+    A seed line is added once: never twice, never to a seed file the client deleted, and never
+    again after the client removed it. Returns (carried, add, settled): entries already recorded,
+    entries this upgrade appends (with the exact bytes, so an undo removes only those), and new
+    entries that need no write.
+    """
+    recorded = list(record.get("seed_lines") or [])
+    done = {(e["path"], e["line"]) for e in recorded}
+    add, settled = [], []
+    for sl in manifest.get("seed_lines") or []:
+        if (sl["path"], sl["line"]) in done:
+            continue
+        entry = {"path": sl["path"], "line": sl["line"], "release": manifest["version"]}
+        full = os.path.join(target, sl["path"])
+        if not os.path.isfile(full):
+            settled.append(dict(entry, state="absent"))  # deleted by the client: theirs to keep deleted
+            continue
+        with open(full, "rb") as fh:
+            text = fh.read().decode("utf-8", "replace")
+        if any(line.strip() == sl["line"] for line in text.splitlines()):
+            settled.append(dict(entry, state="present"))
+            continue
+        sep = "" if text == "" or text.endswith("\n") else "\n"
+        add.append(dict(entry, state="added", appended=sep + "\n" + sl["line"] + "\n"))
+    return recorded, add, settled
+
+
+def _apply_seed_lines(target, adds):
+    for e in adds:
+        with open(os.path.join(target, e["path"]), "ab") as fh:
+            fh.write(e["appended"].encode("utf-8"))
+
+
+def _undo_seed_lines(target, adds):
+    """Take back exactly what an upgrade appended. Safe to call when it was never appended."""
+    for e in adds:
+        full = os.path.join(target, e["path"])
+        if not os.path.isfile(full):
+            continue
+        with open(full, "rb") as fh:
+            text = fh.read().decode("utf-8", "replace")
+        tail = e.get("appended") or ""
+        if tail and text.endswith(tail):
+            new = text[:-len(tail)]
+        else:  # the client wrote after it: remove the one line, leave the rest as they made it
+            lines = text.splitlines(True)
+            hits = [i for i, line in enumerate(lines) if line.strip() == e["line"]]
+            if not hits:
+                continue
+            del lines[hits[-1]]
+            new = "".join(lines)
+        with open(full, "wb") as fh:
+            fh.write(new.encode("utf-8"))
 
 
 def _upgrade_preflight(target, manifest, source_repo, aios_lookup=None):
@@ -502,6 +566,7 @@ def _upgrade_preflight(target, manifest, source_repo, aios_lookup=None):
 def _upgrade_locked(target, manifest, source_repo, aios_lookup=None):
     record, current_version, min_from, creds, files, old_managed, old_seeded = _upgrade_preflight(
         target, manifest, source_repo, aios_lookup)
+    seed_lines_kept, seed_lines_add, seed_lines_settled = _seed_line_plan(target, record, manifest)
 
     txn_id = "%s-%s-to-%s" % (util.now_iso().replace(":", "").replace("-", ""),
                               current_version, manifest["version"])
@@ -520,6 +585,9 @@ def _upgrade_locked(target, manifest, source_repo, aios_lookup=None):
         "seed_adds": sorted({p for p, e in files.items()
                              if e["class"] == "seed" and p not in old_seeded
                              and not os.path.lexists(os.path.join(target, p))}),
+        # The declared lines this upgrade appends to seed files, with their exact bytes, so a
+        # recovery after a hard kill takes back only those.
+        "seed_lines": seed_lines_add,
     })
 
     new_managed, new_seeded, created_seeds = [], [], []
@@ -565,6 +633,7 @@ def _upgrade_locked(target, manifest, source_repo, aios_lookup=None):
             if os.path.isfile(full):
                 os.remove(full)
         _prune_empty_dirs(target)
+        _apply_seed_lines(target, seed_lines_add)
         util.fault("upgrade.before_record")
 
         new_record = dict(record)
@@ -579,6 +648,8 @@ def _upgrade_locked(target, manifest, source_repo, aios_lookup=None):
         }
         new_record["managed"] = sorted(new_managed, key=lambda e: e["path"])
         new_record["seeded"] = sorted(new_seeded, key=lambda e: e["path"])
+        if seed_lines_kept or seed_lines_add or seed_lines_settled:
+            new_record["seed_lines"] = seed_lines_kept + seed_lines_settled + seed_lines_add
         new_record["credentials"] = [{"name": c["name"], "ref": c["ref"],
                                       "required": c["required"], "resolved": c["resolved"]}
                                      for c in creds]
@@ -605,6 +676,7 @@ def _upgrade_locked(target, manifest, source_repo, aios_lookup=None):
         removable = sorted((new_managed_paths - set(old_managed)) | set(created_seeds))
         _restore(target, backup_root, record, remove_paths=removable,
                  expected=set(old_managed) | new_managed_paths | set(created_seeds))
+        _undo_seed_lines(target, seed_lines_add)
         problems, _ = verify(target, record)
         if os.path.isfile(journal_path(target)):
             os.remove(journal_path(target))
@@ -668,6 +740,7 @@ def _rollback_locked(target):
         remove = sorted((current_paths | journal_adds) - prior_paths)
         _restore(target, backup_root, prior, remove,
                  expected=current_paths | journal_adds)
+        _undo_seed_lines(target, journal.get("seed_lines") or [])
         os.remove(journal_path(target))
         problems, summary = verify(target, prior)
         if problems:
@@ -691,6 +764,9 @@ def _rollback_locked(target):
     prior_paths = {e["path"] for e in prior.get("managed") or []}
     remove = sorted(current_paths - prior_paths)
     _restore(target, backup_root, prior, remove, expected=current_paths)
+    version = (current.get("release") or {}).get("version")
+    _undo_seed_lines(target, [e for e in current.get("seed_lines") or []
+                              if e.get("state") == "added" and e.get("release") == version])
     problems, summary = verify(target, prior)
     if problems:
         raise Refusal(EXIT_VERIFY, "rollback did not restore a verifiable workspace", problems)

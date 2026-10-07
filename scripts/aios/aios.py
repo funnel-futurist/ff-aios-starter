@@ -203,6 +203,14 @@ def cmd_verify(args):
                             "(pass --repo to also check the record against the pinned release)"))
     _say("managed:   %d/%d files re-hashed from disk"
          % (summary["managed_checked"], summary["managed_total"]))
+    for e in record.get("seed_lines") or []:
+        full = os.path.join(target, e["path"])
+        here = False
+        if os.path.isfile(full):
+            with open(full, encoding="utf-8", errors="replace") as fh:
+                here = any(line.strip() == e["line"] for line in fh)
+        _say("  line:    %s %s `%s` (yours to keep or remove)"
+             % (e["path"], "has" if here else "no longer has", e["line"]))
     config = None
     try:
         config = orgconfig.load(target)
@@ -245,6 +253,8 @@ def cmd_upgrade(args):
         if plan["new_seeds"]:
             _say("  new seeds: %d, written once and yours afterwards: %s"
                  % (len(plan["new_seeds"]), ", ".join(plan["new_seeds"])))
+        for sl in plan["seed_lines"]:
+            _say("  one line:  %s gains `%s` (added once; rollback takes it back)" % (sl["path"], sl["line"]))
         _say("  run it again without --dry-run to upgrade")
         return EXIT_OK
     before = install_mod.load_record(target)
@@ -253,7 +263,13 @@ def cmd_upgrade(args):
          % (target, before["release"]["version"], record["release"]["version"]))
     _say("  by:       %s (%s)" % (login, role))
     _say("  managed:  %d files, verified by readback" % len(record["managed"]))
-    _say("  state:    untouched (seed and unmanaged files were not written)")
+    added = [e for e in record.get("seed_lines") or []
+             if e.get("state") == "added" and e.get("release") == record["release"]["version"]]
+    if added:
+        _say("  state:    untouched, except one declared line: %s"
+             % "; ".join("%s gained `%s`" % (e["path"], e["line"]) for e in added))
+    else:
+        _say("  state:    untouched (seed and unmanaged files were not written)")
     _say("  rollback: available (%s)" % record["previous"]["backup"])
     return EXIT_OK
 
