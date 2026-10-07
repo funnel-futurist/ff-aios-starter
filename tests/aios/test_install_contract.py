@@ -418,6 +418,57 @@ class UpgradeAndRollback(Sandbox):
                          open(os.path.join(self.target, "START_HERE.md")).read(),
                          "a refused upgrade must not have written anything")
 
+    def test_an_edited_managed_file_is_refused_with_its_diff_and_two_ways_forward(self):
+        # Chat Zero's 2.7.0 -> 2.7.1 upgrade test: a bare "modified managed file" was a dead end.
+        with open(os.path.join(self.target, "START_HERE.md"), "a") as fh:
+            fh.write("my hand edit\n")
+        with self.assertRaises(Refusal) as ctx:
+            install_mod.upgrade(self.target, self.v2, self.source)
+        self.assertEqual(ctx.exception.code, util.EXIT_VERIFY)
+        details = "\n".join(ctx.exception.details)
+        self.assertIn("modified managed file: START_HERE.md", details)
+        self.assertIn("START_HERE.md was edited after install", details)
+        self.assertIn("    +my hand edit", details)  # the diff itself, release copy first
+        self.assertIn("to revert it: git -C %s show %s:START_HERE.md" % (self.source, self.rev[:12]), details)
+        self.assertIn("to keep it: move your change into a file the release doesn't manage", details)
+        self.assertNotIn("now clearer", open(os.path.join(self.target, "START_HERE.md")).read())
+
+    def test_the_dry_run_lists_the_managed_changes_and_writes_nothing(self):
+        record_before = install_mod.load_record(self.target)
+        listing_before = sorted(os.listdir(os.path.join(self.target, ".aios")))
+        plan = install_mod.upgrade_plan(self.target, self.v2, self.source)
+        self.assertEqual((plan["from"], plan["to"]), ("1.0.0", "1.1.0"))
+        self.assertEqual(plan["changed"], ["START_HERE.md"])
+        self.assertEqual(plan["added"], [".claude/skills/new_skill/SKILL.md"])
+        self.assertEqual(plan["removed"], [])
+        self.assertGreater(plan["unchanged"], 0)
+        # nothing written: not a file, not the record, not a backup, a journal or a lock
+        self.assertEqual(install_mod.load_record(self.target), record_before)
+        self.assertEqual(sorted(os.listdir(os.path.join(self.target, ".aios"))), listing_before)
+        self.assertEqual(install_mod.state_fingerprint(self.target), self.state_before)
+        self.assertNotIn("now clearer", open(os.path.join(self.target, "START_HERE.md")).read())
+        self.assertEqual(install_mod.verify(self.target)[0], [])
+
+    def test_the_dry_run_refuses_what_the_upgrade_refuses(self):
+        with open(os.path.join(self.target, "START_HERE.md"), "a") as fh:
+            fh.write("my hand edit\n")
+        with self.assertRaises(Refusal) as ctx:
+            install_mod.upgrade_plan(self.target, self.v2, self.source)
+        self.assertEqual(ctx.exception.code, util.EXIT_VERIFY)
+        self.assertIn("to keep it:", "\n".join(ctx.exception.details))
+
+    def test_the_cli_dry_run_prints_the_changes_and_exits_0(self):
+        self.be("acme-founder")
+        release = self.write_json("v2.json", self.v2)
+        code, out, err = self.cli("upgrade", "--release", release, "--target", self.target,
+                                  "--repo", self.source, "--dry-run")
+        self.assertEqual(code, 0, err)
+        self.assertIn("dry run:", out)
+        self.assertIn("1.0.0 -> 1.1.0, nothing written", out)
+        self.assertIn("changed:   START_HERE.md", out)
+        self.assertIn("added:     .claude/skills/new_skill/SKILL.md", out)
+        self.assertNotIn("now clearer", open(os.path.join(self.target, "START_HERE.md")).read())
+
     def _commit_workspace(self):
         """Put the workspace under git, the way every real client workspace is."""
         harness.run_git(self.target, "init", "-q", "-b", "main")

@@ -233,6 +233,20 @@ def cmd_upgrade(args):
     config = orgconfig.load(target)
     policy = roles.load_policy(target)
     login, role = roles.require_lifecycle(policy, config, "upgrade")
+    if args.dry_run:
+        # The same checks and refusals as a real upgrade; nothing is written, not even a lock.
+        plan = install_mod.upgrade_plan(target, manifest, repo, _aios_lookup_from(args.aios_releases))
+        _say("dry run: %s %s -> %s, nothing written" % (target, plan["from"], plan["to"]))
+        _say("  by:        %s (%s)" % (login, role))
+        for label in ("changed", "added", "removed"):
+            for path in plan[label]:
+                _say("  %-10s %s" % (label + ":", path))
+        _say("  unchanged: %d managed files" % plan["unchanged"])
+        if plan["new_seeds"]:
+            _say("  new seeds: %d, written once and yours afterwards: %s"
+                 % (len(plan["new_seeds"]), ", ".join(plan["new_seeds"])))
+        _say("  run it again without --dry-run to upgrade")
+        return EXIT_OK
     before = install_mod.load_record(target)
     record = install_mod.upgrade(target, manifest, repo, _aios_lookup_from(args.aios_releases))
     _say("upgraded %s: %s -> %s"
@@ -533,6 +547,8 @@ def build_parser():
     up.add_argument("--target", default=".")
     up.add_argument("--repo", default=_repo_root())
     up.add_argument("--aios-releases", dest="aios_releases")
+    up.add_argument("--dry-run", dest="dry_run", action="store_true",
+                    help="run every check and print the managed-file changes; write nothing")
     up.set_defaults(func=cmd_upgrade)
 
     rbk = sub.add_parser("rollback", help="restore the previous release")

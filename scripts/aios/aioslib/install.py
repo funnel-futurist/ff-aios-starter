@@ -20,6 +20,7 @@ the journal on disk, and `rollback` uses it to put the workspace back. Recovery 
 been tested against a clean exception is not recovery.
 """
 
+import difflib
 import os
 import shutil
 
@@ -376,7 +377,69 @@ def upgrade(target, manifest, source_repo, aios_lookup=None):
         return _upgrade_locked(target, manifest, source_repo, aios_lookup)
 
 
-def _upgrade_locked(target, manifest, source_repo, aios_lookup=None):
+DRIFT_DIFF_LINES = 40
+
+
+def upgrade_plan(target, manifest, source_repo, aios_lookup=None):
+    """What `upgrade` would do, writing nothing: the same refusals, then the managed-file changes."""
+    record, _version, _min_from, _creds, files, old_managed, old_seeded = _upgrade_preflight(
+        target, manifest, source_repo, aios_lookup)
+    managed = {p: e for p, e in files.items() if e["class"] == "managed"}
+    return {
+        "from": (record.get("release") or {}).get("version"),
+        "to": manifest["version"],
+        "changed": sorted(p for p, e in managed.items()
+                          if p in old_managed and old_managed[p].get("sha256") != e["sha256"]),
+        "added": sorted(p for p in managed if p not in old_managed),
+        "removed": sorted(set(old_managed) - set(files)),
+        "unchanged": sum(1 for p, e in managed.items()
+                         if p in old_managed and old_managed[p].get("sha256") == e["sha256"]),
+        "new_seeds": sorted(p for p, e in files.items() if e["class"] == "seed" and p not in old_seeded
+                            and not os.path.lexists(os.path.join(target, p))),
+    }
+
+
+def drift_recipe(target, record, source_repo, problems):
+    """For each managed file edited by hand: what changed, and the two ways forward.
+
+    A bare "modified managed file" refusal was a dead end (Chat Zero's 2.7.0 -> 2.7.1 upgrade test).
+    """
+    prefix = "modified managed file: "
+    drifted = [p[len(prefix):].split(" (on disk", 1)[0] for p in problems if p.startswith(prefix)]
+    if not drifted:
+        return []
+    release = record.get("release") or {}
+    rev = release.get("git_rev") or ""
+    pinned = {}
+    if rev and util.rev_exists(source_repo, rev):
+        pinned = {path: data for path, _mode, data in util.read_tree(source_repo, rev) if path in drifted}
+    out = []
+    for path in drifted:
+        out.append("%s was edited after install. What changed (the installed %s, then yours):"
+                   % (path, release.get("version")))
+        if path in pinned:
+            with open(os.path.join(target, path), "rb") as fh:
+                mine = fh.read()
+            diff = list(difflib.unified_diff(pinned[path].decode("utf-8", "replace").splitlines(),
+                                             mine.decode("utf-8", "replace").splitlines(),
+                                             "release/%s" % path, "workspace/%s" % path, lineterm=""))
+            out += ["    %s" % line for line in diff[:DRIFT_DIFF_LINES]]
+            if len(diff) > DRIFT_DIFF_LINES:
+                out.append("    ... %d more lines: git -C %s log -p -- %s"
+                           % (len(diff) - DRIFT_DIFF_LINES, target, path))
+            out.append("to revert it: git -C %s show %s:%s > %s, then commit"
+                       % (source_repo, rev[:12], path, os.path.join(target, path)))
+        else:
+            out.append("    (the installed release isn't in %s; see your edit with: git -C %s log -p -- %s)"
+                       % (source_repo, target, path))
+            out.append("to revert it: put back the installed release's copy of %s, then commit" % path)
+        out.append("to keep it: move your change into a file the release doesn't manage (your own file, "
+                   "or a seed file such as CLAUDE.md), revert this one, commit, and upgrade again")
+    return out
+
+
+def _upgrade_preflight(target, manifest, source_repo, aios_lookup=None):
+    """Every check an upgrade makes before it writes anything. The dry run makes the same ones."""
     record = load_record(target)
     if load_journal(target):
         raise Refusal(EXIT_STATE, "a previous operation did not finish; run rollback first",
@@ -399,8 +462,12 @@ def _upgrade_locked(target, manifest, source_repo, aios_lookup=None):
                           "release %s cannot upgrade from %s (min_upgrade_from %s)"
                           % (manifest["version"], current_version, min_from))
 
-    # Dirty or partial state is refused, never silently overwritten.
-    require_verified(target, record, "workspace")
+    # Dirty or partial state is refused, never silently overwritten. An edited managed file comes
+    # with its diff and the two ways forward.
+    problems, _summary = verify(target, record)
+    if problems:
+        raise Refusal(EXIT_VERIFY, "workspace does not match its installed release",
+                      problems + drift_recipe(target, record, source_repo, problems))
     if util.worktree_dirty(target):
         raise Refusal(EXIT_STATE,
                       "the workspace has uncommitted git changes; commit or stash them so the "
@@ -429,6 +496,12 @@ def _upgrade_locked(target, manifest, source_repo, aios_lookup=None):
             "managed by the installed release" % (manifest["version"], len(collisions)),
             sorted(collisions)[:20] + ["move or delete them, then upgrade again"],
         )
+    return record, current_version, min_from, creds, files, old_managed, old_seeded
+
+
+def _upgrade_locked(target, manifest, source_repo, aios_lookup=None):
+    record, current_version, min_from, creds, files, old_managed, old_seeded = _upgrade_preflight(
+        target, manifest, source_repo, aios_lookup)
 
     txn_id = "%s-%s-to-%s" % (util.now_iso().replace(":", "").replace("-", ""),
                               current_version, manifest["version"])

@@ -34,6 +34,7 @@ neither. So, from an up-to-date clone of `ff-aios-starter` next to your workspac
 
 ```bash
 cd ../ff-aios-starter && git pull
+python3 scripts/aios/aios.py upgrade --release releases/starter-X.Y.Z.json --target ../my-workspace --dry-run   # what would change; writes nothing
 python3 scripts/aios/aios.py upgrade --release releases/starter-X.Y.Z.json --target ../my-workspace
 ```
 
@@ -122,7 +123,9 @@ local changes to the system layer - that is information, not a failure.
 
 1. Refuses unless the new release is approved, pinned and intact.
 2. Refuses if your workspace has **drifted** (a managed file edited by hand) or if git has
-   uncommitted changes. Both are refusals rather than overwrites, on purpose.
+   uncommitted changes. Both are refusals rather than overwrites, on purpose. For an edited
+   file it prints the diff and the two ways forward: revert it, or keep your change by moving
+   it into a file the release doesn't manage.
 3. Refuses if the new release ships a path that already exists as your own file.
 4. Snapshots every managed file and writes a journal **before** changing anything.
 5. Replaces managed files. Adds new seed files only where they do not already exist.
