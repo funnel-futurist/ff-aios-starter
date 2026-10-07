@@ -392,7 +392,7 @@ class ProtectionVerifierTellsTheTruth(Sandbox):
                 "  *'branches/main'*) echo %s;;\n"
                 "  *'contents/.github/CODEOWNERS'*) echo CODEOWNERS;;\n"
                 "  *) echo ''; ;;\n"
-                "esac\n" % (protection_error, "true" if protected else "false"))
+                "esac\n" % (protection_error, "" if protected is None else ("true" if protected else "false")))
         os.chmod(gh, 0o755)
         env = dict(os.environ, PATH=self.bin + os.pathsep + os.environ["PATH"])
         return subprocess.run(
@@ -429,6 +429,37 @@ class ProtectionVerifierTellsTheTruth(Sandbox):
                                       protection_error="gh: Resource not accessible by integration (HTTP 403)")
         out = proc.stdout.decode()
         self.assertIn("INCONCLUSIVE", out)
+        self.assertEqual(proc.returncode, 0, out)
+
+    def test_a_rule_hidden_from_the_token_is_unknown_not_absent(self):
+        # GitHub answers "Not Found" when a token may not read a rule. With the branch flag saying
+        # protected, that is unknown; reading it as absent was the bug.
+        proc = self._run_with_stub_gh(protected=True, protection_error="gh: Not Found (HTTP 404)")
+        out = proc.stdout.decode()
+        self.assertNotIn("NO branch protection", out)
+        self.assertIn("INCONCLUSIVE", out)
+        self.assertEqual(proc.returncode, 0, out)
+
+    def test_a_403_without_the_branch_flag_is_unknown_not_absent(self):
+        proc = self._run_with_stub_gh(protected=None,
+                                      protection_error="gh: Resource not accessible by integration (HTTP 403)")
+        out = proc.stdout.decode()
+        self.assertNotIn("NO branch protection", out)
+        self.assertIn("INCONCLUSIVE", out)
+        self.assertEqual(proc.returncode, 0, out)
+
+    def test_githubs_explicit_answer_is_absent_even_without_the_branch_flag(self):
+        proc = self._run_with_stub_gh(protected=None, protection_error="gh: Branch not protected (HTTP 404)")
+        out = proc.stdout.decode()
+        self.assertIn("NO branch protection", out)
+        self.assertEqual(proc.returncode, 1, out)
+
+    def test_a_protected_branch_with_no_classic_rule_is_unknown_not_absent(self):
+        # The flag says protected, but there is no classic rule to read: a ruleset, most likely.
+        proc = self._run_with_stub_gh(protected=True, protection_error="gh: Branch not protected (HTTP 404)")
+        out = proc.stdout.decode()
+        self.assertNotIn("NO branch protection", out)
+        self.assertIn("a ruleset?", out)
         self.assertEqual(proc.returncode, 0, out)
 
     def test_the_failure_counter_is_initialised_before_any_check(self):
