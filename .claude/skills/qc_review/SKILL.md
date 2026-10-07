@@ -10,14 +10,14 @@ Review any document or deliverable against the client's QC preferences and the a
 ## Input
 
 Specify one of:
-- A file path (e.g., `00_AIOS/review_queue/ad_copy_v1.md`)
+- A file path (e.g., `02_Deliverables/_review_queue/ad_copy_v1.md`)
 - Pasted text to review
 
 ## Steps
 
-1. Read `00_AIOS/review_queue/qc_preferences.md`, client's brand voice, visual preferences, and taste standards.
-2. Read `00_AIOS/review_queue/qc_approval_rubric.md`, the shared approval criteria.
-3. Read the relevant F6 docs from `00_AIOS/company/`, especially avatar analysis (voice/language) and pitch & messaging (positioning).
+1. Read `03_Quality_Control/qc_preferences.md`, client's brand voice, visual preferences, and taste standards.
+2. Read `03_Quality_Control/qc_approval_rubric.md`, the shared approval criteria.
+3. Read the relevant F6 docs from `01_Foundations/`, especially avatar analysis (voice/language) and pitch & messaging (positioning).
 4. Review the target deliverable against all three layers: agency standards, client preferences, and F6 alignment.
 
 ## Output

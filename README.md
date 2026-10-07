@@ -56,7 +56,7 @@ That's the on-ramp. New to GitHub or Claude Code, or want every click spelled ou
 
 ## What's inside
 
-**The workspace (seven domain folders).** `00_AIOS` is who you are and where work goes; `01_Creation`, `02_Team_Ops`, `03_RevOps` and `04_Attention` are the four ways the business runs; `05_Jobs` holds recurring jobs; `99_Archive` holds what's finished. Every company's instance uses the same seven, so anyone who has seen one can find their way around yours. You don't have to memorize it: `00_AIOS/routing.md` says which folder takes which request, or just ask.
+**The workspace (folders `01` through `09`).** Numbered, on purpose. Your foundations, your deliverables, your clients, your operations, each in its own lane. You don't have to memorize it. Just ask the brain where something goes, or where something lives. Clean structure is what lets it find things fast a year from now.
 
 **Skills (type `/`).** Pre-built moves you run by name. Type `/` in Claude Code to see what's available: `/onboard_wizard` to load up, plus skills to review a doc, run a status check, audit your files, and more. Each one is a packaged way of doing a job well. When you catch yourself explaining the same task twice, make it a skill. Now it's permanent.
 

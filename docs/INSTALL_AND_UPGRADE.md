@@ -44,28 +44,6 @@ with uncommitted work.
 `start` and `verify` are safe to run any time and change nothing. `upgrade` and `rollback` are
 founder-only.
 
-## Upgrading from Starter 2.x to 3.0 (the folder move)
-
-3.0 replaces the numbered folders (`01_Foundations` ... `11_Projects`) with seven domain folders (`00_AIOS` ... `05_Jobs`, `99_Archive`). The upgrade moves your files for you. The exact map is in the release record, so it was approved with the release.
-
-**What it does:**
-- **Moves every file.** Every file in an old folder moves to its new home, including files you made yourself. Nothing is left in the old folders: if anything would be, the upgrade undoes itself.
-- **Refreshes untouched starter files.** A starter file you never edited (still byte-for-byte what the old release wrote) gets the 3.0 text.
-- **Never edits your words.** A file you edited keeps them exactly.
-- **Lists what you should check:**
-  - files of yours that still mention an old folder, which aren't edited, so update them when you're ready;
-  - any moved site whose host setting (Vercel's Root Directory) must change.
-
-**What it refuses:**
-- uncommitted work;
-- a file that would land on top of a different file you already have.
-
-Either refusal changes nothing.
-
-**Afterwards:** commit. Git shows the change as moves, so the history of each file follows it.
-
-**Going back:** `rollback` reverses every move and restores the old text of refreshed files. A file you edited after upgrading keeps your edit.
-
 ## Getting an exact release
 
 Every release is a record, `releases/starter-X.Y.Z.json`, plus a tag, `starter-X.Y.Z`. The

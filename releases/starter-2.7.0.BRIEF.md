@@ -2,6 +2,8 @@
 
 **Written for:** Phoenix, before being asked to approve anything. About four minutes.
 
+> **Approved 2026-10-06 at `c5dce56`**, not `d3f360d`: `c5dce56` is `d3f360d` plus the version label (`.template_version.json` says 2.7.0). Phoenix's words and the line he answered are in `releases/starter-2.7.0.json`.
+
 ## The decision in one line
 
 Approve AIOS Starter 2.7.0 at `d3f360d`. It is 2.6.1's fixes plus three things:

@@ -18,17 +18,19 @@ This skill activates when:
 Run all 10 checks. For each, assign PASS, FLAG, or FAIL.
 
 ### Check 1: Folder Structure
-Verify the Starter 3.0 domain folders exist:
-- `00_AIOS/` with `company/` (6 subfolders: market_analysis, avatar_analysis, offer_optimization, offer_economics, pitch_and_messaging, profile_snapshot), `systems/`, `review_queue/`, `routing.md` and `decisions_log.md`
-- `01_Creation/` with `brand/`, `asset_library/`, `preferences/`, `outputs/`
-- `02_Team_Ops/` with `projects/` and `routines/`
-- `03_RevOps/` with `customer_journey/` and `automations/`
-- `04_Attention/`, `05_Jobs/`, `99_Archive/`
+Verify all 7 canonical folders exist:
+- `01_Foundations/` with 6 subfolders (market_analysis, avatar_analysis, offer_optimization, offer_economics, pitch_and_messaging, profile_snapshot)
+- `02_Deliverables/` with _review_queue + subfolders (copy, funnels, ads, emails, reports, webinars, audits)
+- `03_Quality_Control/`
+- `04_Customer_Journey/`
+- `05_Assets/`
+- `06_Communication/`
+- `07_Setup/`
 
-FAIL if any top-level domain folder is missing. FLAG if subfolders are missing. FAIL if a Starter 2.x folder (`01_Foundations/` ... `11_Projects/`) still exists: the 3.0 upgrade moves everything out of them.
+FAIL if any top-level folder is missing. FLAG if subfolders are missing.
 
 ### Check 2: F6 Completeness
-Check each `00_AIOS/company/` subfolder for at least one document (not counting .gitkeep or _workspace.md).
+Check each `01_Foundations/` subfolder for at least one document (not counting .gitkeep or _workspace.md).
 Report: "X/6 F6 docs loaded" with list of which are missing.
 PASS = 6/6. FLAG = 1-5. FAIL = 0.
 
@@ -39,12 +41,12 @@ Scan all files for:
 - Files at root that should be in a subfolder → FLAG
 
 ### Check 4: Task Tracker Freshness
-Read `03_RevOps/customer_journey/task_tracker.md`:
+Read `04_Customer_Journey/task_tracker.md`:
 - Are there active tasks? PASS if yes, FLAG if empty.
 - Are any tasks >30 days old with no update? FLAG with list.
 
 ### Check 5: QC Preferences
-Read `00_AIOS/review_queue/qc_preferences.md`:
+Read `03_Quality_Control/qc_preferences.md`:
 - Is it filled in (not just template placeholders)? PASS if customized, FLAG if still template defaults.
 
 ### Check 6: Security, Settings
@@ -57,20 +59,20 @@ Verify `.gitignore` blocks: `.env`, `.env.*`, `*.pem`, `*.key`, `credentials.jso
 FAIL if file missing or rules incomplete.
 
 ### Check 8: Engagement Timeline
-Read `03_RevOps/customer_journey/engagement_timeline.md`:
+Read `04_Customer_Journey/engagement_timeline.md`:
 - Is client name filled in? PASS/FAIL
 - Is current phase set? PASS/FAIL
 - Is start date set? PASS/FLAG
 
 ### Check 9: Communication Files
-Check these exist:
-- `02_Team_Ops/routines/daily_handoff.md`, with at least 1 entry?
-- `00_AIOS/decisions_log.md`
-- `02_Team_Ops/routines/feedback_log.md`
+Check `06_Communication/` has:
+- `daily_handoff.md`, exists? Has at least 1 entry?
+- `decisions_log.md`, exists?
+- `feedback_log.md`, exists?
 FLAG if files exist but are empty. FAIL if files missing.
 
 ### Check 10: Orphan Files
-Check for files at root level that aren't standard (START_HERE.md, README.md, CLAUDE.md, SETUP.md, REPO_CONTEXT.md, estate.yaml, GETTING_STARTED.md, taxonomy_rules.md, .env.example, .template_version.json, and the license and policy files). FLAG any unexpected files.
+Check for files at root level that aren't standard (CLAUDE.md, README.md, GETTING_STARTED.md, taxonomy_rules.md, .env.example, .template_version.json). FLAG any unexpected files.
 
 ## OUTPUT FORMAT
 

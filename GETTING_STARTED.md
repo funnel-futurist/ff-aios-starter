@@ -32,7 +32,7 @@
    (On Windows, open each file in the `releases` folder and use the newest one that says `"status": "approved"`.)
    Then check the release's tag: `python3 scripts/aios/aios.py release check-tag starter-X.Y.Z --release-id starter-X.Y.Z`. If it passes, run `git checkout starter-X.Y.Z`, so the install tool you run is that release's own. If it refuses (starter-2.6.0 does, a known exception described in the install guide), stay on this copy. The installer still installs only that release's files and checks every one. Write your organization file (who you are and your role) as shown in [docs/INSTALL_AND_UPGRADE.md](docs/INSTALL_AND_UPGRADE.md), then run `python3 scripts/aios/aios.py install --release releases/starter-X.Y.Z.json --target ../my-aios --config my-org.json`. Then, in `my-aios`: `git add -A`, `git commit -m "Install AIOS"`, `git push`. (Already made a copy with "Use this template"? That copies whatever was on the main branch that day. See "Already have a workspace from Use this template?" in the install guide.)
 
-7. **Open Claude Code in your AIOS folder and check it.** VS Code: File → Open Folder → pick `my-aios`. You should see `CLAUDE.md`, `SETUP.md`, and the domain folders `00_AIOS` to `05_Jobs` plus `99_Archive` in the sidebar. Run `python3 scripts/aios/aios.py start`. It should print your GitHub name, your role (founder) and the release you installed.
+7. **Open Claude Code in your AIOS folder and check it.** VS Code: File → Open Folder → pick `my-aios`. You should see `CLAUDE.md`, `GETTING_STARTED.md`, and the `01`-`09` folders in the sidebar. Run `python3 scripts/aios/aios.py start`. It should print your GitHub name, your role (founder) and the release you installed.
 
 8. **(Optional) Get an Anthropic API key, only if a skill asks for one.** Claude Code runs on your subscription, and every key in this AIOS is optional: the installer lists each as "not configured (optional)". If you do add one: Go to console.anthropic.com (same login), API Keys → Create key. Name it specifically, like `my-aios-claude-code`, so you can revoke just that one later. **Copy it now, you can't see it again.** Then set a spend limit on the key (start at $20-$50/mo) so a runaway script can't surprise you.
 
@@ -48,14 +48,14 @@
 
 14. **Bookmark the unstuck protocol.** Open [docs/UNSTUCK_PROTOCOL.md](docs/UNSTUCK_PROTOCOL.md) and pin it. The order: caveman-mode Claude → screenshot + AI → YouTube (last 1-2 months) → NotebookLM → escalate to a human. Between Claude Code and this, you'll solve ~99% yourself.
 
-15. **Connect Google Drive (so your brain stays current).** This lets your AIOS read and write your real documents. In console.cloud.google.com: New Project → name it → APIs and Services → Enable APIs, and turn on **only** the document suite you'll use: **Drive**, **Docs**, **Sheets**, **Slides**. Don't enable everything (least privilege; add Gmail/Calendar later only when you have a reason). Create credentials, put the key in `.env`, then point your `00_AIOS/company/` docs at your real Drive files so they stay on the latest version. Stuck? Unstuck protocol → search "Google Drive API key Cloud Console."
+15. **Connect Google Drive (so your brain stays current).** This lets your AIOS read and write your real documents. In console.cloud.google.com: New Project → name it → APIs and Services → Enable APIs, and turn on **only** the document suite you'll use: **Drive**, **Docs**, **Sheets**, **Slides**. Don't enable everything (least privilege; add Gmail/Calendar later only when you have a reason). Create credentials, put the key in `.env`, then point your `01_Foundations/` docs at your real Drive files so they stay on the latest version. Stuck? Unstuck protocol → search "Google Drive API key Cloud Console."
 
 ---
 
 ## You're set up when all of these are true
 Subscription active · git, Python 3, Node.js and `gh` installed and signed in · your private repo installed from an approved release (`start` shows it) · Claude Code running on your computer · `/onboard_wizard` run · team invited to the repo · secure (2FA on, named keys with spend limits) · unstuck protocol bookmarked.
 
-**Prove it's actually working:** run `/context_load`, then `/f6_completeness_check`, then ask *"what do you understand about my business?"* If Claude answers with specifics from your own docs, your brain is wired right. A generic answer means Drive, your `00_AIOS/company/`, or your key isn't connected yet, fix that before you rely on it.
+**Prove it's actually working:** run `/context_load`, then `/f6_completeness_check`, then ask *"what do you understand about my business?"* If Claude answers with specifics from your own docs, your brain is wired right. A generic answer means Drive, your `01_Foundations/`, or your key isn't connected yet, fix that before you rely on it.
 
 Caveman version: **account + subscription + tools + installed repo + running + team on it + safety net + proof it works.**
 

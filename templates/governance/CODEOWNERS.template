@@ -45,7 +45,7 @@
 # The founder lane: every path an operator's role may not change (.aios/roles.json paths_denied).
 # The boundary check fails an operator's PR here until a founder approves; this makes GitHub
 # ask the right person for that approval.
-/00_AIOS/company/offer_economics/  [REPO_OWNER]
+/01_Foundations/offer_economics/  [REPO_OWNER]
 /scripts/aios/              [REPO_OWNER] [PRIMARY_REVIEWER]
 /templates/governance/      [REPO_OWNER] [PRIMARY_REVIEWER]
 

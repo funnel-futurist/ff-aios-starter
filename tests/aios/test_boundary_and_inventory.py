@@ -25,7 +25,7 @@ from aioslib.util import EXIT_OK, EXIT_ROLE  # noqa: E402
 REAL_ROOT = harness.REPO_ROOT
 
 OPERATOR_DENIED = [
-    "00_AIOS/company/offer_economics/**", ".github/**", ".aios/config.json",
+    "01_Foundations/offer_economics/**", ".github/**", ".aios/config.json",
     ".aios/roles.json", ".claude/settings.json", ".claude/hooks/**", "scripts/aios/**",
 ]
 
@@ -53,8 +53,8 @@ class _Workspace(Sandbox):
         harness.write(self.ws, ".aios/roles.json", json.dumps(_policy()))
         harness.write(self.ws, ".aios/config.json", json.dumps(harness.config(people=_people())))
         harness.write(self.ws, ".aios/.gitignore", "usage/\n")
-        harness.write(self.ws, "00_AIOS/company/offer_economics/pricing.md", "# price\n")
-        harness.write(self.ws, "01_Creation/outputs/draft.md", "# draft\n")
+        harness.write(self.ws, "01_Foundations/offer_economics/pricing.md", "# price\n")
+        harness.write(self.ws, "02_Deliverables/draft.md", "# draft\n")
 
     def edit(self, rel, login="acme-va", tool="Edit"):
         return boundary.check_edit(self.ws, tool, {"file_path": os.path.join(self.ws, rel)},
@@ -67,7 +67,7 @@ class SessionHook(_Workspace):
     def test_an_operator_is_refused_on_every_founder_lane_path(self):
         for rel in (".aios/config.json", ".aios/roles.json", ".claude/settings.json",
                     ".claude/hooks/guard.js", ".github/workflows/ci.yml",
-                    "00_AIOS/company/offer_economics/pricing.md", "scripts/aios/aios.py"):
+                    "01_Foundations/offer_economics/pricing.md", "scripts/aios/aios.py"):
             allowed, reason = self.edit(rel)
             self.assertFalse(allowed, rel)
             self.assertIn("founder lane", reason)
@@ -90,7 +90,7 @@ class SessionHook(_Workspace):
         def explode(_root):
             raise AssertionError("an ordinary edit must not pay for an identity lookup")
         allowed, _ = boundary.check_edit(
-            self.ws, "Write", {"file_path": os.path.join(self.ws, "01_Creation/outputs/draft.md")},
+            self.ws, "Write", {"file_path": os.path.join(self.ws, "02_Deliverables/draft.md")},
             identify=explode)
         self.assertTrue(allowed)
 
@@ -105,9 +105,9 @@ class SessionHook(_Workspace):
         self.assertTrue(self.edit(".aios/config.json", tool="Read")[0])
 
     def test_a_symlink_cannot_smuggle_an_edit_into_the_founder_lane(self):
-        link = os.path.join(self.ws, "01_Creation", "outputs", "innocent.md")
+        link = os.path.join(self.ws, "02_Deliverables", "innocent.md")
         os.symlink(os.path.join(self.ws, ".aios", "config.json"), link)
-        allowed, _ = self.edit("01_Creation/outputs/innocent.md")
+        allowed, _ = self.edit("02_Deliverables/innocent.md")
         self.assertFalse(allowed)
 
     def test_relative_paths_are_resolved_against_the_workspace(self):
@@ -173,8 +173,8 @@ class PullRequestCheck(Sandbox):
         harness.write(self.repo, ".aios/roles.json", json.dumps(_policy(), indent=2))
         harness.write(self.repo, ".aios/config.json",
                       json.dumps(harness.config(people=_people()), indent=2))
-        harness.write(self.repo, "01_Creation/outputs/draft.md", "# draft\n")
-        harness.write(self.repo, "00_AIOS/company/offer_economics/pricing.md", "# price\n")
+        harness.write(self.repo, "02_Deliverables/draft.md", "# draft\n")
+        harness.write(self.repo, "01_Foundations/offer_economics/pricing.md", "# price\n")
         harness.run_git(self.repo, "add", "-A")
         harness.run_git(self.repo, "commit", "-qm", "base")
         self.base = util.git(self.repo, ["rev-parse", "HEAD"])
@@ -199,7 +199,7 @@ class PullRequestCheck(Sandbox):
         self.assertIn(".aios/config.json", "\n".join(lines))
 
     def test_a_founders_approval_of_that_commit_passes_it(self):
-        head = self.change({"00_AIOS/company/offer_economics/pricing.md": "# new price\n"})
+        head = self.change({"01_Foundations/offer_economics/pricing.md": "# new price\n"})
         for founder in ("acme-founder", "acme-partner"):
             code, _ = self.check(head, approvers=[founder])
             self.assertEqual(code, EXIT_OK, founder)
@@ -214,7 +214,7 @@ class PullRequestCheck(Sandbox):
         self.assertEqual(self.check(head, author="acme-founder")[0], EXIT_OK)
 
     def test_ordinary_work_by_an_operator_passes(self):
-        head = self.change({"01_Creation/outputs/draft.md": "# better draft\n"})
+        head = self.change({"02_Deliverables/draft.md": "# better draft\n"})
         self.assertEqual(self.check(head)[0], EXIT_OK)
 
     def test_a_pr_cannot_loosen_the_rule_it_is_checked_against(self):
@@ -228,7 +228,7 @@ class PullRequestCheck(Sandbox):
         self.assertEqual(code, EXIT_ROLE, "the rule must be read from the base commit")
 
     def test_deleting_or_moving_a_protected_file_counts(self):
-        head = self.change({}, removals=["00_AIOS/company/offer_economics/pricing.md"])
+        head = self.change({}, removals=["01_Foundations/offer_economics/pricing.md"])
         self.assertEqual(self.check(head)[0], EXIT_ROLE)
 
     def test_a_stranger_is_held_to_the_operator_limits(self):
@@ -315,31 +315,6 @@ class WhatTheRepoShips(Sandbox):
             self.assertTrue(any(prefix == r or prefix.startswith(r + "/") for r in rules),
                             "%s is founder-lane but no code owner is asked to review it"
                             % pattern)
-
-    def test_the_founder_lane_moved_with_the_3_0_folders(self):
-        """A layout move must carry each protection to the new path, never quietly drop it."""
-        denied = self.load(".aios/roles.json")["roles"]["operator"]["paths_denied"]
-        self.assertIn("00_AIOS/company/offer_economics/**", denied)
-        layout = self.load("release/package_spec.json")["layout"]
-        old_roots = tuple(layout["retired_roots"])
-        stale = [p for p in denied if p.startswith(old_roots)]
-        self.assertEqual(stale, [], "founder-lane rules still name 2.x folders")
-        # and the real hook refuses an operator there
-        ws = os.path.join(self.tmp, "ws")
-        shutil.copytree(os.path.join(REAL_ROOT, ".aios"), os.path.join(ws, ".aios"))
-        util.write_json(os.path.join(ws, ".aios", "config.json"), harness.config())
-        target = os.path.join(ws, "00_AIOS", "company", "offer_economics", "pricing.md")
-        allowed, reason = boundary.check_edit(ws, "Write", {"file_path": target},
-                                              identify=lambda _root: "acme-va")
-        self.assertFalse(allowed, reason)
-
-    def test_every_2x_folder_has_a_3_0_home(self):
-        layout = self.load("release/package_spec.json")["layout"]
-        sources = {m["from"].split("/")[0] for m in layout["moves"]}
-        self.assertEqual(sources, set(layout["retired_roots"]))
-        for root in layout["retired_roots"]:
-            self.assertFalse(os.path.exists(os.path.join(REAL_ROOT, root)),
-                             "the Starter itself still ships %s" % root)
 
     def test_the_boundary_check_runs_on_pull_requests_and_reviews(self):
         wf = open(os.path.join(REAL_ROOT, ".github", "workflows",
