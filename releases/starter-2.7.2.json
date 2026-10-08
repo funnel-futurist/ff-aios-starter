@@ -1,7 +1,8 @@
 {
   "approval": {
-    "approved_at": null,
-    "approved_by": null
+    "approved_at": "2026-10-08T14:08:00Z",
+    "approved_by": "phoenix-ship-it",
+    "basis": "Phoenix, 2026-10-08 at about 14:08Z, wrote \"Approve starter 2.7.2 at d988d2c\", the exact line the founder brief releases/starter-2.7.2.BRIEF.md (at 6ea99db) asked for. Recorded verbatim by Chat Zero in ff-delegation exec/operating-cutover-20260921 at cdd5f47, CHUNK_RECORDS.md, the entry headed \"10-08 ~14:08Z: Phoenix's words\". The approval binds to d988d2c4cb3302173f1954e8d7bb190699db402c only. It covers 2.7.1 (never released), whose changes 2.7.2 contains. He did not say \"keep 2.7.0\", so 2.7.0 and 2.7.1 are superseded, as the brief said."
   },
   "compatibility": {
     "breaking": [],
@@ -747,6 +748,6 @@
     "workspace_health",
     "wrap-up"
   ],
-  "status": "draft",
+  "status": "approved",
   "version": "2.7.2"
 }

@@ -2,6 +2,8 @@
 
 **Written for:** Phoenix, before approving. About three minutes.
 
+> **Approved 2026-10-08 at `d988d2c`**, the exact commit this brief names. Phoenix's words and where they are recorded are in `releases/starter-2.7.2.json`.
+
 **One approval can cover both 2.7.1 and 2.7.2.** 2.7.2 contains everything in 2.7.1 (#27), plus the operator core. Approving 2.7.2 alone means one sentence from you, one PR approval and one merge, and 2.7.1 is never tagged, as 2.6.1 never was. **That is the recommendation.** The 2.7.1 brief, on #27, covers the other route.
 
 ## The decision in one line
