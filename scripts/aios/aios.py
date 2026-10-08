@@ -203,6 +203,14 @@ def cmd_verify(args):
                             "(pass --repo to also check the record against the pinned release)"))
     _say("managed:   %d/%d files re-hashed from disk"
          % (summary["managed_checked"], summary["managed_total"]))
+    for e in record.get("seed_lines") or []:
+        full = os.path.join(target, e["path"])
+        here = False
+        if os.path.isfile(full):
+            with open(full, encoding="utf-8", errors="replace") as fh:
+                here = any(line.strip() == e["line"] for line in fh)
+        _say("  line:    %s %s `%s` (yours to keep or remove)"
+             % (e["path"], "has" if here else "no longer has", e["line"]))
     config = None
     try:
         config = orgconfig.load(target)
@@ -233,13 +241,35 @@ def cmd_upgrade(args):
     config = orgconfig.load(target)
     policy = roles.load_policy(target)
     login, role = roles.require_lifecycle(policy, config, "upgrade")
+    if args.dry_run:
+        # The same checks and refusals as a real upgrade; nothing is written, not even a lock.
+        plan = install_mod.upgrade_plan(target, manifest, repo, _aios_lookup_from(args.aios_releases))
+        _say("dry run: %s %s -> %s, nothing written" % (target, plan["from"], plan["to"]))
+        _say("  by:        %s (%s)" % (login, role))
+        for label in ("changed", "added", "removed"):
+            for path in plan[label]:
+                _say("  %-10s %s" % (label + ":", path))
+        _say("  unchanged: %d managed files" % plan["unchanged"])
+        if plan["new_seeds"]:
+            _say("  new seeds: %d, written once and yours afterwards: %s"
+                 % (len(plan["new_seeds"]), ", ".join(plan["new_seeds"])))
+        for sl in plan["seed_lines"]:
+            _say("  one line:  %s gains `%s` (added once; rollback takes it back)" % (sl["path"], sl["line"]))
+        _say("  run it again without --dry-run to upgrade")
+        return EXIT_OK
     before = install_mod.load_record(target)
     record = install_mod.upgrade(target, manifest, repo, _aios_lookup_from(args.aios_releases))
     _say("upgraded %s: %s -> %s"
          % (target, before["release"]["version"], record["release"]["version"]))
     _say("  by:       %s (%s)" % (login, role))
     _say("  managed:  %d files, verified by readback" % len(record["managed"]))
-    _say("  state:    untouched (seed and unmanaged files were not written)")
+    added = [e for e in record.get("seed_lines") or []
+             if e.get("state") == "added" and e.get("release") == record["release"]["version"]]
+    if added:
+        _say("  state:    untouched, except one declared line: %s"
+             % "; ".join("%s gained `%s`" % (e["path"], e["line"]) for e in added))
+    else:
+        _say("  state:    untouched (seed and unmanaged files were not written)")
     _say("  rollback: available (%s)" % record["previous"]["backup"])
     return EXIT_OK
 
@@ -533,6 +563,8 @@ def build_parser():
     up.add_argument("--target", default=".")
     up.add_argument("--repo", default=_repo_root())
     up.add_argument("--aios-releases", dest="aios_releases")
+    up.add_argument("--dry-run", dest="dry_run", action="store_true",
+                    help="run every check and print the managed-file changes; write nothing")
     up.set_defaults(func=cmd_upgrade)
 
     rbk = sub.add_parser("rollback", help="restore the previous release")

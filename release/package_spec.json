@@ -1,6 +1,6 @@
 {
   "schema": "ff-aios-starter/package-spec@1",
-  "_comment": "Which paths ship in a release, and who owns each one after install. managed = the release owns it (replaced on upgrade, verified by readback). seed = written once if absent, then yours forever. Anything excluded never ships; anything you create yourself is invisible to the installer.",
+  "_comment": "Which paths ship in a release, and who owns each one after install. managed = the release owns it (replaced on upgrade, verified by readback). seed = written once if absent, then yours forever. Anything excluded never ships; anything you create yourself is invisible to the installer. seed_lines = one declared line a release adds once to a seed file that predates it (today: the operator core's import in CLAUDE.md); never twice, never into a deleted file, taken back by rollback.",
   "exclude": [
     "evidence/**",
     "releases/**",
@@ -32,6 +32,12 @@
       "template": "templates/governance/CODEOWNERS.template",
       "out": ".github/CODEOWNERS",
       "why": "CODEOWNERS must name owners who actually have access to THIS repository, so it is rendered per workspace, never copied."
+    }
+  ],
+  "seed_lines": [
+    {
+      "path": "CLAUDE.md",
+      "line": "@.aios/operator_core/OPERATOR_CORE.md"
     }
   ]
 }

@@ -97,8 +97,17 @@ def build(repo, rev, version, spec=None, branch=None, credentials=None, min_upgr
         p.split("/")[2] for p, _c, _m, _s in files
         if p.startswith(".claude/skills/") and p.count("/") >= 3
     })
+    seed_lines = spec.get("seed_lines") or []
+    problems = check_seed_lines(seed_lines, spec)
+    for sl in seed_lines if not problems else []:
+        text = util.git(repo, ["show", "%s:%s" % (rev, sl["path"])], check=False) or ""
+        if not any(line.strip() == sl["line"] for line in text.splitlines()):
+            problems.append("seed line %r is not in %s at %s, so a fresh install would lack it"
+                            % (sl["line"], sl["path"], rev[:12]))
+    if problems:
+        raise Refusal(EXIT_PACKAGE, "the package spec's seed_lines are not releasable", problems)
 
-    return {
+    manifest = {
         "schema": SCHEMA,
         "release_id": "starter-%s" % version,
         "package": PACKAGE,
@@ -122,6 +131,29 @@ def build(repo, rev, version, spec=None, branch=None, credentials=None, min_upgr
             {"path": p, "class": c, "mode": m, "sha256": s} for p, c, m, s in files
         ],
     }
+    if seed_lines:  # only when declared, so a release without them keeps its exact shape
+        manifest["seed_lines"] = [{"path": sl["path"], "line": sl["line"]} for sl in seed_lines]
+    return manifest
+
+
+def check_seed_lines(seed_lines, spec=None):
+    """A seed line is one line a release adds once to a seed file that predates it (an import, say).
+
+    It is the only way a release writes into a file that is the client's: so it must be one plain
+    line, in a seed file, and declared, never inferred.
+    """
+    problems = []
+    if not isinstance(seed_lines, list):
+        return ["seed_lines must be a list"]
+    for sl in seed_lines:
+        path, line = (sl or {}).get("path"), (sl or {}).get("line")
+        if not isinstance(path, str) or not isinstance(line, str) or not line.strip():
+            problems.append("seed line %r needs a path and a non-empty line" % (sl,))
+        elif "\n" in line or "\r" in line or line != line.strip():
+            problems.append("seed line for %s must be one line with no surrounding space" % path)
+        elif spec is not None and classify(spec, path) != "seed":
+            problems.append("seed line target %s is not a seed file" % path)
+    return problems
 
 
 # ─── checks ──────────────────────────────────────────────────────────────────
@@ -130,6 +162,8 @@ def check_shape(man):
     problems = []
     if man.get("schema") != SCHEMA:
         problems.append("schema is %r, expected %r" % (man.get("schema"), SCHEMA))
+    if "seed_lines" in man:
+        problems += check_seed_lines(man["seed_lines"])
     if man.get("package") != PACKAGE:
         problems.append("package is %r, expected %r" % (man.get("package"), PACKAGE))
     if not util.parse_semver(man.get("version", "")):

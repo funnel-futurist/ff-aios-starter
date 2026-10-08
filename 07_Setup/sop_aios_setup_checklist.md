@@ -38,11 +38,11 @@ GitHub is where your workspace files live in the cloud. Think of it like a secur
 
 ## Step 2: Get Access to Your Workspace
 
-Your AIOS workspace is a private GitHub repository created from the `ff-aios-starter` template. There are two ways you might have it:
+Your AIOS workspace is a private GitHub repository with an approved `ff-aios-starter` release installed into it by the installer. There are two ways you might have it:
 
-**Option A: You created it yourself (standalone)**
-1. You clicked "Use this template" on the `ff-aios-starter` repo
-2. You now own a private repo under your own GitHub account
+**Option A: You installed it yourself (standalone)**
+1. You created an empty private repo and installed the newest approved release into it ([GETTING_STARTED.md](../GETTING_STARTED.md) steps 5 and 6). Don't use the green "Use this template" button: it copies whatever is on the main branch that day, not an approved release.
+2. You own the repo under your own GitHub account
 3. No invitation needed. Go straight to Step 3.
 
 **Option B: Your agency set it up for you**

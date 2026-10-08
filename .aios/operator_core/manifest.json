@@ -1,0 +1,17 @@
+{
+  "differences": [
+    "line 2: this edition note",
+    "section 8: names the one import line a release adds to CLAUDE.md, which the source's 'never touch' sentence doesn't",
+    "section 9: points to the workspace's own voice rules and the /humanize skill instead of a repository clients can't open"
+  ],
+  "edition": "client",
+  "import_line": "@.aios/operator_core/OPERATOR_CORE.md",
+  "scope": "client",
+  "sha256": "2a938ffc459a52b05b19583805fee2b099923a356455e65a2b5901162ab16523",
+  "shipped_in": "starter-2.7.2",
+  "source_commit": "5d835ed8eeda4ac9ae505e77f311da8b332348b9",
+  "source_path": "00_Foundations/operator_core/OPERATOR_CORE.md",
+  "source_repo": "funnel-futurist/ai-os",
+  "source_sha256": "c2334ade3a4a89bdff000a659b675e225006b7363db605eee67b3222796069f1",
+  "version": "1.1.1"
+}

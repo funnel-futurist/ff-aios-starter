@@ -36,16 +36,29 @@ PROT=$(gh api "repos/$REPO/branches/main/protection" 2>/tmp/_prot_err)
 CODE=$?
 ERR=$(cat /tmp/_prot_err 2>/dev/null); rm -f /tmp/_prot_err
 if [ $CODE -ne 0 ]; then
-  if echo "$ERR" | grep -qi "Not Found"; then
-    if [ "$PROTECTED" != "false" ]; then
-      echo "  ✗ FAIL: main has NO branch protection (direct pushes to main are NOT blocked)"
-      fails=$((fails+1))
-    fi
-  elif echo "$ERR" | grep -qiE "403|admin"; then
-    echo "  ⚠ NOTE: can't read protection (needs an admin token). Re-run as an admin to verify."
-    echo "─────────────────────────────────────────────"; echo "INCONCLUSIVE (no admin access) — not a failure."; exit 0
+  # Only two answers prove protection is ABSENT: the branch's own flag saying false (counted above), or
+  # GitHub's explicit "Branch not protected". A 403, or a bare "Not Found" (GitHub hides a rule from a
+  # token that may not read it), means UNKNOWN, never absent. The first version of this check read
+  # "Not Found" as absent; the one before that read "Branch not protected" as unknown and exited 0.
+  if [ "$PROTECTED" = "false" ]; then
+    :  # already a FAIL: confirmed without admin
+  elif echo "$ERR" | grep -qi "Branch not protected" && [ "$PROTECTED" != "true" ]; then
+    echo "  ✗ FAIL: main has NO branch protection (direct pushes to main are NOT blocked)"
+    fails=$((fails+1))
   else
-    echo "  ⚠ NOTE: couldn't read protection ($(echo "$ERR" | head -1 | cut -c1-80))"; exit 0
+    if echo "$ERR" | grep -qiE "403|admin"; then
+      echo "  ⚠ NOTE: can't read protection (needs an admin token). Re-run as an admin to verify."
+    elif echo "$ERR" | grep -qi "Branch not protected"; then
+      echo "  ⚠ NOTE: main is protected, but not by a classic rule this check can read (a ruleset?)."
+    else
+      echo "  ⚠ NOTE: couldn't read protection, so it is unknown, not absent ($(echo "$ERR" | head -1 | cut -c1-80))"
+    fi
+    # An unreadable detail is no reason to go green over a failure already confirmed without admin.
+    if [ "$fails" -gt 0 ]; then
+      echo "─────────────────────────────────────────────"
+      echo "RESULT: $fails check(s) FAILED - main is not protected (confirmed without admin)."; exit 1
+    fi
+    echo "─────────────────────────────────────────────"; echo "INCONCLUSIVE (no admin access) - not a failure."; exit 0
   fi
 else
   echo "$PROT" | python3 -c "

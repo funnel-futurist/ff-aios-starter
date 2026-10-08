@@ -1,8 +1,8 @@
 {
   "approval": {
-    "approved_at": "2026-10-06T22:50:00Z",
+    "approved_at": "2026-10-08T14:08:00Z",
     "approved_by": "phoenix-ship-it",
-    "basis": "Phoenix, 2026-10-06 at about 22:50Z, answered the line \"Approve starter 2.7.0 at c5dce56\": yes / no with \"Approved starter two point seven, yes\". Recorded by Chat Zero in ff-delegation exec/operating-cutover-20260921 at 59ba051, BOWTIE_QC_REVIEW_ROUTING_2026-10-06.md section 9. The approval binds to c5dce563f028125bef056af622b72dbded08f86c only: the 2.7.0 candidate d3f360d plus the version label (.template_version.json says 2.7.0). Provenance of 2.6.0's 186 copied Anthropic files is in section 3 of the same record; this release holds none of them."
+    "basis": "Phoenix, 2026-10-08 at about 14:08Z, wrote \"Approve starter 2.7.2 at d988d2c\", the exact line the founder brief releases/starter-2.7.2.BRIEF.md (at 6ea99db) asked for. Recorded verbatim by Chat Zero in ff-delegation exec/operating-cutover-20260921 at cdd5f47, CHUNK_RECORDS.md, the entry headed \"10-08 ~14:08Z: Phoenix's words\". The approval binds to d988d2c4cb3302173f1954e8d7bb190699db402c only. It covers 2.7.1 (never released), whose changes 2.7.2 contains. He did not say \"keep 2.7.0\", so 2.7.0 and 2.7.1 are superseded, as the brief said."
   },
   "compatibility": {
     "breaking": [],
@@ -12,14 +12,14 @@
     "aios_release": null
   },
   "counts": {
-    "files": 110,
-    "managed": 74,
+    "files": 112,
+    "managed": 76,
     "seed": 36,
     "skills": 20
   },
   "created_from": {
-    "branch": "exec/lane01-starter-2.7.0-version-20261006",
-    "git_rev": "c5dce563f028125bef056af622b72dbded08f86c"
+    "branch": "exec/lane01-starter-2.7.2-20261007",
+    "git_rev": "d988d2c4cb3302173f1954e8d7bb190699db402c"
   },
   "credentials": [
     {
@@ -55,6 +55,18 @@
       "mode": "100644",
       "path": ".aios/local-operator.example.json",
       "sha256": "07df5a30f9f77ec34b4d2c549954d47b56b4da95d267a182f64442d214bb4258"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".aios/operator_core/OPERATOR_CORE.md",
+      "sha256": "2a938ffc459a52b05b19583805fee2b099923a356455e65a2b5901162ab16523"
+    },
+    {
+      "class": "managed",
+      "mode": "100644",
+      "path": ".aios/operator_core/manifest.json",
+      "sha256": "7f49297a8cef749cde4837b99a4c478475c3d8b77c695460c82afee14f6dd429"
     },
     {
       "class": "managed",
@@ -228,7 +240,7 @@
       "class": "managed",
       "mode": "100644",
       "path": ".github/workflows/pr-review.yml",
-      "sha256": "2bbafa6f56d7f5dfcf9151da8ec03597f3ba456e625b936fbf8505a087117c75"
+      "sha256": "7f9205f193f54683a2f7a739cf393fc9536e16d1a677e14c61a26a617d27ff3f"
     },
     {
       "class": "managed",
@@ -246,7 +258,7 @@
       "class": "managed",
       "mode": "100644",
       "path": ".template_version.json",
-      "sha256": "e9af85124fa1973b02e6fea21bfec4eb156447f28ea6c16a9988ecc10afe107b"
+      "sha256": "b9109f534b276eeddf41479d500d61c044c1d628578114791e60391137947525"
     },
     {
       "class": "seed",
@@ -420,13 +432,13 @@
       "class": "managed",
       "mode": "100644",
       "path": "07_Setup/founder_setup_walkthrough.md",
-      "sha256": "03b82bd7fd8ddb889aca2112276c9ae8d302019c8aeacc5038f3663c1cfc4f65"
+      "sha256": "e28f52b25b6619c8c7c4d48314637a3843b23f07d26dff127e0cf45d550adc2a"
     },
     {
       "class": "managed",
       "mode": "100644",
       "path": "07_Setup/sop_aios_setup_checklist.md",
-      "sha256": "b8888ba659a4c336bef40a9c55a1d612d27bfe6d73d97b09c8066a985bdcc356"
+      "sha256": "03fb0469fbe98c4d865892042da4a2c98311b46316bc3c9406ea3dea0849e0f6"
     },
     {
       "class": "managed",
@@ -462,7 +474,7 @@
       "class": "seed",
       "mode": "100644",
       "path": "CLAUDE.md",
-      "sha256": "c1d9f3d33a06636909392bc01995d1cfd14ceb433dc70e44a1b26724885bbb65"
+      "sha256": "98ec8bb97c808dba31a331ef38786e55a316b7d426ebfef43a3399aaf88afb27"
     },
     {
       "class": "managed",
@@ -510,7 +522,7 @@
       "class": "managed",
       "mode": "100644",
       "path": "docs/INSTALL_AND_UPGRADE.md",
-      "sha256": "587f98266ca109e38f792d96abbbc20bb4956b82f2af5ae21535ad9ebba4c8ac"
+      "sha256": "865f2577ddb493cf1bbb7f6fec65965a09191b2879a94a2efe594514099433cf"
     },
     {
       "class": "managed",
@@ -552,7 +564,7 @@
       "class": "managed",
       "mode": "100755",
       "path": "scripts/aios/aios.py",
-      "sha256": "55e07911035950ea737f5bf3d3e6c902fde112fcd459679981585b1082c27de0"
+      "sha256": "25e0018450fda1d8d037352ed57b76c2e90f765ab3a9cfabce237bdfce122a6f"
     },
     {
       "class": "managed",
@@ -576,7 +588,7 @@
       "class": "managed",
       "mode": "100644",
       "path": "scripts/aios/aioslib/install.py",
-      "sha256": "0e2383692e5deac44f03ad74038e87afa7e28f98361c7b794e13cc7d0615f076"
+      "sha256": "815731fb0f8d45cbb672e013665361b5762152e5d3a4a8fb51b9f59a6ba259f6"
     },
     {
       "class": "managed",
@@ -588,7 +600,7 @@
       "class": "managed",
       "mode": "100644",
       "path": "scripts/aios/aioslib/release.py",
-      "sha256": "a1e6031e073c5c699e8c2278619b4573a9564605da0a4730849b52496d597f7f"
+      "sha256": "691d87a387b2a3baee87fd75069eb9afd05ca4a5ef7ea1f763841c087cad7bcc"
     },
     {
       "class": "managed",
@@ -648,7 +660,7 @@
       "class": "managed",
       "mode": "100755",
       "path": "scripts/team/verify-branch-protection.sh",
-      "sha256": "302fa17053a8b3546f927e09dbc428ef14845b22efe7a0636aa0bedb67f7886f"
+      "sha256": "b9fa2c4b531181c871d1b962564a9bebc5d74d9e90594a44dcd8e3b3f9723982"
     },
     {
       "class": "managed",
@@ -706,8 +718,14 @@
     }
   ],
   "package": "ff-aios-starter",
-  "release_id": "starter-2.7.0",
+  "release_id": "starter-2.7.2",
   "schema": "ff-aios-starter/release@1",
+  "seed_lines": [
+    {
+      "line": "@.aios/operator_core/OPERATOR_CORE.md",
+      "path": "CLAUDE.md"
+    }
+  ],
   "skills": [
     "changelog",
     "context_load",
@@ -730,6 +748,6 @@
     "workspace_health",
     "wrap-up"
   ],
-  "status": "superseded",
-  "version": "2.7.0"
+  "status": "approved",
+  "version": "2.7.2"
 }
