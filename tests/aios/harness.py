@@ -31,6 +31,7 @@ PACKAGE_SPEC = {
     "schema": "ff-aios-starter/package-spec@1",
     "exclude": ["evidence/**", "releases/**", "release/**", "tests/**", ".github/CODEOWNERS"],
     "seed": ["CLAUDE.md", "README.md", ".gitignore", "01_Foundations/**", "06_Communication/**"],
+    "client_owned": [".claude/settings.local.json"],
 }
 
 ROLES = {

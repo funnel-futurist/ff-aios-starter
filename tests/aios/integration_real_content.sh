@@ -221,6 +221,10 @@ printf 'my real deliverable\n' > "$TARGET/02_Deliverables/copy/launch_email.md"
 printf '# my market\nreal notes\n' > "$TARGET/01_Foundations/market_analysis/_workspace.md"
 mkdir -p "$TARGET/.claude/skills/my_own_skill"
 printf '# mine\n' > "$TARGET/.claude/skills/my_own_skill/SKILL.md"
+# R3-h-1: the client-owned settings override. Claude Code merges it over the managed
+# .claude/settings.json, and no install, upgrade or rollback may ever touch it.
+printf '{"permissions":{"deny":["Read(./clients-private/**)"]}}\n' > "$TARGET/.claude/settings.local.json"
+OVERRIDE_SHA=$(shasum -a 256 "$TARGET/.claude/settings.local.json" | cut -d' ' -f1)
 STATE_BEFORE=$(cd "$TARGET" && find . -path ./.git -prune -o -path ./.aios/backups -prune -o -type f -print \
   | grep -v '^\./\.aios/\(install\.json\|txn\.json\)$' | sort | xargs shasum -a 256 | shasum -a 256)
 echo "  state fingerprint: ${STATE_BEFORE%% *}"
@@ -276,6 +280,16 @@ grep -q "shipped in 9.1.0" "$TARGET/START_HERE.md" && bad "refused upgrade still
   || ok "refused upgrade wrote nothing"
 git -C "$SRC" show "$REV:START_HERE.md" > "$TARGET/START_HERE.md"
 
+step "R3-h-1: editing the managed settings blocks the upgrade, and says where to put the change"
+cp "$TARGET/.claude/settings.json" "$WORK/settings.json.orig"
+echo "" >> "$TARGET/.claude/settings.json"
+aios upgrade --repo "$SRC" --release "$WORK/v9.1.0.json" --target "$TARGET" \
+  >/dev/null 2>"$WORK/settings_edit.txt"
+expect_code 6 $? "edited managed settings refused"
+grep -q "settings.local.json" "$WORK/settings_edit.txt" \
+  && ok "the refusal points to .claude/settings.local.json" || bad "refusal does not mention the override"
+cp "$WORK/settings.json.orig" "$TARGET/.claude/settings.json"
+
 step "the workspace is under git, like every real client workspace"
 # Until 2026-09-24 this whole script upgraded a workspace with no git at all, where the
 # "uncommitted changes" check is skipped. A real 2.6.0 -> 2.6.1 upgrade then showed that the
@@ -303,6 +317,8 @@ grep -q "shipped in 9.1.0" "$TARGET/START_HERE.md" && ok "managed file really ch
   || bad "new managed file missing"
 grep -q "MY OWN CONSTITUTION" "$TARGET/CLAUDE.md" && ok "seed file untouched" \
   || bad "SEED FILE WAS OVERWRITTEN"
+[ "$(shasum -a 256 "$TARGET/.claude/settings.local.json" | cut -d' ' -f1)" = "$OVERRIDE_SHA" ] \
+  && ok "client settings override byte-identical after upgrade" || bad "CLIENT SETTINGS OVERRIDE CHANGED BY UPGRADE"
 STATE_AFTER=$(cd "$TARGET" && find . -path ./.git -prune -o -path ./.aios/backups -prune -o -type f -print \
   | grep -v '^\./\.aios/\(install\.json\|txn\.json\)$' | grep -v 'shipped_in_910' \
   | grep -v '^\./START_HERE\.md$' | sort | xargs shasum -a 256 | shasum -a 256)
@@ -321,6 +337,8 @@ grep -q "shipped in 9.1.0" "$TARGET/START_HERE.md" && bad "rollback left new con
   || ok "file added by 9.1.0 removed again"
 grep -q "MY OWN CONSTITUTION" "$TARGET/CLAUDE.md" && ok "seed survived the round trip" \
   || bad "SEED LOST IN ROLLBACK"
+[ "$(shasum -a 256 "$TARGET/.claude/settings.local.json" | cut -d' ' -f1)" = "$OVERRIDE_SHA" ] \
+  && ok "client settings override byte-identical after rollback" || bad "CLIENT SETTINGS OVERRIDE CHANGED BY ROLLBACK"
 [ -f "$TARGET/02_Deliverables/copy/launch_email.md" ] && ok "operator's own work survived" \
   || bad "OPERATOR WORK LOST"
 [ -f "$TARGET/.claude/skills/my_own_skill/SKILL.md" ] && ok "operator's own skill survived" \
@@ -353,6 +371,8 @@ if [ "$STATE_RECOVERED" = "$STATE_BEFORE" ]; then
 else
   bad "state changed across crash recovery"
 fi
+[ "$(shasum -a 256 "$TARGET/.claude/settings.local.json" | cut -d' ' -f1)" = "$OVERRIDE_SHA" ] \
+  && ok "client settings override byte-identical after a hard kill and recovery" || bad "CLIENT SETTINGS OVERRIDE CHANGED BY CRASH RECOVERY"
 
 step "N2: a missing REQUIRED credential fails loudly"
 python3 - "$WORK/v9.0.0.json" "$WORK/v9.0.0-needs-cred.json" <<'PY'

@@ -46,7 +46,14 @@ def load_spec(repo, rev=None, spec_path="release/package_spec.json"):
 
 
 def classify(spec, path):
-    """Return 'managed', 'seed' or None (excluded) for a repo-relative path."""
+    """Return 'managed', 'seed' or None (excluded) for a repo-relative path.
+
+    A `client_owned` path is never part of a package: it is the layer a client puts their own
+    changes in (today `.claude/settings.local.json`, which Claude Code merges over the managed
+    `.claude/settings.json`). The installer neither writes, replaces, verifies nor removes it.
+    """
+    if util.match_any(spec.get("client_owned"), path):
+        return None
     if util.match_any(spec.get("exclude"), path):
         return None
     if util.match_any(spec.get("seed"), path):
@@ -62,6 +69,15 @@ def select_files(repo, rev, spec):
     """
     out = []
     for path, mode, data in util.read_tree(repo, rev, include_links=True):
+        if util.match_any(spec.get("client_owned"), path):
+            # Silently dropping it would hide the mistake. A file the client owns must not
+            # be tracked in the source at all: the next person to run `git add -f` would
+            # otherwise be shipping, or one day shipping over, a client's own settings.
+            raise Refusal(
+                EXIT_PACKAGE,
+                "the source tracks a client-owned path, which a release must never carry: %s" % path,
+                ["untrack it (git rm --cached); it is listed under client_owned in release/package_spec.json"],
+            )
         cls = classify(spec, path)
         if cls is None:
             continue

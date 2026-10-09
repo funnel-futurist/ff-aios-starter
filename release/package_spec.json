@@ -1,6 +1,6 @@
 {
   "schema": "ff-aios-starter/package-spec@1",
-  "_comment": "Which paths ship in a release, and who owns each one after install. managed = the release owns it (replaced on upgrade, verified by readback). seed = written once if absent, then yours forever. Anything excluded never ships; anything you create yourself is invisible to the installer. seed_lines = one declared line a release adds once to a seed file that predates it (today: the operator core's import in CLAUDE.md); never twice, never into a deleted file, taken back by rollback.",
+  "_comment": "Which paths ship in a release, and who owns each one after install. managed = the release owns it (replaced on upgrade, verified by readback). seed = written once if absent, then yours forever. Anything excluded never ships; anything you create yourself is invisible to the installer. client_owned = paths that are the client's by contract and never part of any package (the settings override layer): the installer never writes, replaces, verifies or removes them, and a release build refuses a source that tracks one. seed_lines = one declared line a release adds once to a seed file that predates it (today: the operator core's import in CLAUDE.md); never twice, never into a deleted file, taken back by rollback.",
   "exclude": [
     "evidence/**",
     "releases/**",
@@ -33,6 +33,9 @@
       "out": ".github/CODEOWNERS",
       "why": "CODEOWNERS must name owners who actually have access to THIS repository, so it is rendered per workspace, never copied."
     }
+  ],
+  "client_owned": [
+    ".claude/settings.local.json"
   ],
   "seed_lines": [
     {
