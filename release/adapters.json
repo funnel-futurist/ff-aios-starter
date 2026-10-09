@@ -1,0 +1,140 @@
+{
+  "schema": "ff-aios-starter/adapters@1",
+  "_comment": "Which shipped files work with only one AI tool, and which work with any. The Starter's instructions, skills, hooks, safety settings and AI reviewer are built on Claude Code. No other tool is supported or verified: nothing here claims otherwise. `signatures` are the places a tool's files live: any tracked file matching them must be listed under that tool's `files`, so a new tool-specific file cannot arrive undeclared (tests/aios/test_adapters.py). `verified` needs evidence, and each piece of evidence must resolve to a real test. Verified here means the named tests exercise the file layout and the hook contract with simulated hook input and the real hook command; it is not a recording of a live session. Declared in the Starter's own repository only: release/** is not shipped to client workspaces.",
+  "tools": {
+    "claude-code": {
+      "status": "verified",
+      "scope": "file layout and hook contract, tested with simulated hook input and the real hook command; no live-session recording is kept in this repository",
+      "evidence": [
+        "tests/aios/test_boundary_and_inventory.py::WhatTheRepoShips::test_the_session_hook_is_wired_for_every_edit_tool",
+        "tests/aios/test_boundary_and_inventory.py::SessionHook::test_the_real_hook_command_prints_a_deny_decision_for_an_operator",
+        "tests/aios/test_boundary_and_inventory.py::Inventory::test_claude_md_names_every_skill",
+        "tests/aios/test_boundary_and_inventory.py::Inventory::test_the_document_skills_are_installed_from_anthropic_and_credited",
+        "scripts/team/guard-dangerous-git.test.js"
+      ],
+      "signatures": [
+        ".claude/**",
+        "CLAUDE.md",
+        ".github/workflows/pr-review.yml"
+      ],
+      "files": [
+        ".claude/hooks/git-staleness-check.js",
+        ".claude/hooks/guard-dangerous-git.js",
+        ".claude/settings.json",
+        ".claude/skills/README.md",
+        ".claude/skills/changelog/SKILL.md",
+        ".claude/skills/context_load/SKILL.md",
+        ".claude/skills/dashboard/SKILL.md",
+        ".claude/skills/f6_completeness_check/SKILL.md",
+        ".claude/skills/file_audit/SKILL.md",
+        ".claude/skills/financial_teardown/SKILL.md",
+        ".claude/skills/grill_me/SKILL.md",
+        ".claude/skills/humanize/SKILL.md",
+        ".claude/skills/onboard_wizard/SKILL.md",
+        ".claude/skills/pr_review/SKILL.md",
+        ".claude/skills/project_management/SKILL.md",
+        ".claude/skills/qc_review/SKILL.md",
+        ".claude/skills/resolve-conflict/SKILL.md",
+        ".claude/skills/review-queue/SKILL.md",
+        ".claude/skills/security_check/SKILL.md",
+        ".claude/skills/start-my-day/SKILL.md",
+        ".claude/skills/start/SKILL.md",
+        ".claude/skills/upskill/SKILL.md",
+        ".claude/skills/workspace_health/SKILL.md",
+        ".claude/skills/wrap-up/SKILL.md",
+        ".github/workflows/pr-review.yml",
+        "CLAUDE.md",
+        "docs/PR_REVIEWER_SETUP.md",
+        "scripts/verify_skill_push.py",
+        "scripts/verify_skills.py"
+      ]
+    },
+    "codex": {
+      "status": "not verified",
+      "note": "nothing shipped; AGENTS.md and a Codex hook layer do not exist in this package",
+      "signatures": [
+        "AGENTS.md",
+        ".codex/**"
+      ],
+      "files": []
+    },
+    "cursor": {
+      "status": "not verified",
+      "note": "nothing shipped",
+      "signatures": [
+        ".cursor/**",
+        ".cursorrules"
+      ],
+      "files": []
+    },
+    "gemini": {
+      "status": "not verified",
+      "note": "nothing shipped",
+      "signatures": [
+        "GEMINI.md",
+        ".gemini/**"
+      ],
+      "files": []
+    },
+    "copilot": {
+      "status": "not verified",
+      "note": "nothing shipped",
+      "signatures": [
+        ".github/copilot-instructions.md",
+        ".github/instructions/**"
+      ],
+      "files": []
+    },
+    "windsurf": {
+      "status": "not verified",
+      "note": "nothing shipped",
+      "signatures": [
+        ".windsurf/**",
+        ".windsurfrules"
+      ],
+      "files": []
+    },
+    "aider": {
+      "status": "not verified",
+      "note": "nothing shipped",
+      "signatures": [
+        ".aider*",
+        "CONVENTIONS.md"
+      ],
+      "files": []
+    }
+  },
+  "mixed": [
+    {
+      "path": "scripts/aios/aios.py",
+      "tool_specific_part": "the `hook pre-edit` command reads Claude Code hook input",
+      "neutral_part": "install, upgrade, rollback, verify, release, sanitize, governance, boundary, workspace"
+    },
+    {
+      "path": "scripts/aios/aioslib/boundary.py",
+      "tool_specific_part": "parses Claude Code PreToolUse hook JSON for the in-session founder-lane guard",
+      "neutral_part": "the pull-request boundary check (check-pr), which holds the same lane server-side for any tool"
+    }
+  ],
+  "tool_neutral": [
+    "scripts/aios/aioslib/install.py",
+    "scripts/aios/aioslib/release.py",
+    "scripts/aios/aioslib/util.py",
+    "scripts/aios/aioslib/sanitize.py",
+    "scripts/aios/aioslib/protected.py",
+    "scripts/aios/aioslib/workspace.py",
+    "release/package_spec.json",
+    "releases/*.json",
+    ".aios/operator_core/**",
+    "01_Foundations/**",
+    "02_Deliverables/**",
+    "03_Quality_Control/**",
+    "04_Customer_Journey/**",
+    "05_Assets/**",
+    "06_Communication/**",
+    "taxonomy_rules.md",
+    "templates/workspace-kit/**",
+    ".github/workflows/install-contract.yml",
+    ".github/workflows/verify-protection.yml"
+  ]
+}

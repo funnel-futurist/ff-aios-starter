@@ -10,6 +10,7 @@
     rollback          restore the previous release (also recovers a killed upgrade)
     start             role-scoped entry point
     sanitize          what would ship: secrets, client names, internal URLs
+    adapters          which shipped files work with only one AI tool (check the manifest)
     protected         protected-text scan of the whole public tree (fingerprints, never text)
     governance        CODEOWNERS check / render
     boundary          does this pull request touch the founder lane without a founder?
@@ -31,7 +32,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from aioslib import governance, install as install_mod, orgconfig, release as release_mod  # noqa: E402
-from aioslib import boundary, protected, roles, sanitize, util, workspace  # noqa: E402
+from aioslib import adapters, boundary, protected, roles, sanitize, util, workspace  # noqa: E402
 from aioslib.util import (EXIT_ERROR, EXIT_GOVERNANCE, EXIT_OK, EXIT_SANITIZE, Refusal)  # noqa: E402
 
 
@@ -444,6 +445,19 @@ def cmd_protected_pin(args):
     return EXIT_OK
 
 
+def cmd_adapters_check(args):
+    repo = os.path.abspath(args.repo)
+    files = protected.tracked_or_walked(repo)
+    found = adapters.problems(repo, files)
+    manifest = adapters.load(repo)
+    for name, tool in sorted(manifest["tools"].items()):
+        _say("%-12s %-12s %d file(s)" % (name, tool["status"], len(tool.get("files") or [])))
+    if found:
+        raise Refusal(util.EXIT_PACKAGE, "the adapter manifest and the tree disagree", found)
+    _say("adapter manifest ok: every tool-specific file is declared")
+    return EXIT_OK
+
+
 def cmd_governance_check(args):
     root = os.path.abspath(args.root)
     config = None
@@ -647,6 +661,12 @@ def build_parser():
     sa.add_argument("--allow-generic", dest="allow_generic", action="store_true",
                     help="also match denylist terms that are ordinary English words")
     sa.set_defaults(func=cmd_sanitize)
+
+    ad = sub.add_parser("adapters", help="which shipped files are tool-specific")
+    adsub = ad.add_subparsers(dest="subcommand")
+    adc = adsub.add_parser("check", help="the manifest and the tree must agree")
+    adc.add_argument("--repo", default=_repo_root())
+    adc.set_defaults(func=cmd_adapters_check)
 
     pr = sub.add_parser("protected", help="protected-text scan of the public tree")
     prsub = pr.add_subparsers(dest="subcommand")
