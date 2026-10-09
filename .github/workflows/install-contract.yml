@@ -43,6 +43,23 @@ jobs:
         run: |
           node --test scripts/pr_review/static_checks.test.mjs
           node scripts/team/guard-dangerous-git.test.js
+      - name: Public-methods allow-list is in order (needs no private input)
+        run: python3 scripts/aios/aios.py protected check-allowlist
+      - name: Protected-text scan of the whole public tree (only where the private list is configured)
+        # The fingerprint list is private and lives outside this repository. Where it is held as the
+        # repository secret below, the real scan runs here. Where it is not (a fork, a pull request
+        # from a fork), this step SAYS it did not run: the fixture tests above prove the mechanism,
+        # but only this step looks at the real tree against the real list.
+        env:
+          PROTECTED_FINGERPRINTS_JSON: ${{ secrets.PROTECTED_FINGERPRINTS_JSON }}
+        run: |
+          if [ -z "$PROTECTED_FINGERPRINTS_JSON" ]; then
+            echo "::warning::protected scan NOT RUN here: no private fingerprint list is configured. Run it where the list lives: release/PROTECTED_TEXT_SCAN.md"
+            exit 0
+          fi
+          umask 077
+          printf '%s' "$PROTECTED_FINGERPRINTS_JSON" > "$RUNNER_TEMP/protected-fingerprints.json"
+          python3 scripts/aios/aios.py protected scan --fingerprints "$RUNNER_TEMP/protected-fingerprints.json"
 
   governance:
     if: github.event_name != 'pull_request_review'

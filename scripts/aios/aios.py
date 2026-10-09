@@ -10,6 +10,7 @@
     rollback          restore the previous release (also recovers a killed upgrade)
     start             role-scoped entry point
     sanitize          what would ship: secrets, client names, internal URLs
+    protected         protected-text scan of the whole public tree (fingerprints, never text)
     governance        CODEOWNERS check / render
     boundary          does this pull request touch the founder lane without a founder?
     hook              Claude Code hooks (pre-edit: hold the founder lane in the session)
@@ -30,7 +31,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from aioslib import governance, install as install_mod, orgconfig, release as release_mod  # noqa: E402
-from aioslib import boundary, roles, sanitize, util, workspace  # noqa: E402
+from aioslib import boundary, protected, roles, sanitize, util, workspace  # noqa: E402
 from aioslib.util import (EXIT_ERROR, EXIT_GOVERNANCE, EXIT_OK, EXIT_SANITIZE, Refusal)  # noqa: E402
 
 
@@ -387,6 +388,62 @@ def cmd_sanitize(args):
     return EXIT_OK
 
 
+def _allowlist_path(args, repo):
+    return args.allowlist or os.path.join(repo, protected.DEFAULT_ALLOWLIST)
+
+
+def cmd_protected_fingerprint(args):
+    """Private side: turn protected source files into a fingerprint list. Writes no text."""
+    sources = []
+    for spec in args.source:
+        label, sep, path = spec.partition("=")
+        if not sep or not os.path.isfile(path):
+            raise Refusal(EXIT_SANITIZE, "--source wants LABEL=path to an existing file, got %r" % spec)
+        with open(path, "r", encoding="utf-8", errors="replace") as fh:
+            sources.append((label, fh.read()))
+    data = protected.build_list(sources, args.window, args.min_hits)
+    util.write_json(args.out, data)
+    total = sum(len(v) for v in data["sources"].values())
+    _say("wrote %s: %d source(s), %d fingerprints, window %d words, min hits %d"
+         % (args.out, len(data["sources"]), total, args.window, args.min_hits))
+    _say("it holds fingerprints only. Keep it OUTSIDE the public repository.")
+    return EXIT_OK
+
+
+def cmd_protected_scan(args):
+    repo = os.path.abspath(args.repo)
+    fp_list = protected.load_list(args.fingerprints or os.environ.get(protected.ENV_LIST))
+    allowlist = protected.load_allowlist(_allowlist_path(args, repo))
+    problems = protected.check_allowlist(repo, allowlist)
+    if problems:
+        raise Refusal(EXIT_SANITIZE, "the public-methods allow-list is not in order", problems)
+    findings, scanned, allowed = protected.scan_tree(repo, fp_list, allowlist)
+    _say("scanned %d file(s) in %s against %d protected source(s)" % (scanned, repo, len(fp_list["sources"])))
+    _say("allow-listed as public on purpose (%d): %s" % (len(allowed), ", ".join(allowed) or "none matched"))
+    protected.require_clean(findings)
+    _say("findings: 0 (no protected text outside the allow-list)")
+    return EXIT_OK
+
+
+def cmd_protected_check_allowlist(args):
+    repo = os.path.abspath(args.repo)
+    allowlist = protected.load_allowlist(_allowlist_path(args, repo))
+    problems = protected.check_allowlist(repo, allowlist)
+    if problems:
+        raise Refusal(EXIT_SANITIZE, "the public-methods allow-list is not in order", problems)
+    _say("allow-list ok: %d public method file(s), every one exists and matches its approved bytes"
+         % len(allowlist.get("public_methods", [])))
+    return EXIT_OK
+
+
+def cmd_protected_pin(args):
+    repo = os.path.abspath(args.repo)
+    data = protected.pin_allowlist(repo, _allowlist_path(args, repo))
+    _say("re-pinned %d entr(ies). Review the diff: each changed sha256 is a founder-approved change."
+         % len(data.get("public_methods", [])))
+    return EXIT_OK
+
+
 def cmd_governance_check(args):
     root = os.path.abspath(args.root)
     config = None
@@ -590,6 +647,29 @@ def build_parser():
     sa.add_argument("--allow-generic", dest="allow_generic", action="store_true",
                     help="also match denylist terms that are ordinary English words")
     sa.set_defaults(func=cmd_sanitize)
+
+    pr = sub.add_parser("protected", help="protected-text scan of the public tree")
+    prsub = pr.add_subparsers(dest="subcommand")
+    pf = prsub.add_parser("fingerprint", help="PRIVATE side: protected files -> fingerprint list")
+    pf.add_argument("--source", action="append", required=True, metavar="LABEL=PATH",
+                    help="an opaque label and the protected file, e.g. P-001=/private/path.md")
+    pf.add_argument("--out", required=True, help="where to write the list (outside this repo)")
+    pf.add_argument("--window", type=int, default=protected.DEFAULT_WINDOW)
+    pf.add_argument("--min-hits", dest="min_hits", type=int, default=protected.DEFAULT_MIN_HITS)
+    pf.set_defaults(func=cmd_protected_fingerprint)
+    ps = prsub.add_parser("scan", help="fail if the public tree holds protected text")
+    ps.add_argument("--repo", default=_repo_root())
+    ps.add_argument("--fingerprints", help="the private list (or set %s)" % protected.ENV_LIST)
+    ps.add_argument("--allowlist", help="default: %s" % protected.DEFAULT_ALLOWLIST)
+    ps.set_defaults(func=cmd_protected_scan)
+    pc = prsub.add_parser("check-allowlist", help="needs no private input; runs in public CI")
+    pc.add_argument("--repo", default=_repo_root())
+    pc.add_argument("--allowlist")
+    pc.set_defaults(func=cmd_protected_check_allowlist)
+    pp = prsub.add_parser("pin", help="re-pin the allow-list to the files' current bytes (reviewed act)")
+    pp.add_argument("--repo", default=_repo_root())
+    pp.add_argument("--allowlist")
+    pp.set_defaults(func=cmd_protected_pin)
 
     go = sub.add_parser("governance", help="CODEOWNERS check / render")
     gosub = go.add_subparsers(dest="subcommand")

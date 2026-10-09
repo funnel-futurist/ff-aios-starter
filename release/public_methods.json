@@ -1,0 +1,42 @@
+{
+  "schema": "ff-aios-starter/public-methods@1",
+  "_comment": "The method files that are PUBLIC ON PURPOSE in this public template. The protected-text scan (aios protected scan) exempts exactly these files, and only these exact bytes: sha256 is pinned, so editing one turns the public CI red until a reviewer re-pins it (aios protected pin). Whether each file stays public is a founder decision made separately from any code change; to pull a file from the public tree, delete the entry AND the file. Nothing here removes or flags any of them.",
+  "decision": "pending founder review: which of these stay public (not decided by the change that introduced this list)",
+  "public_methods": [
+    {
+      "path": ".claude/skills/grill_me/SKILL.md",
+      "reason": "Stress-test questioning method for pressure-testing a plan before building it.",
+      "sha256": "414c9c0ccd64b8fb033582a4592cf5667a1067ce1dd1140ca8d598aa5f085bf5"
+    },
+    {
+      "path": ".claude/skills/project_management/SKILL.md",
+      "reason": "Project planning and tracking method the Starter's operators run daily.",
+      "sha256": "9b4ac4c185ba8f4e9e6e97fc5d596ff22ae6c63afdb8f214f3d98c1aaba1f20f"
+    },
+    {
+      "path": ".claude/skills/financial_teardown/SKILL.md",
+      "reason": "Bank-statement teardown prompt. Names an FF SOP by title; shipped on purpose.",
+      "sha256": "737a859e1ccab7373f91da9b8fe5abb7844c51423daf71d2c71d0213e5d10fa6"
+    },
+    {
+      "path": ".claude/skills/humanize/SKILL.md",
+      "reason": "Copy-quality pass that strips AI-sounding patterns.",
+      "sha256": "b83a72452477f597061e968c2658a5f61dba9a6ef4c18d9bfb695df04126f657"
+    },
+    {
+      "path": ".claude/skills/qc_review/SKILL.md",
+      "reason": "Copy-quality review gate.",
+      "sha256": "7a59c965484709b8accd9a838072db628de624a093750f91915aaa93d5d4a7d8"
+    },
+    {
+      "path": ".claude/skills/f6_completeness_check/SKILL.md",
+      "reason": "Checks the client's foundation folders are filled; names the document set, not its method.",
+      "sha256": "552117dbe0d38e5ce918b9b4409421ef73caf870442eb1b9e63babd12267993d"
+    },
+    {
+      "path": "docs/UNSTUCK_PROTOCOL.md",
+      "reason": "The short unstuck operating card every client receives.",
+      "sha256": "cdf8fb7537652df95b2ef627f45b9fd807d85f3d40e4e5f6191a7e1d759e73b7"
+    }
+  ]
+}
