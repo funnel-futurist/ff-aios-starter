@@ -125,7 +125,8 @@ local changes to the system layer - that is information, not a failure.
 2. Refuses if your workspace has **drifted** (a managed file edited by hand) or if git has
    uncommitted changes. Both are refusals rather than overwrites, on purpose. For an edited
    file it prints the diff and the two ways forward: revert it, or keep your change by moving
-   it into a file the release doesn't manage.
+   it into a file the release doesn't manage. For `.claude/settings.json` that file is
+   `.claude/settings.local.json` (see "Your own settings" below).
 3. Refuses if the new release ships a path that already exists as your own file.
 4. Snapshots every managed file and writes a journal **before** changing anything.
 5. Replaces managed files. Adds new seed files only where they do not already exist.
@@ -141,6 +142,42 @@ local changes to the system layer - that is information, not a failure.
 If any step fails, it puts the workspace back and verifies that it did. If the machine dies
 mid-upgrade, the journal survives and `rollback` recovers from it. Both paths are tested,
 including against a hard kill.
+
+## Your own settings (changes that never block an upgrade)
+
+`.claude/settings.json` is managed: it carries the safety deny rules, the three hooks and the
+document-skills plugin, and **editing it by hand blocks the next upgrade** (the refusal prints your
+diff and says why). The supported way to change Claude Code's behaviour in your workspace is a file
+you own:
+
+```
+.claude/settings.local.json
+```
+
+Claude Code reads it natively and applies it over `.claude/settings.json` (its settings
+documentation lists project-local above shared-project settings). List settings such as
+`permissions.allow` and `permissions.deny` **merge**: yours are added to ours, they do not replace them.
+
+```json
+{
+  "permissions": {
+    "deny": ["Read(./clients-private/**)"]
+  }
+}
+```
+
+| | |
+|---|---|
+| **Who owns it** | You. It is listed under `client_owned` in the package spec: no release ever ships it, and install, upgrade, rollback and `verify` never write, replace, verify or remove it. A release build refuses a source that tracks one. |
+| **What it can do** | Add permission rules (`allow`, `deny`, `ask`) and set options. This is what Claude Code's settings documentation describes for the project-local file. |
+| **What it cannot do** | Take away a permission rule the release ships: lists merge, so ours stay. If you need one removed or changed, that is a request for a release, not a local edit. How a local file interacts with the release's three hooks is not something this guide has verified, so do not rely on it to change or remove them. |
+| **Git** | The Starter's `.gitignore` already ignores it, so it is personal and per machine. To share one override with your whole team, delete that line from your `.gitignore` (the file is yours) and commit the override on purpose; Claude Code then asks for workspace trust before it applies the file's `allow` rules. |
+| **Proof** | The test suite asserts the override is byte-identical after an upgrade and after a rollback, with the workspace under git, committed or not. |
+
+What it does not give you, honestly: an untracked file never reaches a pull request, so the
+`boundary` check cannot see it, and the in-session founder-lane guard is only as strong as each
+person's own settings on their own machine. It protects your ability to upgrade, not anyone's
+ability to be held to the lane.
 
 ## Rollback
 

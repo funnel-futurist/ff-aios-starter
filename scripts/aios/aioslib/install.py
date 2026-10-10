@@ -442,6 +442,10 @@ def drift_recipe(target, record, source_repo, problems):
             out.append("to revert it: put back the installed release's copy of %s, then commit" % path)
         out.append("to keep it: move your change into a file the release doesn't manage (your own file, "
                    "or a seed file such as CLAUDE.md), revert this one, commit, and upgrade again")
+        if path == ".claude/settings.json":
+            out.append("for this file specifically: put your own permission rules or settings in "
+                       ".claude/settings.local.json. Claude Code merges it over this one, and no upgrade, "
+                       "rollback or verify ever touches it (docs/INSTALL_AND_UPGRADE.md, \"Your own settings\")")
     return out
 
 
