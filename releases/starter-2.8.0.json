@@ -1,7 +1,8 @@
 {
   "approval": {
-    "approved_at": null,
-    "approved_by": null
+    "approved_at": "2026-10-11T01:33:00Z",
+    "approved_by": "phoenix-ship-it",
+    "basis": "Phoenix, 2026-10-11 at about 01:33Z, wrote \"Approve starter 2.8.0 at ffafd5f\", the exact line the founder brief releases/starter-2.8.0.BRIEF.md (at a338415) asked for, and linked the brief in the same message. Recorded verbatim by Chat Zero in ff-delegation exec/operating-cutover-20260921 at c45dd32, CHUNK_RECORDS.md, the entry \"10-11 ~01:33Z: Phoenix's words\". The approval binds to ffafd5f3844646240e60fa29032ce3d9bc9ee41a only (re-cut with release build at that rev: byte-identical to the stored draft, sha256 aee0e1bfab91fd77...). He did not say \"keep 2.7.2\", so 2.7.2 is superseded, as the brief said. The 7 public method files are unchanged; which stay public remains a separate decision."
   },
   "compatibility": {
     "breaking": [],
@@ -759,6 +760,6 @@
     "workspace_health",
     "wrap-up"
   ],
-  "status": "draft",
+  "status": "approved",
   "version": "2.8.0"
 }
