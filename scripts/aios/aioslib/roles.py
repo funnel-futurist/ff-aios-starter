@@ -155,4 +155,4 @@ def denied_paths(policy, role):
 
 
 def path_allowed(policy, role, path):
-    return not util.match_any(denied_paths(policy, role), path)
+    return not util.lane_match(denied_paths(policy, role), path)

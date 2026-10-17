@@ -1,0 +1,27 @@
+Scans of the Starter 3.1.0 candidate: code pin 7ebf598959b5f97e5e36e6548ddea0db6af1b58a, branch head 4195103 (2026-10-17).
+Counts only: no protected text, no protected paths and no client names appear here.
+
+## Protected text (STR-7): FF's private full-coverage reverse scan
+scanner                          reverse_scan_noce.py sha256 cf3010de53005236be2019d58cbafdb6223918c4969038e9f11b6d3e66bddc38 (the owner's no-Creative-Engine wrapper)
+  wrapping reverse_scan.py       sha256 ffe2094cd598c6383b22d33eed3a77b708f6fd7d4da79f1473384e035715279e
+  no-CE: removed 1 Creative Engine declaration(s) before listing any repository
+protected layer declaration      ai-os 0295cbfea960:00_Foundations/control_plane/intelligence_layer.json, sha256 6da3ca57fcf48cdfd041f6b4dbcfe0742f3f764c6037ab10931186ce1bf71a20
+protected fingerprint list       fingerprints.json sha256 43266d9df359be133db759061a68a1497dd8675307a76d7ecf21fecf86152e41
+public tree scanned              cand = 4195103a2d907ac9e1e5ef17c3a9715dceac47fa (the whole branch head: code, evidence and records)
+already public, not counted      starter-2.7.0, 2.7.2, 2.8.0, 2.9.0, 2.10.0, 3.0.0, main d7843c7
+protected files compared         14998
+over 25 MB, streamed             5 (self-check first: streaming produced exactly the window set on 60 real files, 530818 windows)
+unscanned                        0
+pairs with any shared window     7
+pairs at or over the rule (3+)   0
+pairs under the rule             7, all in tests/aios/audit_site/sitecustomize.py, tests/aios/test_adopt_existing_3_1.py
+FF method found                  none
+carried over unchanged           .claude/skills/pr_review/SKILL.md, byte-identical to 2.10.0 and 3.0.0 (blob 3454048b4f):
+                                 the one overlap at the 2.10.0 cut, shared tooling governed by ai-os #507
+independent check                to be added by Chat Zero's own run of the exact head, as for 3.0.0
+
+## Client names
+denylist sha256                  8ad1ffae9678e314fde8122cfc4cd0af4fbe4c08acad050b41ac18b1bc69bb90 (24 terms, supplied at run time, never printed)
+lines 3.1 adds (d7843c7..4195103)  11457
+matches in those lines           1: one ordinary English word, lowercase, in the opening line of the upgrade rehearsal script; not a name
+whole tree, release mode         14 findings at the head, 14 on main d7843c7: the same files and kinds (ordinary-word matches)

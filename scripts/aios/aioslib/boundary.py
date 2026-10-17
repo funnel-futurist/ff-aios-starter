@@ -28,7 +28,7 @@ import shutil
 import subprocess
 import time
 
-from . import roles, util
+from . import governance, roles, util
 from .util import EXIT_OK, EXIT_ROLE, Refusal
 
 # The role an unidentified person is held to. The most restricted lane, never the least.
@@ -52,11 +52,12 @@ def denied_for(policy, role):
 
 def violations(policy, role, paths):
     denied = denied_for(policy, role)
-    return sorted({p for p in paths if util.match_any(denied, p)})
+    # As the disk resolves each name, so a case or Windows spelling of a lane path is that path (C3).
+    return sorted({p for p in paths if util.lane_match(denied, p)})
 
 
 def _any_role_denies(policy, path):
-    return any(util.match_any(spec.get("paths_denied") or [], path)
+    return any(util.lane_match(spec.get("paths_denied") or [], path)
                for spec in (policy.get("roles") or {}).values())
 
 
@@ -92,18 +93,21 @@ def _gh_hosts_file():
 
 def _cached_identity(root):
     """gh costs about a second, and an edit should not. Cache the login briefly, gitignored."""
-    path = os.path.join(root, IDENTITY_CACHE)
-    cached = util.read_json_safe(path) if os.path.isfile(path) else None
+    # A copy the repository tracks, or one reached through a committed link, is the repository's file,
+    # never this machine's cache; and nothing in it can raise here, since a hook that raises lets the
+    # edit through (independent review, 3.1 rounds 55 and 56).
+    cached = util.read_local_cache(root, IDENTITY_CACHE)
     fingerprint = _gh_fingerprint()
-    if cached and cached.get("login") and cached.get("gh") == fingerprint and \
-            time.time() - float(cached.get("at") or 0) < IDENTITY_TTL_SECONDS:
+    try:
+        fresh = time.time() - float(cached.get("at") or 0) < IDENTITY_TTL_SECONDS if cached else False
+    except (TypeError, ValueError):
+        fresh = False
+    if fresh and isinstance(cached.get("login"), str) and cached["login"] and cached.get("gh") == fingerprint:
         return cached["login"]
     login, _source = roles.identity(timeout=5)
     if login:
-        try:
-            util.write_json(path, {"login": login, "at": time.time(), "gh": fingerprint})
-        except OSError:
-            pass  # a read-only disk must not turn into a refusal
+        # Never over a file of the repository's; a read-only disk must not turn into a refusal either.
+        util.write_local_cache(root, IDENTITY_CACHE, {"login": login, "at": time.time(), "gh": fingerprint})
     return login
 
 
@@ -149,9 +153,16 @@ def check_edit(root, tool_name, tool_input, identify=None):
         "%s (not in the people map)" % login if login else "an unidentified person")
     return False, (
         "%s belongs to the founder lane, and %s may not change it. Ask a founder to make "
-        "this change, or to review a pull request that proposes it. If you are a founder and "
+        "this change, or open a pull request for %s to approve. If you are a founder and "
         "see this, run `gh auth login` so the workspace can tell who you are.%s" % (
-            rel, who, "" if login else " " + roles.WEB_NOTE + "."))
+            rel, who, lane_approver(policy), "" if login else " " + roles.WEB_NOTE + "."))
+
+
+def lane_approver(policy):
+    """Who approves a founder-lane pull request, as the role policy says: its declared
+    founder_lane_reviewers when it declares them (the whole permission), else a founder (3.1 round 17)."""
+    return ("an approved founder-lane reviewer (the role policy's founder_lane_reviewers)"
+            if "founder_lane_reviewers" in (policy or {}) else "a founder or co-founder")
 
 
 def hook_pre_edit(stdin_text, root=None):
@@ -187,9 +198,10 @@ def _show_json(repo, rev, path):
 
 
 def changed_paths(repo, base, head):
-    """Every path the PR adds, edits, deletes or renames (both sides of a rename)."""
-    out = util.git(repo, ["diff", "--name-only", "--no-renames", "%s...%s" % (base, head)])
-    return [p for p in out.splitlines() if p]
+    """Every path the PR adds, edits, deletes or renames (both sides of a rename), as git stores it: NUL
+    separated, so a name git would print quoted (a non-ASCII one) reaches the lane check unchanged (C3)."""
+    out = util.git(repo, ["diff", "--name-only", "-z", "--no-renames", "%s...%s" % (base, head)], binary=True)
+    return [p.decode("utf-8", "surrogateescape") for p in out.split(b"\0") if p]
 
 
 def check_pr(repo, base, head, author, approvers):
@@ -204,15 +216,28 @@ def check_pr(repo, base, head, author, approvers):
     who = "%s (%s)" % (author, role or "not in the people map")
     if not hits:
         return EXIT_OK, ["%s changed no founder-lane path" % who]
+    # Who may approve the founder lane: founders and co-founders, or, when the base policy declares
+    # them, its founder_lane_reviewers - review permission, not founder status (G98). Never the author.
+    # When the base policy declares the reviewers, that list is the whole permission: a founder left
+    # off it doesn't count either, and a declaration that can't be used counts nobody (fails closed;
+    # independent review, 3.1 round 2).
+    declared = "founder_lane_reviewers" in policy
+    if declared:
+        usable = governance.lane_reviewer_problems(policy, config) == []
+        reviewers = governance.lane_reviewers(policy, config)[0] if usable else set()
+        eligible = lambda a: ("@" + a.lower()) in reviewers  # noqa: E731
+    else:
+        eligible = lambda a: roles.role_for(config, a) in APPROVER_ROLES  # noqa: E731
     founder_approvals = sorted(a for a in approvers
-                               if roles.role_for(config, a) in APPROVER_ROLES
-                               and a.lower() != (author or "").lower())
+                               if eligible(a) and a.lower() != (author or "").lower())
     if founder_approvals:
         return EXIT_OK, ["%s changed %d founder-lane path(s), approved at this commit by %s"
                          % (who, len(hits), ", ".join(founder_approvals))]
+    whom = ("an approved founder-lane reviewer (the role policy's founder_lane_reviewers)" if declared
+            else "a founder or co-founder")
     return EXIT_ROLE, (
-        ["%s changed %d founder-lane path(s) without a founder's approval of this commit:"
-         % (who, len(hits))]
+        ["%s changed %d founder-lane path(s) without an approval of this commit from %s:"
+         % (who, len(hits), whom)]
         + ["  - %s" % p for p in hits[:20]]
-        + ["a founder or co-founder approves the pull request, then this check re-runs and "
-           "passes. A new push needs a new approval."])
+        + ["%s approves the pull request, then this check re-runs and passes. A new push needs a "
+           "new approval." % (whom[0].upper() + whom[1:])])

@@ -1,0 +1,38 @@
+### S1 the copies
+starter: 4195103 release(3.1.0): draft record re-cut at 7ebf598 (the bytecode fix)
+ai-os copy: main at 0295cbfea
+
+### S2 the candidate record (draft), and a REHEARSAL-ONLY approval copy
+  PASS  record built at 7ebf598 (157 files)
+
+### S3 FF's own role policy and adoption plan, committed in the copy
+  PASS  the copy's CODEOWNERS has a /.github/ rule to take the owners from
+  PASS  FF's founder lane holds the ownership list (C3)
+founder lane: 12 path(s) from the copy's CODEOWNERS; 3 reviewer account(s) declared
+  PASS  plan: 18 adopt, 29 instance-owned (FF's roles.json among them), 110 excluded, 157 in all
+
+### S4 adopt --existing (the real CLI)
+    adopted starter-3.1.0 into the existing instance /private/tmp/claude-501/-Users-phoenixbohannon-Documents-GitHub-ai-os/babba437-dae9-4bc3-90f4-1220053829e8/scratchpad/ev/4195103/r310/ai-os
+      by:       phoenix-ship-it (founder)
+      plan:     .aios/adoption.json (sha256 4d9e4d85a45d)
+      created:  18 file(s), verified by readback, and the org config; nothing of the instance's was written
+      kept:     every path the plan says is the instance's; no folder move, no seed line
+      next:     commit the change (git add -A, then git commit); `aios rollback` undoes it
+  PASS  adopted (exit 0)
+
+### S5 what changed
+  PASS  no tracked file changed (index identical, no diff): ai-os's own 01_Foundations and CLAUDE.md included
+  PASS  exactly the 18 adopted files plus the config and record are new (20)
+  PASS  every instance-owned file keeps its bytes (29)
+  PASS  verify --repo: verdict:   matches the installed release
+  PASS  instance check: all 12 founder-lane paths PASS with the declared reviewers
+  PASS  instance check: the ownership list (record and plan) is in the lane, PASS (C3): PASS  founder   ownership list .aios/install.json: in the founder lane, so a pull request from anyone who isn't a founder needs founder-lane approval to change it | PASS  founder   ownership list .aios/adoption.json: in the founder lane, so a pull request from anyone who isn't a founder needs founder-lane approval to change it
+  PASS  instance check says reviewers are not founder status
+  PASS  instance check fails closed offline (enforcement unverified), exit 6
+  PASS  start runs and names the release and the founder role (exit 0)
+
+### S6 rollback
+    the adoption was undone: every file it created and left unchanged is gone, and the workspace is no longer pinned to a release
+  PASS  rollback (exit 0) returns the copy to exactly its committed state
+
+RESULT: 15 passed, 0 failed

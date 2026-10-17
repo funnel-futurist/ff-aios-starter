@@ -109,6 +109,9 @@ def build(repo, rev, version, spec=None, branch=None, credentials=None, min_upgr
     files = select_files(repo, rev, spec)
     if not files:
         raise Refusal(EXIT_PACKAGE, "package spec selected no files at %s" % rev)
+    reserved = sorted(p for p, _c, _m, _s in files if util.is_reserved(p))
+    if reserved:
+        raise Refusal(EXIT_PACKAGE, "the package would ship the installer's own state paths", reserved[:20])
 
     skills = sorted({
         p.split("/")[2] for p, _c, _m, _s in files
@@ -275,6 +278,10 @@ def check_shape(man):
                         % (man.get("release_id"), man.get("version")))
     if man.get("status") not in VALID_STATUS:
         problems.append("status %r is not one of %s" % (man.get("status"), list(VALID_STATUS)))
+    reserved = sorted(e.get("path", "") for e in man.get("files") or [] if util.is_reserved(e.get("path", "")))
+    if reserved:
+        problems.append("the release ships the installer's own state paths, which it may never do: %s"
+                        % ", ".join(reserved[:10]))
     for cred in man.get("credentials") or []:
         name = cred.get("name")
         if not CRED_NAME_RE.match(name or ""):

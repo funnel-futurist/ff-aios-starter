@@ -31,6 +31,10 @@ import os
 import shutil
 import sys
 
+# No bytecode cache beside the package, before any of it is imported. Run from a Starter clone or a workspace, Python
+# would otherwise write scripts/aios/aioslib/__pycache__ into that repository, a write the installer never makes on
+# purpose. macOS's own python3 never writes one; a Linux runner's Python did (GitHub's runs of 3.1, rounds 62 to 68).
+sys.dont_write_bytecode = True
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from aioslib import governance, install as install_mod, orgconfig, release as release_mod  # noqa: E402
@@ -169,18 +173,45 @@ def cmd_adopt(args):
     target = os.path.abspath(args.target)
 
     # `adopt` is listed as a founder lifecycle action, and the CLI simply did not check -
-    # both review families found it. The policy travels in the release, because an
-    # unpinned workspace's own copy is the thing being adopted.
+    # both review families found it. For a plain adopt the policy travels in the release, because
+    # an unpinned workspace's own copy is the thing being adopted. An existing instance keeps its
+    # own policy, which must be committed before anything is written: that one decides who may
+    # adopt into it (independent review, 3.1 round 16).
     policy = None
-    for path, _mode, data in util.read_tree(repo, manifest["created_from"]["git_rev"]):
-        if path == roles.POLICY_PATH.replace(os.sep, "/"):
-            policy = json.loads(data.decode("utf-8"))
-            break
+    if args.existing:
+        policy = roles.load_policy(target)
+    else:
+        for path, _mode, data in util.read_tree(repo, manifest["created_from"]["git_rev"]):
+            if path == roles.POLICY_PATH.replace(os.sep, "/"):
+                policy = json.loads(data.decode("utf-8"))
+                break
     if policy is None:
         raise Refusal(util.EXIT_ROLE, "the release ships no %s, so no role can be checked"
                       % roles.POLICY_PATH)
     login, role = roles.require_lifecycle(policy, config, "adopt")
 
+    if args.plan and not args.existing:
+        raise Refusal(util.EXIT_STATE, "--plan is for --existing: a plain adopt pins a workspace that "
+                                       "already matches the release byte for byte")
+    if args.existing:
+        plan_rel = None
+        if args.plan:
+            plan_rel = os.path.relpath(os.path.abspath(args.plan), target)
+            if plan_rel == ".." or plan_rel.startswith(".." + os.sep):
+                raise Refusal(util.EXIT_STATE, "the adoption plan must be inside the instance it adopts "
+                                               "into: %s" % args.plan)
+        record = install_mod.adopt_existing(target, manifest, repo, config, plan_rel,
+                                            _aios_lookup_from(args.aios_releases))
+        info = record["adoption"]
+        _say("adopted %s into the existing instance %s" % (record["release"]["release_id"], target))
+        _say("  by:       %s (%s)" % (login, role))
+        _say("  plan:     %s (sha256 %s)" % (info["plan"], info["plan_sha256"][:12]))
+        made = [c for c in info["created"] if c["path"] != ".aios/config.json"]
+        _say("  created:  %d file(s), verified by readback%s; nothing of the instance's was written"
+             % (len(made), ", and the org config" if len(made) < len(info["created"]) else ""))
+        _say("  kept:     every path the plan says is the instance's; no folder move, no seed line")
+        _say("  next:     commit the change (git add -A, then git commit); `aios rollback` undoes it")
+        return EXIT_OK
     record = install_mod.adopt(target, manifest, repo, config,
                                _aios_lookup_from(args.aios_releases))
     _say("pinned %s to %s (%d managed files matched byte for byte)"
@@ -212,9 +243,16 @@ def cmd_verify(args):
     _say("managed:   %d/%d files re-hashed from disk"
          % (summary["managed_checked"], summary["managed_total"]))
     for e in record.get("seed_lines") or []:
-        full = os.path.join(target, e["path"])
+        # Read only inside the workspace: the record is committed, so a pull request could point an
+        # entry anywhere; verify reports such a path above (independent review, 3.1 round 44).
+        # Only a regular file, reached with no link on the way, really inside the workspace (round 45).
+        safe = util.safe_relpath(e["path"]) and not install_mod._linked_paths(target, [e["path"]])
+        full = install_mod._seed_line_target(target, e["path"]) if safe else None
+        if not safe or (full is None and os.path.lexists(os.path.join(target, e["path"]))):
+            _say("  line:    %r not read: the path leaves the workspace or runs through a link" % e["path"])
+            continue
         here = False
-        if os.path.isfile(full):
+        if full:
             with open(full, encoding="utf-8", errors="replace") as fh:
                 here = any(line.strip() == e["line"] for line in fh)
         _say("  line:    %s %s `%s` (yours to keep or remove)"
@@ -321,18 +359,51 @@ def cmd_upgrade(args):
                                                       .get("retired_roots") or []):
             _say("  NEXT:     %s" % line)
         _say("  next:     commit the change (git add -A, then git commit): git shows it as renames")
+    for line in install_mod.ownership_review_notice(target, record):
+        _say("  NEXT:     %s" % line)
     _say("  rollback: available (%s)" % record["previous"]["backup"])
     return EXIT_OK
 
 
 def cmd_rollback(args):
     target = os.path.abspath(args.target)
-    config = orgconfig.load(target)
+    # By the paths, never by what a file there says: a journal that isn't one refuses below (3.1 round 27).
+    nothing_changed = (not os.path.lexists(install_mod.journal_path(target))
+                       and not os.path.lexists(install_mod.install_record_path(target)))
+    if nothing_changed and install_mod.clear_dead_lock(target):
+        # Nothing was ever changed here, only a dead holder's lock left by an adoption killed before its
+        # journal. Clearing that needs no role, whatever the people map or policy say; a live holder's
+        # lock is never taken (independent review, 3.1 round 10).
+        _say("nothing to roll back: this workspace has no install record and no journal; "
+             "cleared a dead operation's lock")
+        _say("  release:  none (nothing was changed)")
+        return EXIT_OK
+    try:
+        config = orgconfig.load(target)
+    except Refusal:
+        # An adoption killed before its org config landed, or an undo that already removed it: the
+        # journal holds the people map, so the operator is still checked against it (3.1).
+        journal = install_mod.load_journal(target) or {}
+        if journal.get("op") in ("adopt-existing", "adopt-undo") and journal.get("config"):
+            config = journal["config"]
+        elif nothing_changed:
+            _say("nothing to roll back: this workspace has no install record and no journal")
+            return EXIT_OK
+        else:
+            raise
     policy = roles.load_policy(target)
     login, role = roles.require_lifecycle(policy, config, "rollback")
-    record, summary, how = install_mod.rollback(target)
+    record, summary, how = install_mod.rollback(target, os.path.abspath(args.repo) if args.repo else None)
     _say("%s" % how)
     _say("  by:       %s (%s)" % (login, role))
+    if summary["release_id"] is None:
+        if summary.get("record_left"):
+            _say("  release:  .aios/install.json was left because it changed: check it, then delete it to "
+                 "finish unpinning")
+        else:
+            _say("  release:  none (%s)" % ("nothing was changed" if summary.get("unchanged") else
+                                            "the adoption is undone; this is the instance it was before"))
+        return EXIT_OK
     _say("  release:  %s (%s)" % (summary["release_id"], summary["version"]))
     _say("  managed:  %d/%d files re-hashed from disk"
          % (summary["managed_checked"], summary["managed_total"]))
@@ -365,15 +436,16 @@ def cmd_start(args):
              % (summary["release_id"], summary["version"], "" if not problems else "  DRIFTED"))
         for p in problems[:5]:
             _say("  - %s" % p)
-        if record.get("layout") == "3":
-            fails = [d for st, d in governance.founder_review_local(
-                target, policy, config, layout_mod.OLD_FOLDERS) if st == "FAIL"]
-            _say("founder review: %s" % ("CODEOWNERS covers the founder lane (run `aios instance check` "
-                                         "to confirm GitHub enforces it)" if not fails else
-                                         "NOT RESTORED at the 3.0 paths - `aios instance check` fails "
-                                         "until it is (docs/human_steps/restore_founder_review.md)"))
-            for d in fails[:5]:
-                _say("  - %s" % d)
+        # Every workspace, as `aios instance check` does: the record's layout field is the workspace's
+        # to edit, and a 3.0 copy pinned with `adopt` has none (independent review, 3.1 round 50).
+        fails = [d for st, d in governance.founder_review_local(
+            target, policy, config, layout_mod.OLD_FOLDERS, install_mod.ownership_paths(record)) if st == "FAIL"]
+        _say("founder review: %s" % ("CODEOWNERS covers the founder lane (run `aios instance check` "
+                                     "to confirm GitHub enforces it)" if not fails else
+                                     "NOT RESTORED at the founder-lane paths - `aios instance check` "
+                                     "fails until it is (docs/human_steps/restore_founder_review.md)"))
+        for d in fails[:5]:
+            _say("  - %s" % d)
     except Refusal:
         _say("release:   UNPINNED - this workspace was not installed from an approved release")
         _say("           (a workspace made with \"Use this template\" copies mutable main;")
@@ -389,12 +461,16 @@ def cmd_start(args):
         _say("")
         _say("founder lane (ask a founder first): %s" % ", ".join(denied))
         _say("  held two ways: Claude will not edit these for you, and a pull request that")
-        _say("  changes them fails its boundary check until a founder approves that commit.")
+        _say("  changes them fails its boundary check until %s approves that commit."
+             % boundary.lane_approver(policy))
         _say("  a direct push to main is stopped only if branch protection is on.")
     for warning in _hook_runtime_warnings(target):
         _say("")
         _say("warning:   %s" % warning)
-    newer = notice.check(target)
+    try:
+        newer = notice.check(target)
+    except Exception:  # noqa: BLE001 - a notice must never break a session start (3.1 round 56)
+        newer = None
     if newer:
         _say("")
         _say("update:    %s" % newer)
@@ -415,8 +491,13 @@ def cmd_instance_check(args):
     for problem in governance.check(target, slug, config):
         results.append(("B4", "FAIL", problem))  # placeholders, binding, owner syntax
     if policy is not None and config is not None:
+        # The ownership list is the record's (and an adoption's plan): none without a record (C3).
+        try:
+            ownership = install_mod.ownership_paths(install_mod.load_record(target))
+        except Refusal:
+            ownership = []
         for status, detail in governance.founder_review_local(target, policy, config,
-                                                              layout_mod.OLD_FOLDERS):
+                                                              layout_mod.OLD_FOLDERS, ownership):
             results.append(("founder", status, detail))
         if args.offline:
             results.append(("founder", "FAIL", "GitHub enforcement not checked (--offline), so founder "
@@ -424,10 +505,15 @@ def cmd_instance_check(args):
         else:
             rel, path = governance.find_file(target)
             local_text = open(path, encoding="utf-8", errors="replace").read() if path else None
-            founders = governance.founders_of(config)
-            for status, detail in governance.founder_review_remote(slug, policy, founders, local_text):
+            # Whoever may approve the founder lane: the founders, or the accounts the role policy
+            # declares as founder-lane reviewers (review permission, not founder status; G98).
+            founders, declared = governance.lane_reviewers(policy, config)
+            for status, detail in governance.founder_review_remote(
+                    slug, policy, sorted(founders), local_text,
+                    governance.REVIEWERS_NOUN if declared else "founders"):
                 results.append(("founder", status, detail))
-            for status, detail in governance.founder_review_enforced(slug, founders):
+            for status, detail in governance.founder_review_enforced(
+                    slug, sorted(founders), "founder-lane" if declared else "founder"):
                 results.append(("founder", status, detail))
     for control, status, detail in results:
         _say("  %-5s %-9s %s" % (status, control, detail))
@@ -748,6 +834,11 @@ def build_parser():
     ad.add_argument("--config", required=True)
     ad.add_argument("--repo", default=_repo_root())
     ad.add_argument("--aios-releases", dest="aios_releases")
+    ad.add_argument("--existing", action="store_true",
+                    help="adopt into an instance that already exists and isn't a Starter copy: create-only, "
+                         "every path classified by the instance's own plan (3.1)")
+    ad.add_argument("--plan", help="the instance's adoption plan, a path inside the target "
+                                   "(default .aios/adoption.json); with --existing")
     ad.set_defaults(func=cmd_adopt)
 
     ve = sub.add_parser("verify", help="readback the workspace against its release")
@@ -770,6 +861,8 @@ def build_parser():
 
     rbk = sub.add_parser("rollback", help="restore the previous release")
     rbk.add_argument("--target", default=".")
+    rbk.add_argument("--repo", help="the release's source (an ff-aios-starter clone): needed to undo a "
+                                    "finished adoption, so only that release's own files are removed")
     rbk.set_defaults(func=cmd_rollback)
 
     st = sub.add_parser("start", help="role-scoped entry point")

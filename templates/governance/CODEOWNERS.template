@@ -41,6 +41,10 @@
 /.aios/config.json          [REPO_OWNER] [PRIMARY_REVIEWER]
 /.aios/core_bridge/instance.json [REPO_OWNER] [PRIMARY_REVIEWER]
 /.aios/roles.json           [REPO_OWNER] [PRIMARY_REVIEWER]
+# Which files are the installer's own: the install record and an adoption's plan. An upgrade or the
+# undo trusts this list, so changing it needs a founder too (3.1).
+/.aios/install.json         [REPO_OWNER] [PRIMARY_REVIEWER]
+/.aios/adoption.json        [REPO_OWNER] [PRIMARY_REVIEWER]
 /releases/                  [REPO_OWNER] [PRIMARY_REVIEWER]
 /release/                   [REPO_OWNER] [PRIMARY_REVIEWER]
 

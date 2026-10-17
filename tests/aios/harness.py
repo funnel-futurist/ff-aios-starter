@@ -113,9 +113,36 @@ def bump_source(root, changes, message="next version"):
 
 
 def build_manifest(repo, rev, version, credentials=None, min_upgrade_from=None,
-                   aios_release=None):
-    return release_mod.build(repo, rev, version, branch="main", credentials=credentials,
-                             min_upgrade_from=min_upgrade_from, aios_release=aios_release)
+                   aios_release=None, record="branch"):
+    """Build a fixture release and record it in the source, as the real release flow does: an upgrade
+    checks a workspace's pin against the source's own record (3.1 round 39). `record="branch"` commits
+    releases/<id>.json on the checked-out branch; "tag" puts it on a side commit tagged with the release
+    id, so the branch (and what a later release build reads from it) is unchanged; None records nothing."""
+    manifest = release_mod.build(repo, rev, version, branch="main", credentials=credentials,
+                                 min_upgrade_from=min_upgrade_from, aios_release=aios_release)
+    rel = "releases/%s.json" % manifest["release_id"]
+    text = json.dumps(manifest, indent=2) + "\n"
+    if record == "branch":
+        write(repo, rel, text)
+        run_git(repo, "add", "--", rel)
+        if subprocess.run(["git", "-C", repo, "diff", "--cached", "--quiet", "--", rel]).returncode:
+            run_git(repo, "commit", "-qm", "record %s" % manifest["release_id"], "--", rel)
+    elif record == "tag":
+        # A tag carries the approved record, as a real release's does (a draft on a tag is skipped).
+        text = json.dumps(approve(manifest), indent=2) + "\n"
+
+        def git(args, data=None, env=None):
+            return subprocess.run(["git", "-C", repo] + args, input=data, env=env, check=True,
+                                  stdout=subprocess.PIPE, stderr=subprocess.DEVNULL).stdout.decode().strip()
+        blob = git(["hash-object", "-w", "--stdin"], text.encode())
+        env = dict(os.environ, GIT_INDEX_FILE=os.path.join(repo, ".git", "harness-record.index"))
+        git(["read-tree", rev], env=env)
+        git(["update-index", "--add", "--cacheinfo", "100644,%s,%s" % (blob, rel)], env=env)
+        tree = git(["write-tree"], env=env)
+        os.remove(env["GIT_INDEX_FILE"])
+        commit = git(["commit-tree", tree, "-p", rev, "-m", "record %s" % manifest["release_id"]])
+        run_git(repo, "tag", manifest["release_id"], commit)
+    return manifest
 
 
 def approve(manifest, by=FIXTURE_APPROVER):

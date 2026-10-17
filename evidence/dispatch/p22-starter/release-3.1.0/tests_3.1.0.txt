@@ -1,0 +1,23 @@
+fresh GitHub clone: 4195103 release(3.1.0): draft record re-cut at 7ebf598 (the bytecode fix)
+python: Python 3.9.6  node: v25.8.1
+
+## unit and contract tests
+Ran 915 tests in 1263.215s
+OK
+
+## end-to-end on the real content
+RESULT: 65 passed, 0 failed
+
+## PR floor
+ℹ tests 17
+ℹ pass 17
+ℹ fail 0
+guard tests: 49 passed, 0 failed  (33 ask-cases, 16 allow-cases)
+
+## allow-list
+allow-list ok: 7 public method file(s), every one exists and matches its approved bytes
+
+## release record
+release:  starter-3.1.0
+status:   draft
+pinned:   7ebf598959b5f97e5e36e6548ddea0db6af1b58a

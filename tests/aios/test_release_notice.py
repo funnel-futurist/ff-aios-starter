@@ -22,6 +22,8 @@ from aioslib import notice  # noqa: E402
 
 DAY = 24 * 3600
 PIN = "a" * 40
+# What every installer writes at the top of an install record (3.1 round 50 checks both).
+RECORD_HEAD = {"schema": "ff-aios-starter/install@1", "package": "ff-aios-starter"}
 
 
 def record(status, pin=PIN):
@@ -59,7 +61,7 @@ class Notice(unittest.TestCase):
     def install(self, version):
         os.makedirs(os.path.join(self.tmp, ".aios"), exist_ok=True)
         with open(os.path.join(self.tmp, ".aios", "install.json"), "w") as fh:
-            json.dump({"release": {"version": version, "release_id": "starter-" + version}}, fh)
+            json.dump(dict(RECORD_HEAD, release={"version": version, "release_id": "starter-" + version}), fh)
 
     def approved_290(self):
         return Fetch({("main", "2.9.0"): record("approved"), ("starter-2.9.0", "2.9.0"): record("approved")})
@@ -164,7 +166,7 @@ class RealHook(unittest.TestCase):
         shutil.copytree(os.path.join(harness.REPO_ROOT, "scripts"), os.path.join(self.ws, "scripts"))
         os.makedirs(os.path.join(self.ws, ".aios"))
         with open(os.path.join(self.ws, ".aios", "install.json"), "w") as fh:
-            json.dump({"release": {"version": "2.8.0"}}, fh)
+            json.dump(dict(RECORD_HEAD, release={"version": "2.8.0"}), fh)
         subprocess.run(["git", "init", "-q", self.ws], check=True)
 
     def run_hook(self):

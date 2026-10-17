@@ -41,6 +41,8 @@
         ".aios/config.json",
         ".aios/core_bridge/instance.json",
         ".aios/roles.json",
+        ".aios/install.json",
+        ".aios/adoption.json",
         ".claude/settings.json",
         ".claude/hooks/**",
         ".codex/hooks.json",

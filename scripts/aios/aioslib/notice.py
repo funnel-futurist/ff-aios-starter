@@ -110,13 +110,17 @@ def check(target, now=None, tags_fn=None, fetch_fn=None, clock=time.monotonic):
     installed = _version(installed_text)
     if installed is None:
         return None
-    cache_path = os.path.join(target, CACHE)
+    # Never a cache the repository tracks or reaches through a committed link: a pull request could make
+    # every start print its own line, or break the start (independent review, 3.1 round 56).
+    cached = util.read_local_cache(target, CACHE)
     try:
-        cached = util.read_json(cache_path)
-        window = EVERY if cached.get("complete", True) else RETRY
-        if cached.get("installed") == installed_text and now - float(cached.get("checked_at", 0)) < window:
-            return cached.get("line")
-    except (OSError, ValueError, TypeError):
+        if cached:
+            window = EVERY if cached.get("complete", True) else RETRY
+            line = cached.get("line")
+            if cached.get("installed") == installed_text and now - float(cached.get("checked_at", 0)) < window \
+                    and (line is None or isinstance(line, str)):
+                return line
+    except (TypeError, ValueError):
         pass
 
     deadline = clock() + BUDGET
@@ -137,9 +141,7 @@ def check(target, now=None, tags_fn=None, fetch_fn=None, clock=time.monotonic):
     else:
         newest, complete = newest_approved(installed, tags, fetch)
     line = line_for(installed_text, newest) if newest else None
-    try:
-        util.write_json(cache_path, {"checked_at": now, "installed": installed_text, "line": line,
-                                     "complete": bool(newest or complete)})
-    except OSError:
-        pass
+    # Never over a file of the repository's (independent review, 3.1 round 55).
+    util.write_local_cache(target, CACHE, {"checked_at": now, "installed": installed_text, "line": line,
+                                           "complete": bool(newest or complete)})
     return line

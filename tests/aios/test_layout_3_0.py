@@ -102,10 +102,11 @@ def diff(a, b):
 
 def bump_to_v3(source, spec=None, roles_path="00_AIOS/company/offer_economics/**", extra=None):
     """The fixture's 3.0: the starter's own seeds at their 3.0 paths, a new seed or two, the
-    folder map in the spec, and the founder lane at its new path."""
+    folder map in the spec, and the founder lane at its new path, with the ownership list in it, as the
+    Starter's role policy has it from 3.1 (owner decision C3)."""
     run_git(source, "rm", "-q", "-r", "--ignore-unmatch", "01_Foundations", "06_Communication", "07_Setup")
     roles = json.loads(json.dumps(harness.ROLES))
-    roles["roles"]["operator"]["paths_denied"] = [roles_path, ".github/**"]
+    roles["roles"]["operator"]["paths_denied"] = [roles_path, ".github/**", ".aios/install.json", ".aios/adoption.json"]
     files = {
         "00_AIOS/company/market_analysis/_workspace.md": "# market\n",
         "00_AIOS/decisions_log.md": "# decisions\n",
@@ -129,6 +130,7 @@ class Layout3(Sandbox):
         # 2.x ships one managed file inside an old folder, like 07_Setup's walkthroughs.
         self.rev2 = harness.bump_source(self.source, {"07_Setup/walkthrough.md": "# setup\n"})
         self.v2 = harness.approve(harness.build_manifest(self.source, self.rev2, "2.10.0"))
+        self.rev2_recorded = util.git(self.source, ["rev-parse", "HEAD"])  # the pin plus its record
         install_mod.install(self.target, self.v2, self.source, harness.config())
         self.client_content()
         self.git_commit("2.10.0 and my work")
@@ -310,7 +312,7 @@ class MapLine(Layout3):
     def test_two_lines_from_one_upgrade_come_off_byte_for_byte(self):
         spec = dict(V3_SPEC, seed_lines=[{"path": "CLAUDE.md", "line": CORE_LINE},
                                          {"path": "CLAUDE.md", "line": MAP_LINE}])
-        harness.run_git(self.source, "reset", "-q", "--hard", self.rev2)
+        harness.run_git(self.source, "reset", "-q", "--hard", self.rev2_recorded)
         rev3 = bump_to_v3(self.source, spec=spec, extra={
             "CLAUDE.md": "# Your AIOS\n\n%s\n%s\n" % (CORE_LINE, MAP_LINE),
             ".aios/operator_core/OPERATOR_CORE.md": "# core\n"})
@@ -422,7 +424,7 @@ class Interrupted(Layout3):
     def test_a_kill_before_the_journal_rolls_nothing_back(self):
         """An upgraded workspace whose 3.0 upgrade dies while planning: rollback must not undo the
         earlier upgrade. Simulated exactly as a kill leaves it: the lock, no journal."""
-        harness.run_git(self.source, "reset", "-q", "--hard", self.rev2)
+        harness.run_git(self.source, "reset", "-q", "--hard", self.rev2_recorded)
         rev = harness.bump_source(self.source, {"START_HERE.md": "# start here\n2.10.1\n"})
         v2b = harness.approve(harness.build_manifest(self.source, rev, "2.10.1"))
         install_mod.upgrade(self.target, v2b, self.source)
@@ -748,7 +750,8 @@ class FounderReview(Layout3):
     enforces code-owner review."""
 
     OLD = "# aios-codeowners-for: acme/acme-aios\n/01_Foundations/offer_economics/ @acme-founder\n/.github/ @acme-founder\n"
-    NEW = "# aios-codeowners-for: acme/acme-aios\n/00_AIOS/company/offer_economics/ @acme-founder\n/.github/ @acme-founder\n"
+    NEW = ("# aios-codeowners-for: acme/acme-aios\n/00_AIOS/company/offer_economics/ @acme-founder\n/.github/ @acme-founder\n"
+           "/.aios/install.json @acme-founder\n/.aios/adoption.json @acme-founder\n")
 
     def setUp(self):
         super(FounderReview, self).setUp()
@@ -962,7 +965,7 @@ class SeedLineOnAMovedFile(Layout3):
         target_file = "00_AIOS/company/market_analysis/_workspace.md"
         spec = dict(V3_SPEC, seed_lines=[{"path": "CLAUDE.md", "line": MAP_LINE},
                                          {"path": target_file, "line": "@00_AIOS/routing.md"}])
-        harness.run_git(self.source, "reset", "-q", "--hard", self.rev2)
+        harness.run_git(self.source, "reset", "-q", "--hard", self.rev2_recorded)
         rev3 = bump_to_v3(self.source, spec=spec, extra={
             target_file: "# market\n\n@00_AIOS/routing.md\n"})
         v3 = harness.approve(harness.build_manifest(self.source, rev3, "3.0.0"))
@@ -1026,12 +1029,35 @@ class SecondReviewRegressions(Layout3):
         self.assertEqual(os.listdir(outside), [])
         self.assertEqual(diff(before, snapshot(self.target)), [])
 
-    def test_r2_2_an_unnamed_lock_is_never_reclaimed(self):
+    def test_r2_2_a_lock_its_holder_is_still_writing_is_never_reclaimed(self):
+        # Round 2 refused every lock that named no process, since its holder might be writing it.
+        # Since round 10 a holder creates and writes its lock under the workspace guard, so a recovery
+        # waits until the name is there; a lock still unnamed after that lost its holder, and is
+        # cleared (3.1 round 11). Here a live holder is still writing its lock when rollback starts.
         self.up()
-        write(self.target, ".aios/lock", "")  # its holder hasn't written its name yet
-        with self.assertRaises(Refusal) as ctx:
-            install_mod.rollback(self.target)
-        self.assertIn("still running", ctx.exception.message)
+        holder = (
+            "import os, sys, time\n"
+            "sys.path.insert(0, %r)\n"
+            "from aioslib import install\n"
+            "with install._RecoveryGuard(%r):\n"
+            "    fd = os.open(%r, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o644)\n"
+            "    print('unnamed', flush=True)\n"
+            "    time.sleep(1.0)\n"
+            "    os.write(fd, ('upgrade pid=%%d at now\\n' %% os.getpid()).encode())\n"
+            "time.sleep(3.0)\n"
+        ) % (harness.AIOS_DIR, self.target, os.path.join(self.target, ".aios", "lock"))
+        proc = subprocess.Popen([sys.executable, "-c", holder], stdout=subprocess.PIPE)
+        try:
+            self.assertEqual(proc.stdout.readline().strip(), b"unnamed")
+            with open(os.path.join(self.target, ".aios/lock")) as fh:
+                self.assertEqual(fh.read(), "")  # unnamed as rollback starts
+            with self.assertRaises(Refusal) as ctx:
+                install_mod.rollback(self.target)
+            self.assertIn("still running", ctx.exception.message)
+            self.assertTrue(os.path.lexists(os.path.join(self.target, ".aios/lock")))
+        finally:
+            proc.wait()
+            proc.stdout.close()
 
     def test_r2_2_a_lock_removes_only_itself(self):
         lock = install_mod._Lock(self.target, "upgrade")
@@ -1042,7 +1068,7 @@ class SecondReviewRegressions(Layout3):
         self.assertTrue(os.path.exists(os.path.join(self.target, ".aios/lock")))
 
     def test_r2_3_a_finished_rollback_killed_before_unlocking_isnt_repeated(self):
-        harness.run_git(self.source, "reset", "-q", "--hard", self.rev2)
+        harness.run_git(self.source, "reset", "-q", "--hard", self.rev2_recorded)
         rev = harness.bump_source(self.source, {"START_HERE.md": "# start here\n2.10.1\n"})
         install_mod.upgrade(self.target, harness.approve(harness.build_manifest(self.source, rev, "2.10.1")),
                             self.source)
@@ -1280,7 +1306,10 @@ class FourthCodexRegressions(Layout3):
 
     def test_r4_1_a_release_may_never_take_over_a_seed(self):
         spec = dict(V3_SPEC, seed=[x for x in V3_SPEC["seed"] if x != "00_AIOS/**"])
+        # 2.10.0's record moves to a tag, off the branch: the release build's own seed check reads the
+        # branch, and this test is about the installer's check when the build's misses.
         harness.run_git(self.source, "reset", "-q", "--hard", self.rev2)
+        harness.build_manifest(self.source, self.rev2, "2.10.0", record="tag")
         rev3 = bump_to_v3(self.source, spec=spec)  # 00_AIOS/company/... is now managed
         v3 = harness.approve(harness.build_manifest(self.source, rev3, "3.0.0"))
         exc = self.refuses_unchanged(self.up, v3)
@@ -1412,7 +1441,9 @@ class FifthCodexRegressions(InstallerReview):
         spec = dict(harness.PACKAGE_SPEC, seed=harness.PACKAGE_SPEC["seed"] + ["notes/x.md"])
         rev1 = harness.bump_source(self.source, {"notes/x.md": "a seed\n",
                                                  "release/package_spec.json": json.dumps(spec)})
-        install_mod.install(self.target, self.v(rev1, "2.10.0"), self.source, harness.config())
+        # 2.10.0's record goes on a tag, off the branch: the release build's own seed check reads the
+        # branch, and this test is about the installer's check when the build's misses.
+        install_mod.install(self.target, self.v(rev1, "2.10.0", record="tag"), self.source, harness.config())
         self.commit_target("2.10.0")
         run_git(self.source, "rm", "-q", "notes/x.md")  # 2.10.1 stops shipping it
         rev2 = harness.bump_source(self.source, {}, "2.10.1")
@@ -1528,7 +1559,7 @@ class SixthCodexRegressions(InstallerReview):
         spec = dict(harness.PACKAGE_SPEC, seed=harness.PACKAGE_SPEC["seed"] + ["Notes/Plan.md"])
         rev1 = harness.bump_source(self.source, {"Notes/Plan.md": "a seed\n",
                                                  "release/package_spec.json": json.dumps(spec)})
-        install_mod.install(self.target, self.v(rev1, "2.10.0"), self.source, harness.config())
+        install_mod.install(self.target, self.v(rev1, "2.10.0", record="tag"), self.source, harness.config())
         os.remove(os.path.join(self.target, "Notes/Plan.md"))
         os.rmdir(os.path.join(self.target, "Notes"))
         self.commit_target("2.10.0, and I deleted the seed")
